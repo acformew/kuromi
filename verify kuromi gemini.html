@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kuromi SMP — Верификация аккаунта</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bg-main: #050308;        
+            --bg-card: rgba(16, 11, 28, 0.55); 
+            --text-main: #ffffff;      
+            --text-muted: #6e6482;     
+            --primary-purple: #8a2be2; 
+            --accent-pink: #ff007f;    
+            --font-sans: 'Inter', sans-serif;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html, body {
+            height: 100%;
+        }
+
+        body {
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            font-family: var(--font-sans);
+            letter-spacing: -0.01em;
+            line-height: 1.4;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            overflow: hidden;
+            
+            background-image: 
+                radial-gradient(circle at 50% 50%, rgba(138, 43, 226, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 90% 10%, rgba(255, 0, 127, 0.05) 0%, transparent 45%);
+            background-attachment: fixed;
+        }
+
+        .verify-container {
+            max-width: 480px;
+            width: 100%;
+            text-align: center;
+            animation: optimizedFadeIn 0.4s ease-out forwards;
+        }
+
+        @keyframes optimizedFadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .logo-text {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--text-main);
+            text-decoration: none;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            line-height: 1;
+            margin-bottom: 30px;
+            display: inline-block;
+        }
+        .logo-text span { color: var(--accent-pink); }
+
+        .ux-panel {
+            background: var(--bg-card);
+            border: 1px solid rgba(255, 255, 255, 0.03);
+            border-radius: 32px; 
+            padding: 45px 35px;
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.04);
+            border-color: rgba(138, 43, 226, 0.15);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+        }
+
+        .status-icon-box {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            line-height: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 80px;
+            transition: all 0.3s ease;
+        }
+
+        .panel-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #fff;
+            margin-bottom: 12px;
+            line-height: 1.3;
+        }
+
+        .status-description {
+            font-size: 0.95rem;
+            color: var(--text-muted);
+            max-width: 360px;
+            line-height: 1.5;
+        }
+
+        .btn-primary {
+            background: var(--primary-purple);
+            color: var(--text-main);
+            border: none;
+            padding: 14px 36px;
+            border-radius: 30px;
+            font-family: var(--font-sans);
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            box-shadow: 0 10px 25px rgba(138, 43, 226, 0.25);
+            transition: all 0.2s ease;
+            margin-top: 25px;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 12px 30px rgba(138, 43, 226, 0.4);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.02);
+            color: var(--text-main);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 12px 28px;
+            border-radius: 30px;
+            font-family: var(--font-sans);
+            font-weight: 600;
+            font-size: 0.88rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .btn-secondary:hover {
+            border-color: var(--accent-pink);
+            background: rgba(255, 0, 127, 0.03);
+        }
+
+        /* Анимация пульсации для загрузки */
+        .pulse {
+            animation: spinnerPulse 1.4s infinite ease-in-out;
+            color: var(--primary-purple);
+        }
+
+        @keyframes spinnerPulse {
+            0%, 100% { transform: scale(0.95); opacity: 0.5; }
+            50% { transform: scale(1.05); opacity: 1; }
+        }
+    </style>
+    
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+
+    <div class="verify-container">
+        <div class="logo-text">
+            KUROMI<span>SMP</span>
+        </div>
+        
+        <div class="ux-panel">
+            <div id="status-icon" class="status-icon-box pulse">⏳</div>
+            <h2 id="status-text" class="panel-title">Синхронизация шлюза</h2>
+            <div id="details-container" style="width: 100%; display: flex; flex-direction: column; align-items: center;">
+                <p class="status-description">Инициализация безопасного подключения к Supabase Engine...</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const SUPABASE_URL = 'https://cfetfasggtlwgknlqjdb.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNmZXRmYXNnZ3Rsd2drbmxxamRiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIzMzA5NDEsImV4cCI6MjA5NzkwNjk0MX0.wtavat05QxSnPlhuMQU4TSp48VEodNdajEISEH2FKMk';
+
+        const { createClient } = window.supabase;
+        const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        async function runVerificationProcess() {
+            const statusIcon = document.getElementById('status-icon');
+            const statusText = document.getElementById('status-text');
+            const detailsContainer = document.getElementById('details-container');
+
+            const params = new URLSearchParams(window.location.search);
+            const minecraftUuid = params.get('mc_uuid');
+            const minecraftName = params.get('mc_name') || 'Unknown';
+
+            try {
+                // Шаг 1 — Проверка текущей сессии
+                const { data: { session }, error: sessionError } = await supabaseClient.auth.getSession();
+                if (sessionError) throw sessionError;
+
+                // Если сессии нет — запускаем процесс Discord OAuth авторизации
+                if (!session || !session.user) {
+                    if (!minecraftUuid) {
+                        renderErrorState("Критическая ошибка конфигурации: В URL-адресе отсутствует индентификатор 'mc_uuid'. Пожалуйста, зайдите на сервер и сгенерируйте ссылку повторно.");
+                        return;
+                    }
+                    
+                    statusText.innerText = "Авторизация в Discord";
+                    detailsContainer.innerHTML = `<p class="status-description">Для верификации вашего Minecraft-аккаунта необходимо войти через ваш профиль Discord.</p>`;
+                    
+                    // Перенаправление обратно на эту же страницу с сохранением параметров майнкрафта
+                    const currentCleanUrl = window.location.origin + window.location.pathname;
+                    const savedRedirectTarget = `${currentCleanUrl}?mc_uuid=${minecraftUuid}&mc_name=${encodeURIComponent(minecraftName)}`;
+
+                    // Небольшая задержка для плавного UX перед редиректом
+                    setTimeout(async () => {
+                        const { error: oauthError } = await supabaseClient.auth.signInWithOAuth({
+                            provider: 'discord',
+                            options: {
+                                redirectTo: savedRedirectTarget
+                            }
+                        });
+                        if (oauthError) renderErrorState("Сбой OAuth шлюза Supabase: " + oauthError.message);
+                    }, 800);
+                    return;
+                }
+
+                // Сессия успешна найдена, проверяем наличие mc_uuid
+                if (!minecraftUuid) {
+                    renderInfoState(session.user);
+                    return;
+                }
+
+                // Извлекаем метаданные Discord
+                const user = session.user;
+                const discordId = user.user_metadata.provider_id || user.id;
+                const discordName = user.user_metadata.full_name || user.user_metadata.name || 'Discord User';
+
+                statusText.innerText = "Регистрация связи";
+                detailsContainer.innerHTML = `<p class="status-description">Проверка базы данных связанных аккаунтов на совпадения...</p>`;
+
+                // Проверяем, нет ли уже линкованной записи для данного minecraft_uuid
+                const { data: existingLink, error: checkError } = await supabaseClient
+                    .from('linked_accounts')
+                    .select('discord_id, minecraft_name')
+                    .eq('minecraft_uuid', minecraftUuid)
+                    .maybeSingle();
+
+                if (checkError) throw checkError;
+
+                if (existingLink) {
+                    if (existingLink.discord_id === discordId) {
+                        renderSuccessState(discordName, existingLink.minecraft_name || minecraftName);
+                    } else {
+                        renderErrorState(`Данный Minecraft-аккаунт уже жёстко привязан к другому пользователю Discord. Если это ошибка — обратитесь к Администрации Kuromi SMP.`);
+                    }
+                    return;
+                }
+
+                // Если записи нет — производим безопасную вставку в таблицу linked_accounts
+                const { error: insertError } = await supabaseClient
+                    .from('linked_accounts')
+                    .insert({
+                        discord_id: discordId,
+                        minecraft_uuid: minecraftUuid,
+                        minecraft_name: minecraftName
+                    });
+
+                if (insertError) throw insertError;
+
+                // Успешное завершение привязки
+                renderSuccessState(discordName, minecraftName);
+
+            } catch (err) {
+                console.error('Критический сбой подсистемы авторизации:', err);
+                renderErrorState(err.message || "Не удалось завершить транзакцию связи аккаунтов из-за внутренней ошибки сети.");
+            }
+        }
+
+        function renderErrorState(message) {
+            const icon = document.getElementById('status-icon');
+            icon.innerHTML = "❌";
+            icon.classList.remove('pulse');
+            icon.style.color = "var(--accent-pink)";
+            icon.style.filter = "drop-shadow(0 0 10px rgba(255,0,127,0.3))";
+            
+            document.getElementById('status-text').innerText = "Ошибка верификации";
+            document.getElementById('details-container').innerHTML = `
+                <p class="status-description" style="margin-bottom: 20px;">${message}</p>
+                <a href="https://kuromiromimi.netlify.app" class="btn-secondary">Вернуться на сайт</a>
+            `;
+        }
+
+        function renderSuccessState(discordName, minecraftName) {
+            const icon = document.getElementById('status-icon');
+            icon.innerHTML = "✅";
+            icon.classList.remove('pulse');
+            icon.style.color = "#2ecc71";
+            icon.style.filter = "drop-shadow(0 0 12px rgba(46,204,113,0.3))";
+
+            document.getElementById('status-text').innerText = "Аккаунт успешно привязан!";
+            document.getElementById('details-container').innerHTML = `
+                <div style="display: flex; flex-direction: column; align-items: center; gap: 14px; margin-top: 10px; width: 100%;">
+                    <div style="display: flex; align-items: center; gap: 12px; background: rgba(255,255,255,0.02); padding: 14px 22px; border-radius: 18px; border: 1px solid rgba(255,255,255,0.04); width: 100%; justify-content: center; box-shadow: inset 0 1px 0 rgba(255,255,255,0.02);">
+                        <span style="font-weight: 600; color: #fff; font-size: 1.05rem;">🎮 ${minecraftName}</span>
+                        <span style="color: var(--text-muted); font-size: 0.85rem;">↔️</span>
+                        <span style="font-weight: 600; color: #b388ff; font-size: 1.05rem;">📱 ${discordName}</span>
+                    </div>
+                    <p class="status-description" style="font-size: 0.88rem; max-width: 380px;">Синхронизация завершена. Вы можете закрыть текущую вкладку браузера и беспрепятственно зайти на игровой сервер.</p>
+                    <a href="https://kuromiromimi.netlify.app" class="btn-primary" style="margin-top: 5px;">Личный Кабинет</a>
+                </div>
+            `;
+        }
+
+        function renderInfoState(user) {
+            const icon = document.getElementById('status-icon');
+            icon.innerHTML = "👋";
+            icon.classList.remove('pulse');
+            icon.style.color = "var(--primary-purple)";
+
+            const name = user.user_metadata.full_name || user.user_metadata.name || 'Пользователь';
+            document.getElementById('tab-home');
+            document.getElementById('status-text').innerText = "Вы уже вошли!";
+            document.getElementById('details-container').innerHTML = `
+                <p class="status-description" style="margin-bottom: 20px;">Добро пожаловать, ${name}. Сессия Discord активна. Чтобы выполнить привязку аккаунта, зайдите на игровой сервер Kuromi SMP и перейдите по выданной вам ссылке.</p>
+                <a href="https://kuromiromimi.netlify.app" class="btn-primary" style="margin-top: 0;">На главную страницу</a>
+            `;
+        }
+
+        // Запуск процесса обработки
+        runVerificationProcess();
+    </script>
+</body>
+</html>
