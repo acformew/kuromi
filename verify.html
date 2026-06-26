@@ -267,6 +267,20 @@
                     return;
                 }
 
+                // ПРОВЕРКА ДУБЛИКАТА DISCORD: Проверяем, не привязан ли этот Дискорд уже к какому-то нику
+                const { data: existingDiscordLink, error: discordCheckError } = await supabaseClient
+                    .from('linked_accounts')
+                    .select('minecraft_name')
+                    .eq('discord_id', discordId)
+                    .maybeSingle();
+
+                if (discordCheckError) throw discordCheckError;
+
+                if (existingDiscordLink) {
+                    renderErrorState(`Ваш Discord-аккаунт уже привязан к игроку "${existingDiscordLink.minecraft_name}". Один Дискорд-профиль может удерживать только одну проходку.`);
+                    return;
+                }
+
                 // Если записи нет — производим безопасную вставку в таблицу linked_accounts
                 const { error: insertError } = await supabaseClient
                     .from('linked_accounts')
