@@ -896,13 +896,6 @@
                 <div class="panel-title">Игровые механики сервера</div>
                 <div class="mechanics-grid">
                     <div class="mechanic-card">
-                        <div class="mechanic-img-box"><div class="mechanic-placeholder-icon">🔍</div></div>
-                        <div class="mechanic-text-block">
-                            <h3>CoreProtect Логирование</h3>
-                            <p>Мощный инструмент прозрачности геймплея. Позволяет инспектировать блоки и контейнеры, фиксируя точное время и никнейм игрока, укравшего ресурсы или сломавшего постройку.</p>
-                        </div>
-                    </div>
-                    <div class="mechanic-card">
                         <div class="mechanic-img-box"><div class="mechanic-placeholder-icon">⛓️</div></div>
                         <div class="mechanic-text-block">
                             <h3>Арест и Конвоирование</h3>
@@ -1100,19 +1093,23 @@
             return `${String(d.getDate()).padStart(2, '0')}.${String(d.getMonth() + 1).padStart(2, '0')}.${d.getFullYear()}`;
         }
 
-        function formatLastSeenDate(dateStr) {
-            if (!dateStr) return 'Ещё не заходил';
-            const d = new Date(dateStr);
-            if (isNaN(d.getTime())) return '—';
+        function formatDate(dateStr) {
+            if (!dateStr) return 'Неизвестно';
+            const date = new Date(dateStr);
+            if (isNaN(date.getTime())) return 'Неизвестно';
+            
             const now = new Date();
             const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
             const yesterday = new Date(today);
             yesterday.setDate(yesterday.getDate() - 1);
-            const compareDate = new Date(d.getFullYear(), d.getMonth(), d.getDate());
-
-            if (compareDate.getTime() === today.getTime()) return 'Сегодня';
-            if (compareDate.getTime() === yesterday.getTime()) return 'Вчера';
-            return `${String(d.getDate()).padStart(2, '0')}.${String(d.getMonth() + 1).padStart(2, '0')}.${d.getFullYear()}`;
+            const target = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+            
+            if (target.getTime() === today.getTime()) return 'Сегодня';
+            if (target.getTime() === yesterday.getTime()) return 'Вчера';
+            
+            return String(date.getDate()).padStart(2,'0') + '.' +
+                   String(date.getMonth()+1).padStart(2,'0') + '.' +
+                   date.getFullYear();
         }
 
         function initRouletteGraphic() {
@@ -1324,15 +1321,15 @@
                                     <div style="display: flex; gap: 16px; align-items: flex-start;">
                                         <div style="background: rgba(138, 43, 226, 0.15); color: #b388ff; font-weight: 700; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">2</div>
                                         <div style="color: var(--text-muted); font-size: 0.9rem;">
-                                            <span style="font-weight: 600; color: #fff; display: block; margin-bottom: 2px;">💬 Получи код в чате</span>
-                                            При входе тебе покажут 4-значный код верификации.
+                                            <span style="font-weight: 600; color: #fff; display: block; margin-bottom: 2px;">🔗 Нажми на ссылку в чате</span>
+                                            При входе в чате появится кликабельная ссылка. Нажми на неё — откроется браузер.
                                         </div>
                                     </div>
                                     <div style="display: flex; gap: 16px; align-items: flex-start;">
                                         <div style="background: rgba(138, 43, 226, 0.15); color: #b388ff; font-weight: 700; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">3</div>
-                                        <div>
-                                            <span style="font-weight: 600; color: #fff; display: block; margin-bottom: 8px;">🤖 Отправь код боту</span>
-                                            <a href="https://discord.com/users/151947848780139738" target="_blank" class="btn-primary" style="padding: 8px 18px; font-size: 0.8rem; text-decoration: none;">Открыть KuromiBot</a>
+                                        <div style="color: var(--text-muted); font-size: 0.9rem;">
+                                            <span style="font-weight: 600; color: #fff; display: block; margin-bottom: 2px;">✅ Подтверди вход через Discord</span>
+                                            В браузере нажми 'Разрешить' — аккаунт привяжется автоматически.
                                         </div>
                                     </div>
                                 </div>
@@ -1389,7 +1386,7 @@
                                 <div class="stat-value" style="font-size: 1.4rem; font-weight: 700; color: var(--accent-pink);">${kd}</div>
                             </div>
                         </div>
-                        <div style="text-align: left; margin-top: 20px; font-size: 0.85rem; color: var(--text-muted);">Последний раз онлайн: ${formatLastSeenDate(currentStats.last_seen)}</div>
+                        <div style="text-align: left; margin-top: 20px; font-size: 0.85rem; color: var(--text-muted);">Последний раз онлайн: ${formatDate(currentStats.last_seen)}</div>
                     </div>`;
             } catch (e) {
                 console.error(e);
@@ -1441,13 +1438,53 @@
             const container = document.getElementById('players-list-container');
             if(!container) return;
             try {
+                // Загружаем только игроков, у которых есть запись в linked_accounts
                 const { data, error } = await supabaseClient
-                    .from('player_stats')
-                    .select('*')
-                    .order('playtime_seconds', { ascending: false });
+                    .from('linked_accounts')
+                    .select('minecraft_uuid, minecraft_name');
                 
                 if (error) throw error;
-                loadedPlayers = data || [];
+                
+                if (!data || data.length === 0) {
+                    loadedPlayers = [];
+                    displayPlayers(loadedPlayers);
+                    return;
+                }
+
+                // Догружаем статистику из player_stats для полученных uuids
+                const uuids = data.map(p => p.minecraft_uuid);
+                const { data: stats, error: statsError } = await supabaseClient
+                    .from('player_stats')
+                    .select('minecraft_uuid, playtime_seconds, is_online, last_seen, kills, deaths')
+                    .in('minecraft_uuid', uuids);
+
+                if (statsError) throw statsError;
+
+                // Создаем карту статистики для быстрого доступа
+                const statsMap = {};
+                if (stats) {
+                    stats.forEach(s => {
+                        statsMap[s.minecraft_uuid] = s;
+                    });
+                }
+
+                // Объединяем данные
+                loadedPlayers = data.map(p => {
+                    const playerStats = statsMap[p.minecraft_uuid] || { playtime_seconds: 0, is_online: false, last_seen: null, kills: 0, deaths: 0 };
+                    return {
+                        minecraft_uuid: p.minecraft_uuid,
+                        minecraft_name: p.minecraft_name,
+                        playtime_seconds: playerStats.playtime_seconds,
+                        is_online: playerStats.is_online,
+                        last_seen: playerStats.last_seen,
+                        kills: playerStats.kills,
+                        deaths: playerStats.deaths
+                    };
+                });
+
+                // Сортируем игроков по времени онлайна по убыванию
+                loadedPlayers.sort((a, b) => b.playtime_seconds - a.playtime_seconds);
+
                 displayPlayers(loadedPlayers);
             } catch (e) {
                 console.error(e);
@@ -1551,7 +1588,7 @@
                     </div>
                     
                     <div style="font-size: 0.85rem; color: var(--text-muted); text-align: left; border-top: 1px solid rgba(255,255,255,0.04); padding-top: 15px;">
-                        Последний раз онлайн: <span style="color: #fff; font-weight: 600;">${formatLastSeenDate(player.last_seen)}</span>
+                        Последний раз онлайн: <span style="color: #fff; font-weight: 600;">${formatDate(player.last_seen)}</span>
                     </div>
                 </div>
             `;
@@ -1570,6 +1607,7 @@
             
             if(tabName === 'donate') initRouletteGraphic();
             if(tabName === 'profile') loadProfileData();
+            if(tabName === 'players') renderPlayersList();
 
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
@@ -1688,27 +1726,27 @@
         });
 
         async function updateServerStatus() {
-            const serverIp = 'play.hypixel.net'; 
-            const url = `https://api.mcsrvstat.us/2/${serverIp}`;
-
             try {
-                const response = await fetch(url);
+                const response = await fetch(
+                    'https://api.mcsrvstat.us/3/play.kuromismp.ru'
+                );
                 const data = await response.json();
-                const countElement = document.getElementById('online-count');
-                const barElement = document.getElementById('online-bar');
-
+                
+                const onlineEl = document.getElementById('online-count');
+                const barEl = document.getElementById('online-bar');
+                
                 if (data.online) {
-                    const current = data.players.online;
-                    const max = 150; 
-                    countElement.innerText = `${current} / ${max}`;
-                    const percentage = Math.min((current / max) * 100, 100);
-                    barElement.style.width = `${percentage}%`;
+                    const current = data.players?.online ?? 0;
+                    const max = data.players?.max ?? 150;
+                    if (onlineEl) onlineEl.textContent = current + ' / ' + max;
+                    if (barEl) barEl.style.width = Math.min((current/max)*100, 100) + '%';
                 } else {
-                    countElement.innerText = 'OFFLINE';
-                    barElement.style.width = '0%';
+                    if (onlineEl) onlineEl.textContent = 'Офлайн';
+                    if (barEl) barEl.style.width = '0%';
                 }
-            } catch (error) {
-                document.getElementById('online-count').innerText = 'ERROR';
+            } catch (e) {
+                const onlineEl = document.getElementById('online-count');
+                if (onlineEl) onlineEl.textContent = 'Недоступен';
             }
         }
 
