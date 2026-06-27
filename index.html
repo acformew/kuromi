@@ -784,7 +784,7 @@
 
                 <div class="cta-group">
                     <button class="btn-primary" onclick="switchTab('join')">Начать выживание →</button>
-                    <button class="btn-secondary" id="server-ip" onclick="copyIp('kuromismp.20tps.ru')">kuromismp.20tps.ru</button>
+                    <button class="btn-secondary" id="server-ip" onclick="copyIp('play.kuromismp.ru')">play.kuromismp.ru</button>
                 </div>
             </div>
 
@@ -1284,7 +1284,7 @@
 
                 const { data: linkedData, error: linkedError } = await supabaseClient
                     .from('linked_accounts')
-                    .select('minecraft_uuid, minecraft_name')
+                    .select('minecraft_uuid, minecraft_name, created_at')
                     .eq('discord_id', discordId)
                     .maybeSingle();
 
@@ -1316,8 +1316,8 @@
                                         <div style="color: var(--text-muted); font-size: 0.9rem;">
                                             <span style="font-weight: 600; color: #fff; display: block; margin-bottom: 2px;">🔗 Нажми на ссылку в чате</span>
                                             При входе в чате появится кликабельная ссылка. Нажми на неё — откроется браузер.
-                        </div>
-                    </div>
+                                        </div>
+                                    </div>
                                     <div style="display: flex; gap: 16px; align-items: flex-start;">
                                         <div style="background: rgba(138, 43, 226, 0.15); color: #b388ff; font-weight: 700; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">3</div>
                                         <div style="color: var(--text-muted); font-size: 0.9rem;">
@@ -1356,7 +1356,7 @@
                                 <div style="text-align: left;">
                                     <h2 style="font-size: 1.5rem; font-weight: 700; color: #fff;">${linkedData.minecraft_name}</h2>
                                     <div style="font-size: 0.85rem; color: var(--text-muted); margin-top: 4px;">Discord: ${discordUsername}</div>
-                                    <div style="font-size: 0.82rem; color: #b388ff; margin-top: 4px;">На сервере с ${formatDate(currentStats.first_join)}</div>
+                                    <div style="font-size: 0.82rem; color: #b388ff; margin-top: 4px;">На сервере с ${formatDate(linkedData.created_at)}</div>
                                 </div>
                             </div>
                             <button class="btn-secondary" style="padding: 8px 16px; font-size: 0.8rem;" onclick="handleSignOut()">Выйти</button>
@@ -1711,28 +1711,29 @@
         });
 
         async function updateServerStatus() {
-    try {
-        const { data, error } = await supabaseClient
-            .from('player_stats')
-            .select('minecraft_name', { count: 'exact' })
-            .eq('is_online', true);
-
-        const onlineEl = document.getElementById('online-count');
-        const barEl = document.getElementById('online-bar');
-        
-        if (!error) {
-            const current = data ? data.length : 0;
-            const max = 150;
-            if (onlineEl) onlineEl.textContent = current + ' / ' + max;
-            if (barEl) barEl.style.width = Math.min((current / max) * 100, 100) + '%';
-        } else {
-            if (onlineEl) onlineEl.textContent = '0 / 150';
+            try {
+                const response = await fetch(
+                    'https://api.mcsrvstat.us/3/play.kuromismp.ru'
+                );
+                const data = await response.json();
+                
+                const onlineEl = document.getElementById('online-count');
+                const barEl = document.getElementById('online-bar');
+                
+                if (data.online) {
+                    const current = data.players?.online ?? 0;
+                    const max = data.players?.max ?? 150;
+                    if (onlineEl) onlineEl.textContent = current + ' / ' + max;
+                    if (barEl) barEl.style.width = Math.min((current/max)*100, 100) + '%';
+                } else {
+                    if (onlineEl) onlineEl.textContent = 'Офлайн';
+                    if (barEl) barEl.style.width = '0%';
+                }
+            } catch (e) {
+                const onlineEl = document.getElementById('online-count');
+                if (onlineEl) onlineEl.textContent = 'Недоступен';
+            }
         }
-    } catch (e) {
-        const onlineEl = document.getElementById('online-count');
-        if (onlineEl) onlineEl.textContent = '0 / 150';
-    }
-}
 
         renderPlayersList();
         updateServerStatus();
