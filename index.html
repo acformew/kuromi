@@ -746,6 +746,47 @@
         @media (max-width: 480px) {
             .stats-grid { grid-template-columns: 1fr; }
         }
+
+        /* Стили для виджета кошелька */
+        #wallet-widget {
+            background: var(--bg-card);
+            border: 1px solid rgba(138, 43, 226, 0.3);
+            padding: 12px 14px;
+            border-radius: 22px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: #fff;
+            margin-bottom: 10px;
+            transition: all 0.2s ease;
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
+        }
+        #wallet-widget:hover {
+            border-color: var(--accent-pink);
+            background: rgba(255, 0, 127, 0.04);
+            transform: translateY(-1px);
+        }
+        
+        /* Стили кастомного скроллбара для истории транзакций внутри модалки */
+        .wallet-scroll::-webkit-scrollbar {
+            width: 4px;
+        }
+        .wallet-scroll::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.01);
+        }
+        .wallet-scroll::-webkit-scrollbar-thumb {
+            background: rgba(138, 43, 226, 0.3);
+            border-radius: 4px;
+        }
+        .wallet-scroll::-webkit-scrollbar-thumb:hover {
+            background: var(--accent-pink);
+        }
     </style>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
@@ -1346,7 +1387,18 @@
                 const currentStats = stats || { playtime_seconds: 0, deaths: 0, kills: 0, last_seen: null, first_join: null };
                 const kd = currentStats.deaths > 0 ? (currentStats.kills / currentStats.deaths).toFixed(2) : currentStats.kills + ".0";
 
-                headerWidget.innerHTML = `<div class="widget-user-card" onclick="switchTab('profile')"><img src="https://mc-heads.net/avatar/${linkedData.minecraft_name}/44" class="widget-avatar"><div class="widget-name">${linkedData.minecraft_name}</div><div class="widget-status-text" style="color: var(--accent-pink);">● Профиль</div></div>`;
+                headerWidget.innerHTML = `
+                    <div id="wallet-widget" onclick="openWalletModal('${linkedData.minecraft_uuid}')">
+                        💎 <span id="wallet-balance-display">0</span>
+                    </div>
+                    <div class="widget-user-card" onclick="switchTab('profile')">
+                        <img src="https://mc-heads.net/avatar/${linkedData.minecraft_name}/44" class="widget-avatar">
+                        <div class="widget-name">${linkedData.minecraft_name}</div>
+                        <div class="widget-status-text" style="color: var(--accent-pink);">● Профиль</div>
+                    </div>
+                `;
+                
+                loadWalletBalance(linkedData.minecraft_uuid);
                 
                 wrapper.innerHTML = `
                     <div style="width: 100%;">
@@ -1711,28 +1763,242 @@
         });
 
         async function updateServerStatus() {
-    try {
-        const { data, error } = await supabaseClient
-            .from('player_stats')
-            .select('minecraft_name', { count: 'exact' })
-            .eq('is_online', true);
+            try {
+                const { data, error } = await supabaseClient
+                    .from('player_stats')
+                    .select('minecraft_name', { count: 'exact' })
+                    .eq('is_online', true);
 
-        const onlineEl = document.getElementById('online-count');
-        const barEl = document.getElementById('online-bar');
-        
-        if (!error) {
-            const current = data ? data.length : 0;
-            const max = 150;
-            if (onlineEl) onlineEl.textContent = current + ' / ' + max;
-            if (barEl) barEl.style.width = Math.min((current / max) * 100, 100) + '%';
-        } else {
-            if (onlineEl) onlineEl.textContent = '0 / 150';
+                const onlineEl = document.getElementById('online-count');
+                const barEl = document.getElementById('online-bar');
+                
+                if (!error) {
+                    const current = data ? data.length : 0;
+                    const max = 150;
+                    if (onlineEl) onlineEl.textContent = current + ' / ' + max;
+                    if (barEl) barEl.style.width = Math.min((current / max) * 100, 100) + '%';
+                } else {
+                    if (onlineEl) onlineEl.textContent = '0 / 150';
+                }
+            } catch (e) {
+                const onlineEl = document.getElementById('online-count');
+                if (onlineEl) onlineEl.textContent = '0 / 150';
+            }
         }
-    } catch (e) {
-        const onlineEl = document.getElementById('online-count');
-        if (onlineEl) onlineEl.textContent = '0 / 150';
-    }
-}
+
+        // Функция загрузки баланса игровой валюты
+        async function loadWalletBalance(uuid) {
+            try {
+                const { data, error } = await supabaseClient
+                    .from('player_stats')
+                    .select('currency_balance')
+                    .eq('minecraft_uuid', uuid)
+                    .maybeSingle();
+                
+                if (error) throw error;
+                const balance = data?.currency_balance ?? 0;
+                
+                const displayEl = document.getElementById('wallet-balance-display');
+                if (displayEl) displayEl.textContent = balance;
+                
+                return balance;
+            } catch (e) {
+                console.error("Ошибка при получении баланса кошелька:", e);
+                return 0;
+            }
+        }
+
+        // Динамическое создание модального окна кошелька
+        async function openWalletModal(uuid) {
+            const oldOverlay = document.getElementById('wallet-modal-overlay');
+            if (oldOverlay) oldOverlay.remove();
+
+            const overlay = document.createElement('div');
+            overlay.id = 'wallet-modal-overlay';
+            overlay.style.position = 'fixed';
+            overlay.style.top = '0';
+            overlay.style.left = '0';
+            overlay.style.width = '100%';
+            overlay.style.height = '100%';
+            overlay.style.background = 'rgba(5, 3, 8, 0.82)';
+            overlay.style.backdropFilter = 'blur(12px)';
+            overlay.style.webkitBackdropFilter = 'blur(12px)';
+            overlay.style.zIndex = '10000';
+            overlay.style.display = 'flex';
+            overlay.style.alignItems = 'center';
+            overlay.style.justifyContent = 'center';
+            overlay.style.padding = '20px';
+            
+            overlay.onclick = function(e) {
+                if (e.target === overlay) overlay.remove();
+            };
+
+            const currentBalance = await loadWalletBalance(uuid);
+
+            overlay.innerHTML = `
+                <div style="background: rgba(16, 11, 28, 0.96); border-radius: 28px; border: 1px solid rgba(138, 43, 226, 0.2); max-width: 440px; width: 100%; padding: 35px 25px; position: relative; box-shadow: 0 25px 60px rgba(0,0,0,0.65); font-family: var(--font-sans); color: #fff;">
+                    <span style="position: absolute; top: 16px; right: 22px; color: var(--text-muted); font-size: 1.7rem; cursor: pointer; font-weight: bold; line-height: 1;" onclick="document.getElementById('wallet-modal-overlay').remove()">&times;</span>
+                    
+                    <h2 style="font-size: 1.4rem; font-weight: 600; margin-bottom: 5px; display: flex; align-items: center; gap: 8px; justify-content: center;">💎 Кошелёк</h2>
+                    
+                    <div style="text-align: center; margin: 22px 0;">
+                        <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.06em; font-weight: 600; margin-bottom: 4px;">Твой баланс</div>
+                        <div style="font-size: 2.2rem; font-weight: 700; color: #fff; display: flex; align-items: center; justify-content: center; gap: 6px;">
+                            ${currentBalance} <span style="font-size: 1.1rem; color: var(--text-muted); font-weight: 500;">валюты</span>
+                        </div>
+                    </div>
+
+                    <div style="display: flex; background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.04); padding: 4px; border-radius: 16px; gap: 4px; margin-bottom: 22px;">
+                        <button id="wtab-overview" style="flex:1; background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.02); color: #fff; padding: 10px; border-radius: 12px; font-family: var(--font-sans); font-size: 0.85rem; font-weight: 500; cursor: pointer; transition: all 0.2s;" onclick="switchWalletTab('overview', '${uuid}')">Обзор</button>
+                        <button id="wtab-history" style="flex:1; background: none; border: none; color: var(--text-muted); padding: 10px; border-radius: 12px; font-family: var(--font-sans); font-size: 0.85rem; font-weight: 500; cursor: pointer; transition: all 0.2s;" onclick="switchWalletTab('history', '${uuid}')">История</button>
+                        <button id="wtab-season" style="flex:1; background: none; border: none; color: var(--text-muted); padding: 10px; border-radius: 12px; font-family: var(--font-sans); font-size: 0.85rem; font-weight: 500; cursor: pointer; transition: all 0.2s;" onclick="switchWalletTab('season', '${uuid}')">Сезон</button>
+                    </div>
+
+                    <div id="wallet-tab-content" class="wallet-scroll" style="max-height: 260px; overflow-y: auto; padding-right: 4px;"></div>
+                </div>
+            `;
+
+            document.body.appendChild(overlay);
+            switchWalletTab('overview', uuid);
+        }
+
+        // Логика переключения содержимого табов в кошельке
+        async function switchWalletTab(tab, uuid) {
+            ['overview', 'history', 'season'].forEach(t => {
+                const btn = document.getElementById(`wtab-${t}`);
+                if (btn) {
+                    if (t === tab) {
+                        btn.style.background = 'rgba(255, 255, 255, 0.04)';
+                        btn.style.border = '1px solid rgba(255, 255, 255, 0.02)';
+                        btn.style.color = '#fff';
+                    } else {
+                        btn.style.background = 'none';
+                        btn.style.border = 'none';
+                        btn.style.color = 'var(--text-muted)';
+                    }
+                }
+            });
+
+            const container = document.getElementById('wallet-tab-content');
+            if (!container) return;
+            container.innerHTML = `<div style="color: var(--text-muted); text-align: center; padding: 30px 0; font-size: 0.9rem;">Загрузка данных...</div>`;
+
+            let transactions = [];
+            if (tab === 'overview' || tab === 'history') {
+                try {
+                    const { data, error } = await supabaseClient
+                        .from('wallet_transactions')
+                        .select('*')
+                        .eq('minecraft_uuid', uuid)
+                        .order('created_at', { ascending: false })
+                        .limit(20);
+                    if (error) throw error;
+                    transactions = data || [];
+                } catch (e) {
+                    console.error(e);
+                    container.innerHTML = `<div style="color: var(--accent-pink); text-align: center; padding: 30px 0; font-size: 0.9rem;">Не удалось загрузить транзакции</div>`;
+                    return;
+                }
+            }
+
+            if (tab === 'history') {
+                if (transactions.length === 0) {
+                    container.innerHTML = `<div style="color: var(--text-muted); text-align: center; padding: 30px 0; font-size: 0.9rem;">История операций пуста</div>`;
+                    return;
+                }
+
+                let html = `<div style="display: flex; flex-direction: column; gap: 10px;">`;
+                transactions.forEach(tx => {
+                    const isIn = tx.direction === 'in';
+                    const color = isIn ? '#2ecc71' : 'var(--accent-pink)';
+                    const badge = isIn ? '💵' : '🛒';
+                    const sign = isIn ? '+' : '-';
+                    
+                    html += `
+                        <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(255,255,255,0.01); border: 1px solid rgba(255,255,255,0.03); padding: 12px; border-radius: 14px;">
+                            <div style="display: flex; align-items: center; gap: 10px; text-align: left; overflow: hidden;">
+                                <span style="font-size: 1.1rem; flex-shrink: 0;">${badge}</span>
+                                <div style="overflow: hidden;">
+                                    <div style="font-size: 0.85rem; font-weight: 500; color: #fff; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">${tx.description || 'Операция'}</div>
+                                    <div style="font-size: 0.72rem; color: var(--text-muted); margin-top: 2px;">${formatDate(tx.created_at)}</div>
+                                </div>
+                            </div>
+                            <div style="font-size: 0.9rem; font-weight: 700; color: ${color}; white-space: nowrap; margin-left: 10px;">
+                                ${sign}${tx.amount}
+                            </div>
+                        </div>
+                    `;
+                });
+                html += `</div>`;
+                container.innerHTML = html;
+
+            } else if (tab === 'overview') {
+                if (transactions.length === 0) {
+                    container.innerHTML = `<div style="color: var(--text-muted); text-align: center; padding: 30px 0; font-size: 0.9rem;">Недостаточно данных для анализа структуры</div>`;
+                    return;
+                }
+
+                const structure = {};
+                let overallSum = 0;
+                transactions.forEach(tx => {
+                    const type = tx.type || 'other';
+                    structure[type] = (structure[type] || 0) + tx.amount;
+                    overallSum += tx.amount;
+                });
+
+                const palette = ['#8a2be2', '#ff007f', '#ffb700', '#2ecc71', '#00bcd4'];
+                const keys = Object.keys(structure);
+                
+                let accumulatedAngle = 0;
+                const gradientSectors = [];
+                keys.forEach((keys, index) => {
+                    const color = palette[index % palette.length];
+                    const nextAngle = accumulatedAngle + (structure[keys] / overallSum) * 360;
+                    gradientSectors.push(`${color} ${accumulatedAngle}deg ${nextAngle}deg`);
+                    accumulatedAngle = nextAngle;
+                });
+
+                let html = `
+                    <div style="display: flex; flex-direction: column; align-items: center; gap: 18px; padding: 5px 0;">
+                        <div style="width: 120px; height: 120px; border-radius: 50%; background: conic-gradient(${gradientSectors.join(', ')}); border: 2px solid rgba(255,255,255,0.04); box-shadow: 0 5px 15px rgba(0,0,0,0.3);"></div>
+                        <div style="width: 100%; display: flex; flex-direction: column; gap: 8px;">
+                `;
+
+                keys.forEach((key, index) => {
+                    const color = palette[index % palette.length];
+                    const val = structure[key];
+                    const share = ((val / overallSum) * 100).toFixed(1);
+                    
+                    let friendlyName = key;
+                    if (key === 'deposit') friendlyName = 'Внесение руды';
+                    if (key === 'withdraw') friendlyName = 'Снятие в предметы';
+
+                    html += `
+                        <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.82rem; padding: 8px 12px; background: rgba(255,255,255,0.01); border-radius: 10px; border: 1px solid rgba(255,255,255,0.02);">
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <span style="width: 9px; height: 9px; background: ${color}; border-radius: 50%; display: inline-block;"></span>
+                                <span style="color: #fff; text-transform: capitalize;">${friendlyName}</span>
+                            </div>
+                            <div style="color: var(--text-muted); font-weight: 500;">
+                                <span style="color: #fff; font-weight: 600; margin-right: 4px;">${val}</span> (${share}%)
+                            </div>
+                        </div>
+                    `;
+                });
+
+                html += `</div></div>`;
+                container.innerHTML = html;
+
+            } else if (tab === 'season') {
+                container.innerHTML = `
+                    <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 45px 15px; color: var(--text-muted);">
+                        <div style="font-size: 2.3rem; margin-bottom: 12px; filter: drop-shadow(0 0 10px rgba(255,183,0,0.15));">🔒</div>
+                        <div style="font-size: 0.9rem; font-weight: 600; color: #fff; margin-bottom: 4px;">Раздел временно закрыт</div>
+                        <div style="font-size: 0.8rem; line-height: 1.4; max-width: 280px;">Скоро здесь появится статистика Батл Пасса. Следи за новостями запуска 4-го сезона!</div>
+                    </div>
+                `;
+            }
+        }
 
         renderPlayersList();
         updateServerStatus();
