@@ -2370,7 +2370,8 @@
                     const { error: deleteError } = await supabaseClient
                         .from('forum_likes')
                         .delete()
-                        .eq('id', existingLike.id);
+                        .eq('post_id', postId)
+                        .eq('discord_id', currentUserLinkedData.discord_id);
                     if (deleteError) throw deleteError;
                 } else {
                     const { error: insertError } = await supabaseClient
