@@ -149,14 +149,18 @@
             position: relative;
         }
 
-        .header-profile-widget {
+        /* Единый вертикальный сайдбар для правых элементов */
+        .header-profile-sidebar {
             position: absolute;
             top: 0;
             left: calc(100% + 20px); 
             z-index: 10;
             width: 170px; 
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
         }
-        
+
         .widget-login-btn {
             background: var(--bg-card);
             border: 1px solid rgba(255, 255, 255, 0.04);
@@ -692,11 +696,18 @@
         .snake-header:hover { color: var(--text-main); }
         #snakeCanvas { background: #040208; border: 1px solid rgba(138, 43, 226, 0.15); border-radius: 12px; display: block; margin: 15px auto 0 auto; max-width: 100%; }
 
+        #forum-fixed-btn {
+            width: 100%;
+        }
+
         @media (max-width: 1140px) {
-            .header-profile-widget {
+            .header-profile-sidebar {
                 position: static;
                 width: 100%;
                 margin-bottom: 20px;
+                display: flex;
+                flex-direction: column;
+                gap: 10px;
             }
             .widget-user-card {
                 flex-direction: row !important;
@@ -707,6 +718,9 @@
             .widget-avatar {
                 width: 32px;
                 height: 32px;
+            }
+            #forum-fixed-btn {
+                width: 100%;
             }
         }
 
@@ -738,7 +752,7 @@
             .profile-header-card { flex-direction: column; text-align: center; gap: 16px; }
             .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
             
-            .header-profile-widget { margin-top: 15px; }
+            .header-profile-sidebar { margin-top: 15px; }
 
             .snake-footer-container { display: none !important; }
             body { padding-bottom: 30px; }
@@ -761,7 +775,7 @@
             font-weight: 600;
             font-size: 0.9rem;
             color: #fff;
-            margin-bottom: 10px;
+            width: 100%;
             transition: all 0.2s ease;
             backdrop-filter: blur(16px);
             -webkit-backdrop-filter: blur(16px);
@@ -810,7 +824,11 @@
     </header>
 
     <div class="content-container">
-        <div id="header-profile-auth" class="header-profile-widget"></div>
+        <!-- Вертикальный сайдбар, объединяющий профиль, баланс и кнопку форума -->
+        <div class="header-profile-sidebar">
+            <div id="header-profile-auth" style="display: flex; flex-direction: column; gap: 10px; width: 100%;"></div>
+            <button id="forum-fixed-btn" class="widget-login-btn" onclick="switchTab('forum')">💬 Форум</button>
+        </div>
         
         <main id="section-home" class="content-section active">
             <div class="ux-panel">
@@ -862,7 +880,7 @@
 
         <div id="section-join" class="content-section">
             <div class="ux-panel">
-                <div class="panel-title">Варианты авторизации</div>
+                <div class="panel-title">Варианны авторизации</div>
                 <div class="join-row">
                     <div class="ticket-card">
                         <div class="ticket-info">
@@ -1076,6 +1094,15 @@
             </div>
         </div>
 
+        <!-- Секция Форума -->
+        <div id="section-forum" class="content-section">
+            <div class="ux-panel">
+                <div class="panel-title">💬 Форум сообщества</div>
+                <div id="forum-form-container" style="width: 100%; margin-bottom: 30px;"></div>
+                <div id="forum-feed-container" style="width: 100%; display: flex; flex-direction: column; gap: 20px;"></div>
+            </div>
+        </div>
+
         <div class="snake-footer-container">
             <div class="snake-header" onclick="toggleSnakeGame()">
                 <span>Вы серьезно добавили сюда змейку?..</span>
@@ -1100,6 +1127,11 @@
         const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
         let loadedPlayers = [];
+        
+        // Глобальное состояние текущей сессии
+        let currentUserSession = null;
+        let currentUserLinkedData = null; 
+        let isUserModerator = false;
 
         const roulettePrizes = [
             { text: '💀 Смерть', weight: 16.0, color: '#8a2be2' },       
@@ -1298,13 +1330,16 @@
             const wrapper = document.getElementById('profile-main-wrapper');
             const headerWidget = document.getElementById('header-profile-auth');
             if (!wrapper) return;
-            wrapper.innerHTML = `<div style="color: var(--text-muted);">Загрузка профиля...</div>`;
 
             try {
                 const { data: { session }, error: sessionError } = await supabaseClient.auth.getSession();
                 if (sessionError) throw sessionError;
 
                 if (!session || !session.user) {
+                    currentUserSession = null;
+                    currentUserLinkedData = null;
+                    isUserModerator = false;
+                    
                     headerWidget.innerHTML = `<button class="widget-login-btn" onclick="switchTab('profile')">🔑 Войти в профиль</button>`;
                     wrapper.innerHTML = `
                         <div style="display: flex; flex-direction: column; align-items: center; text-align: center; padding: 20px 0;">
@@ -1313,11 +1348,13 @@
                             </div>
                             <h2 class="panel-title" style="margin-bottom: 12px;">Войди через Discord</h2>
                             <p style="font-size: 0.95rem; color: var(--text-muted); max-width: 440px; line-height: 1.5; margin-bottom: 30px;">Привяжи аккаунт, чтобы открыть профиль и собирать внутриигровую статистику.</p>
-                            <button class="btn-primary" style="background: #5865F2; box-shadow: 0 10px 25px rgba(88,101,242,0.25);" onclick="supabaseClient.auth.signInWithOAuth({ provider: 'discord', options: { redirectTo: 'https://acformew.github.io/kuromi/' } })">Войти через Discord</button>
+                            <button class="btn-primary" style="background: #5865F2; box-shadow: 0 10px 25px rgba(88,101,242,0.25);" onclick="supabaseClient.auth.signInWithOAuth({ provider: 'discord', options: { redirectTo: window.location.origin + window.location.pathname } })">Войти через Discord</button>
                         </div>`;
+                    updateForumForm();
                     return;
                 }
 
+                currentUserSession = session;
                 const user = session.user;
                 const discordId = user.user_metadata.provider_id || user.id;
                 const discordUsername = user.user_metadata.full_name || user.user_metadata.name || 'Discord User';
@@ -1332,6 +1369,9 @@
                 if (linkedError) throw linkedError;
 
                 if (!linkedData) {
+                    currentUserLinkedData = null;
+                    isUserModerator = false;
+                    
                     headerWidget.innerHTML = `<div class="widget-user-card" onclick="switchTab('profile')"><div class="widget-name" style="color: #b388ff;">${discordUsername}</div><div class="widget-status-text">⏳ Нет связи</div></div>`;
                     wrapper.innerHTML = `
                         <div style="width: 100%; text-align: left;">
@@ -1357,8 +1397,8 @@
                                         <div style="color: var(--text-muted); font-size: 0.9rem;">
                                             <span style="font-weight: 600; color: #fff; display: block; margin-bottom: 2px;">🔗 Нажми на ссылку в чате</span>
                                             При входе в чате появится кликабельная ссылка. Нажми на неё — откроется браузер.
-                        </div>
-                    </div>
+                                        </div>
+                                    </div>
                                     <div style="display: flex; gap: 16px; align-items: flex-start;">
                                         <div style="background: rgba(138, 43, 226, 0.15); color: #b388ff; font-weight: 700; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">3</div>
                                         <div style="color: var(--text-muted); font-size: 0.9rem;">
@@ -1373,8 +1413,23 @@
                                 <button class="btn-primary" style="padding: 10px 24px; font-size: 0.85rem;" onclick="loadProfileData()">Обновить статус</button>
                             </div>
                         </div>`;
+                    updateForumForm();
                     return;
                 }
+
+                currentUserLinkedData = {
+                    minecraft_uuid: linkedData.minecraft_uuid,
+                    minecraft_name: linkedData.minecraft_name,
+                    discord_id: discordId
+                };
+
+                const { data: modData } = await supabaseClient
+                    .from('forum_moderators')
+                    .select('*')
+                    .eq('discord_id', discordId)
+                    .maybeSingle();
+                
+                isUserModerator = !!modData;
 
                 const { data: stats, error: statsError } = await supabaseClient
                     .from('player_stats')
@@ -1399,6 +1454,7 @@
                 `;
                 
                 loadWalletBalance(linkedData.minecraft_uuid);
+                updateForumForm();
                 
                 wrapper.innerHTML = `
                     <div style="width: 100%;">
@@ -1441,12 +1497,15 @@
 
         async function handleSignOut() {
             await supabaseClient.auth.signOut();
+            currentUserSession = null;
+            currentUserLinkedData = null;
+            isUserModerator = false;
             loadProfileData();
         }
 
         window.addEventListener('click', function(e) {
             if(window.innerWidth <= 768) return; 
-            if(e.target.closest('#snakeCanvas') || e.target.closest('.snake-footer-container') || e.target.closest('.logo-img-left') || e.target.closest('.header-profile-widget')) return; 
+            if(e.target.closest('#snakeCanvas') || e.target.closest('.snake-footer-container') || e.target.closest('.logo-img-left') || e.target.closest('.header-profile-sidebar') || e.target.closest('#forum-fixed-btn')) return; 
             const particleCount = 10; 
             for (let i = 0; i < particleCount; i++) { createSparkParticle(e.clientX, e.clientY); }
         });
@@ -1645,6 +1704,11 @@
             
             if(tabName === 'donate') initRouletteGraphic();
             if(tabName === 'profile') loadProfileData();
+            if(tabName === 'forum') {
+                loadProfileData().then(() => {
+                    loadForumFeed();
+                });
+            }
 
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
@@ -1951,9 +2015,9 @@
                 
                 let accumulatedAngle = 0;
                 const gradientSectors = [];
-                keys.forEach((keys, index) => {
+                keys.forEach((k, index) => {
                     const color = palette[index % palette.length];
-                    const nextAngle = accumulatedAngle + (structure[keys] / overallSum) * 360;
+                    const nextAngle = accumulatedAngle + (structure[k] / overallSum) * 360;
                     gradientSectors.push(`${color} ${accumulatedAngle}deg ${nextAngle}deg`);
                     accumulatedAngle = nextAngle;
                 });
@@ -1974,7 +2038,7 @@
                     if (key === 'withdraw') friendlyName = 'Снятие в предметы';
 
                     html += `
-                        <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.82rem; padding: 8px 12px; background: rgba(255,255,255,0.01); border-radius: 10px; border: 1px solid rgba(255,255,255,0.02);">
+                        <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.82rem; padding: 8px 12px; background: rgba(255, 255, 255, 0.01); border-radius: 10px; border: 1px solid rgba(255, 255, 255, 0.02);">
                             <div style="display: flex; align-items: center; gap: 8px;">
                                 <span style="width: 9px; height: 9px; background: ${color}; border-radius: 50%; display: inline-block;"></span>
                                 <span style="color: #fff; text-transform: capitalize;">${friendlyName}</span>
@@ -1999,6 +2063,322 @@
                 `;
             }
         }
+
+        /* --- ФУНКЦИОНАЛ ФОРУМА --- */
+
+        function updateForumForm() {
+            const container = document.getElementById('forum-form-container');
+            if (!container) return;
+
+            if (currentUserSession && currentUserLinkedData) {
+                container.innerHTML = `
+                    <div style="width: 100%; background: rgba(255, 255, 255, 0.01); border: 1px solid rgba(255, 255, 255, 0.03); padding: 24px; border-radius: 24px; text-align: left;">
+                        <h3 style="font-size: 1.1rem; font-weight: 600; margin-bottom: 12px; color: #fff;">Поделитесь новостью или мыслями</h3>
+                        <textarea id="forum-post-input" style="width: 100%; height: 110px; background: rgba(0, 0, 0, 0.3); border: 1px solid rgba(255, 255, 255, 0.06); border-radius: 14px; padding: 14px; color: #fff; font-family: var(--font-sans); font-size: 0.95rem; resize: none; outline: none; margin-bottom: 12px; transition: border-color 0.2s;" placeholder="Что происходит на сервере?..." onfocus="this.style.borderColor='var(--primary-purple)'" onblur="this.style.borderColor='rgba(255, 255, 255, 0.06)'"></textarea>
+                        <div style="display: flex; justify-content: flex-end;">
+                            <button class="btn-primary" style="padding: 10px 24px; font-size: 0.85rem;" onclick="createForumPost()">Опубликовать</button>
+                        </div>
+                    </div>
+                `;
+            } else {
+                container.innerHTML = `
+                    <div style="width: 100%; background: rgba(138, 43, 226, 0.02); border: 1px solid rgba(138, 43, 226, 0.15); padding: 20px; border-radius: 20px; text-align: center; color: var(--text-muted); font-size: 0.95rem; font-weight: 500;">
+                        🔒 Войди и привяжи Minecraft, чтобы публиковать посты.
+                    </div>
+                `;
+            }
+        }
+
+        async function loadForumFeed() {
+            const feedContainer = document.getElementById('forum-feed-container');
+            if (!feedContainer) return;
+
+            feedContainer.innerHTML = `<div style="color: var(--text-muted); text-align: center; padding: 30px 0; font-size: 0.95rem;">Синхронизация ленты форума...</div>`;
+
+            try {
+                const { data: posts, error: postsError } = await supabaseClient
+                    .from('forum_posts')
+                    .select('*')
+                    .order('created_at', { ascending: false })
+                    .limit(50);
+
+                if (postsError) throw postsError;
+
+                if (!posts || posts.length === 0) {
+                    feedContainer.innerHTML = `<div style="color: var(--text-muted); text-align: center; padding: 40px 0; font-size: 0.95rem;">На форуме пока пусто. Стань первым, кто создаст обсуждение!</div>`;
+                    return;
+                }
+
+                let likedPostIds = [];
+                if (currentUserLinkedData) {
+                    const { data: likes } = await supabaseClient
+                        .from('forum_likes')
+                        .select('post_id')
+                        .eq('discord_id', currentUserLinkedData.discord_id);
+                    if (likes) likedPostIds = likes.map(l => l.post_id);
+                }
+
+                const postIds = posts.map(p => p.id);
+                const { data: comments, error: commentsError } = await supabaseClient
+                    .from('forum_comments')
+                    .select('*')
+                    .in('post_id', postIds)
+                    .order('created_at', { ascending: true });
+
+                if (commentsError) throw commentsError;
+
+                const commentsByPost = {};
+                if (comments) {
+                    comments.forEach(c => {
+                        if (!commentsByPost[c.post_id]) commentsByPost[c.post_id] = [];
+                        commentsByPost[c.post_id].push(c);
+                    });
+                }
+
+                feedContainer.innerHTML = '';
+
+                posts.forEach(post => {
+                    const postComments = commentsByPost[post.id] || [];
+                    const isLiked = likedPostIds.includes(post.id);
+                    const activeLikeColor = isLiked ? 'var(--accent-pink)' : 'var(--text-muted)';
+                    const activeLikeBg = isLiked ? 'rgba(255, 0, 127, 0.05)' : 'rgba(255, 255, 255, 0.01)';
+
+                    const deleteBtnHtml = isUserModerator ? `
+                        <button style="background: rgba(255, 0, 127, 0.1); border: 1px solid rgba(255, 0, 127, 0.2); color: var(--accent-pink); padding: 6px 14px; border-radius: 10px; font-family: var(--font-sans); font-size: 0.75rem; cursor: pointer; transition: all 0.2s;" onclick="deletePost(${post.id})">Удалить</button>
+                    ` : '';
+
+                    let commentsListHtml = '';
+                    postComments.forEach(comm => {
+                        const commDeleteBtn = isUserModerator ? `
+                            <span style="color: var(--accent-pink); cursor: pointer; font-size: 0.75rem; margin-left: auto;" onclick="deleteComment(${comm.id})">Удалить</span>
+                        ` : '';
+
+                        commentsListHtml += `
+                            <div style="display: flex; gap: 12px; background: rgba(0, 0, 0, 0.15); padding: 12px; border-radius: 14px; border: 1px solid rgba(255,255,255,0.02); align-items: flex-start; margin-bottom: 8px;">
+                                <img src="https://mc-heads.net/avatar/${comm.minecraft_name}/28" style="width: 28px; height: 28px; image-rendering: pixelated; border-radius: 6px; flex-shrink: 0;">
+                                <div style="display: flex; flex-direction: column; text-align: left; width: 100%; overflow: hidden;">
+                                    <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap; width: 100%;">
+                                        <span style="font-size: 0.8rem; font-weight: 600; color: #fff;">${comm.minecraft_name}</span>
+                                        <span style="font-size: 0.7rem; color: var(--text-muted);">${formatDate(comm.created_at)}</span>
+                                        ${commDeleteBtn}
+                                    </div>
+                                    <div style="font-size: 0.85rem; color: rgba(255, 255, 255, 0.85); margin-top: 4px; word-break: break-word; line-height: 1.4;">${comm.content}</div>
+                                </div>
+                            </div>
+                        `;
+                    });
+
+                    let commentInputFormHtml = '';
+                    if (currentUserSession && currentUserLinkedData) {
+                        commentInputFormHtml = `
+                            <div style="display: flex; gap: 10px; margin-top: 15px; border-top: 1px solid rgba(255,255,255,0.04); padding-top: 15px;">
+                                <input type="text" id="comment-input-${post.id}" style="flex: 1; background: rgba(0,0,0,0.25); border: 1px solid rgba(255,255,255,0.05); border-radius: 12px; padding: 10px 14px; color: #fff; font-family: var(--font-sans); font-size: 0.88rem; outline: none;" placeholder="Написать ответ...">
+                                <button class="btn-primary" style="padding: 8px 18px; font-size: 0.82rem; border-radius: 12px;" onclick="createComment(${post.id})">Ответить</button>
+                            </div>
+                        `;
+                    } else {
+                        commentInputFormHtml = `
+                            <div style="color: var(--text-muted); font-size: 0.8rem; margin-top: 12px; text-align: center; background: rgba(255,255,255,0.01); padding: 10px; border-radius: 12px; border: 1px dashed rgba(255,255,255,0.03);">
+                                Авторизуйтесь, чтобы участвовать в обсуждении.
+                            </div>
+                        `;
+                    }
+
+                    const card = document.createElement('div');
+                    card.style.width = '100%';
+                    card.style.background = 'rgba(255, 255, 255, 0.01)';
+                    card.style.border = '1px solid rgba(255, 255, 255, 0.02)';
+                    card.style.borderRadius = '24px';
+                    card.style.padding = '24px';
+                    card.style.textAlign = 'left';
+
+                    card.innerHTML = `
+                        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 14px;">
+                            <div style="display: flex; align-items: center; gap: 14px;">
+                                <img src="https://mc-heads.net/avatar/${post.minecraft_name}/40" style="width: 40px; height: 40px; image-rendering: pixelated; border-radius: 8px; border: 1px solid rgba(255,255,255,0.04);">
+                                <div>
+                                    <h4 style="font-size: 0.98rem; font-weight: 600; color: #fff;">${post.minecraft_name}</h4>
+                                    <span style="font-size: 0.75rem; color: var(--text-muted);">${formatDate(post.created_at)}</span>
+                                </div>
+                            </div>
+                            ${deleteBtnHtml}
+                        </div>
+                        <p style="font-size: 0.94rem; color: rgba(255,255,255,0.9); line-height: 1.55; white-space: pre-wrap; word-break: break-word; margin-bottom: 20px;">${post.content}</p>
+                        
+                        <div style="display: flex; gap: 12px; align-items: center;">
+                            <button style="display: flex; align-items: center; gap: 8px; background: ${activeLikeBg}; border: 1px solid rgba(255,255,255,0.03); color: ${activeLikeColor}; padding: 8px 16px; border-radius: 14px; font-family: var(--font-sans); font-size: 0.85rem; font-weight: 600; cursor: pointer; transition: all 0.2s;" onclick="toggleLike(${post.id})">
+                                ❤️ <span>${post.likes_count ?? 0}</span>
+                            </button>
+                            <button style="display: flex; align-items: center; gap: 8px; background: rgba(255,255,255,0.01); border: 1px solid rgba(255,255,255,0.03); color: var(--text-muted); padding: 8px 16px; border-radius: 14px; font-family: var(--font-sans); font-size: 0.85rem; font-weight: 500; cursor: pointer; transition: all 0.2s;" onclick="toggleCommentsDisplay(${post.id})">
+                                Answer 💬 (<span>${postComments.length}</span>)
+                            </button>
+                        </div>
+
+                        <div id="comments-container-${post.id}" style="display: none; background: rgba(5, 3, 8, 0.4); border-radius: 18px; padding: 16px; border: 1px solid rgba(255,255,255,0.02); margin-top: 14px;">
+                            <div id="comments-list-${post.id}" style="max-height: 280px; overflow-y: auto; padding-right: 4px;" class="wallet-scroll">
+                                ${commentsListHtml || '<div style="color: var(--text-muted); font-size: 0.82rem; text-align: center; padding: 15px 0;">Комментариев нет. Оставьте свой ответ первым!</div>'}
+                            </div>
+                            ${commentInputFormHtml}
+                        </div>
+                    `;
+                    feedContainer.appendChild(card);
+                });
+            } catch (e) {
+                console.error("Ошибка при генерации ленты форума:", e);
+                feedContainer.innerHTML = `<div style="color: var(--accent-pink); text-align: center; padding: 20px;">Не удалось подгрузить посты форума.</div>`;
+            }
+        }
+
+        function toggleCommentsDisplay(postId) {
+            const el = document.getElementById(`comments-container-${postId}`);
+            if (!el) return;
+            el.style.display = (el.style.display === 'none') ? 'block' : 'none';
+        }
+
+        async function createForumPost() {
+            const textarea = document.getElementById('forum-post-input');
+            if (!textarea) return;
+            const text = textarea.value.trim();
+            if (!text) {
+                alert('Нельзя опубликовать пустое текстовое поле!');
+                return;
+            }
+
+            try {
+                const { error } = await supabaseClient
+                    .from('forum_posts')
+                    .insert({
+                        minecraft_name: currentUserLinkedData.minecraft_name,
+                        minecraft_uuid: currentUserLinkedData.minecraft_uuid,
+                        discord_id: currentUserLinkedData.discord_id,
+                        content: text,
+                        likes_count: 0
+                    });
+
+                if (error) throw error;
+                textarea.value = '';
+                await loadForumFeed();
+            } catch (e) {
+                console.error(e);
+                alert('Не удалось опубликовать запись на форуме.');
+            }
+        }
+
+        async function createComment(postId) {
+            const input = document.getElementById(`comment-input-${postId}`);
+            if (!input) return;
+            const text = input.value.trim();
+            if (!text) {
+                alert('Поле комментария не должно быть пустым!');
+                return;
+            }
+
+            try {
+                const { error } = await supabaseClient
+                    .from('forum_comments')
+                    .insert({
+                        post_id: postId,
+                        minecraft_name: currentUserLinkedData.minecraft_name,
+                        minecraft_uuid: currentUserLinkedData.minecraft_uuid,
+                        discord_id: currentUserLinkedData.discord_id,
+                        content: text
+                    });
+
+                if (error) throw error;
+                input.value = '';
+                await loadForumFeed();
+                
+                const box = document.getElementById(`comments-container-${postId}`);
+                if (box) box.style.display = 'block';
+            } catch (e) {
+                console.error(e);
+                alert('Ошибка при отправке комментария.');
+            }
+        }
+
+        async function toggleLike(postId) {
+            if (!currentUserLinkedData) {
+                alert('Войди и привяжи Minecraft, чтобы ставить лайки!');
+                return;
+            }
+
+            try {
+                const { data: existingLike, error: checkError } = await supabaseClient
+                    .from('forum_likes')
+                    .select('*')
+                    .eq('post_id', postId)
+                    .eq('discord_id', currentUserLinkedData.discord_id)
+                    .maybeSingle();
+
+                if (checkError) throw checkError;
+
+                if (existingLike) {
+                    const { error: deleteError } = await supabaseClient
+                        .from('forum_likes')
+                        .delete()
+                        .eq('id', existingLike.id);
+                    if (deleteError) throw deleteError;
+
+                    const { data: currentPost } = await supabaseClient.from('forum_posts').select('likes_count').eq('id', postId).single();
+                    const nextCount = Math.max(0, (currentPost?.likes_count ?? 1) - 1);
+                    await supabaseClient.from('forum_posts').update({ likes_count: nextCount }).eq('id', postId);
+                } else {
+                    const { error: insertError } = await supabaseClient
+                        .from('forum_likes')
+                        .insert({
+                            post_id: postId,
+                            discord_id: currentUserLinkedData.discord_id
+                        });
+                    if (insertError) throw insertError;
+
+                    const { data: currentPost } = await supabaseClient.from('forum_posts').select('likes_count').eq('id', postId).single();
+                    const nextCount = (currentPost?.likes_count ?? 0) + 1;
+                    await supabaseClient.from('forum_posts').update({ likes_count: nextCount }).eq('id', postId);
+                }
+
+                await loadForumFeed();
+            } catch (e) {
+                console.error(e);
+            }
+        }
+
+        async function deletePost(postId) {
+            if (!confirm('Подтверждаете удаление данного поста?')) return;
+            try {
+                const { error } = await supabaseClient
+                    .from('forum_posts')
+                    .delete()
+                    .eq('id', postId);
+
+                if (error) {
+                    alert('Нет прав на удаление');
+                    throw error;
+                }
+                await loadForumFeed();
+            } catch (e) {
+                console.error(e);
+            }
+        }
+
+        async function deleteComment(commentId) {
+            if (!confirm('Подтверждаете удаление данного комментария?')) return;
+            try {
+                const { error } = await supabaseClient
+                    .from('forum_comments')
+                    .delete()
+                    .eq('id', commentId);
+
+                if (error) {
+                    alert('Нет прав на удаление');
+                    throw error;
+                }
+                await loadForumFeed();
+            } catch (e) {
+                console.error(e);
+            }
+        }
+
+        /* --- КОНЕЦ ФОРУМА --- */
 
         renderPlayersList();
         updateServerStatus();
