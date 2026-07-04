@@ -824,7 +824,6 @@
     </header>
 
     <div class="content-container">
-        <!-- Вертикальный сайдбар, объединяющий профиль, баланс и кнопку форума -->
         <div class="header-profile-sidebar">
             <div id="header-profile-auth" style="display: flex; flex-direction: column; gap: 10px; width: 100%;"></div>
             <button id="forum-fixed-btn" class="widget-login-btn" onclick="switchTab('forum')">💬 Форум</button>
@@ -1094,7 +1093,6 @@
             </div>
         </div>
 
-        <!-- Секция Форума -->
         <div id="section-forum" class="content-section">
             <div class="ux-panel">
                 <div class="panel-title">💬 Форум сообщества</div>
@@ -1632,7 +1630,25 @@
             displayPlayers(filtered);
         }
 
-        function openPlayerModal(player) {
+        async function openPlayerModal(player) {
+            let playerData = { ...player };
+            
+            // Если поля статистики отсутствуют (запрос из элементов форума), догружаем их асинхронно
+            if (playerData.playtime_seconds === undefined || playerData.kills === undefined) {
+                try {
+                    const { data, error } = await supabaseClient
+                        .from('player_stats')
+                        .select('playtime_seconds, deaths, kills, last_seen, is_online')
+                        .eq('minecraft_uuid', playerData.minecraft_uuid)
+                        .maybeSingle();
+                    if (!error && data) {
+                        playerData = { ...playerData, ...data };
+                    }
+                } catch (e) {
+                    console.error("Ошибка при получении полной статистики игрока:", e);
+                }
+            }
+
             const modalOverlay = document.createElement('div');
             modalOverlay.style.position = 'fixed';
             modalOverlay.style.top = '0';
@@ -1654,21 +1670,21 @@
                 }
             };
 
-            const kills = player.kills || 0;
-            const deaths = player.deaths || 0;
+            const kills = playerData.kills || 0;
+            const deaths = playerData.deaths || 0;
             const kd = deaths === 0 ? kills + ".0" : (kills / deaths).toFixed(2);
 
             modalOverlay.innerHTML = `
                 <div style="background: rgba(16, 11, 28, 0.95); border-radius: 28px; border: 1px solid rgba(138, 43, 226, 0.2); max-width: 480px; width: 100%; padding: 40px 30px; position: relative; box-shadow: 0 20px 50px rgba(0,0,0,0.6); text-align: center; font-family: var(--font-sans);">
                     <span style="position: absolute; top: 20px; right: 25px; color: var(--text-muted); font-size: 1.8rem; cursor: pointer; font-weight: bold; line-height: 1;" onclick="this.parentElement.parentElement.remove()">&times;</span>
                     
-                    <img src="https://mc-heads.net/avatar/${player.minecraft_name}/80" style="image-rendering:pixelated; border-radius:12px; width:80px; height:80px; margin-bottom: 15px; border: 2px solid var(--primary-purple); box-shadow: 0 0 15px rgba(138, 43, 226, 0.15);">
-                    <h2 style="font-size: 1.8rem; font-weight: 700; color: #fff; margin-bottom: 25px;">${player.minecraft_name}</h2>
+                    <img src="https://mc-heads.net/avatar/${playerData.minecraft_name}/80" style="image-rendering:pixelated; border-radius:12px; width:80px; height:80px; margin-bottom: 15px; border: 2px solid var(--primary-purple); box-shadow: 0 0 15px rgba(138, 43, 226, 0.15);">
+                    <h2 style="font-size: 1.8rem; font-weight: 700; color: #fff; margin-bottom: 25px;">${playerData.minecraft_name}</h2>
                     
                     <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; width: 100%; margin-bottom: 25px;">
                         <div style="background: rgba(255,255,255,0.01); border: 1px solid rgba(255,255,255,0.03); border-radius: 20px; padding: 16px; text-align: left;">
                             <div style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 4px;">⏱ Время онлайна</div>
-                            <div style="font-size: 1.3rem; font-weight: 700; color: #fff;">${formatPlaytime(player.playtime_seconds)}</div>
+                            <div style="font-size: 1.3rem; font-weight: 700; color: #fff;">${formatPlaytime(playerData.playtime_seconds)}</div>
                         </div>
                         <div style="background: rgba(255,255,255,0.01); border: 1px solid rgba(255,255,255,0.03); border-radius: 20px; padding: 16px; text-align: left;">
                             <div style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 4px;">💀 Смертей</div>
@@ -1685,7 +1701,7 @@
                     </div>
                     
                     <div style="font-size: 0.85rem; color: var(--text-muted); text-align: left; border-top: 1px solid rgba(255,255,255,0.04); padding-top: 15px;">
-                        Последний раз онлайн: <span style="color: #fff; font-weight: 600;">${formatDate(player.last_seen)}</span>
+                        Последний раз онлайн: <span style="color: #fff; font-weight: 600;">${formatDate(playerData.last_seen)}</span>
                     </div>
                 </div>
             `;
@@ -1850,7 +1866,6 @@
             }
         }
 
-        // Функция загрузки баланса игровой валюты
         async function loadWalletBalance(uuid) {
             try {
                 const { data, error } = await supabaseClient
@@ -1872,7 +1887,6 @@
             }
         }
 
-        // Динамическое создание модального окна кошелька
         async function openWalletModal(uuid) {
             const oldOverlay = document.getElementById('wallet-modal-overlay');
             if (oldOverlay) oldOverlay.remove();
@@ -1926,7 +1940,6 @@
             switchWalletTab('overview', uuid);
         }
 
-        // Логика переключения содержимого табов в кошельке
         async function switchWalletTab(tab, uuid) {
             ['overview', 'history', 'season'].forEach(t => {
                 const btn = document.getElementById(`wtab-${t}`);
@@ -2089,6 +2102,21 @@
             }
         }
 
+        // Вспомогательная функция для сворачивания/разворачивания скрытых комментариев
+        function toggleHiddenComments(postId) {
+            const hidden = document.getElementById(`hidden-comments-${postId}`);
+            const btn = document.getElementById(`toggle-comments-btn-${postId}`);
+            if (!hidden || !btn) return;
+            const isHidden = hidden.style.display === 'none';
+            hidden.style.display = isHidden ? 'block' : 'none';
+            if (isHidden) {
+                btn.textContent = 'Свернуть';
+            } else {
+                const hiddenCount = btn.getAttribute('data-hidden-count');
+                btn.textContent = 'Показать ещё ' + hiddenCount;
+            }
+        }
+
         async function loadForumFeed() {
             const feedContainer = document.getElementById('forum-feed-container');
             if (!feedContainer) return;
@@ -2143,22 +2171,22 @@
                     const activeLikeColor = isLiked ? 'var(--accent-pink)' : 'var(--text-muted)';
                     const activeLikeBg = isLiked ? 'rgba(255, 0, 127, 0.05)' : 'rgba(255, 255, 255, 0.01)';
 
+                    // Исправлен баг синтаксиса UUID (добавлены кавычки в onclick)
                     const deleteBtnHtml = isUserModerator ? `
-                        <button style="background: rgba(255, 0, 127, 0.1); border: 1px solid rgba(255, 0, 127, 0.2); color: var(--accent-pink); padding: 6px 14px; border-radius: 10px; font-family: var(--font-sans); font-size: 0.75rem; cursor: pointer; transition: all 0.2s;" onclick="deletePost(${post.id})">Удалить</button>
+                        <button style="background: rgba(255, 0, 127, 0.1); border: 1px solid rgba(255, 0, 127, 0.2); color: var(--accent-pink); padding: 6px 14px; border-radius: 10px; font-family: var(--font-sans); font-size: 0.75rem; cursor: pointer; transition: all 0.2s;" onclick="deletePost('${post.id}')">Удалить</button>
                     ` : '';
 
-                    let commentsListHtml = '';
-                    postComments.forEach(comm => {
+                    // Функция для сборки разметки отдельного комментария с фиксом клика по аватарке/нику
+                    function renderCommentItem(comm) {
                         const commDeleteBtn = isUserModerator ? `
-                            <span style="color: var(--accent-pink); cursor: pointer; font-size: 0.75rem; margin-left: auto;" onclick="deleteComment(${comm.id})">Удалить</span>
+                            <span style="color: var(--accent-pink); cursor: pointer; font-size: 0.75rem; margin-left: auto;" onclick="deleteComment('${comm.id}')">Удалить</span>
                         ` : '';
-
-                        commentsListHtml += `
+                        return `
                             <div style="display: flex; gap: 12px; background: rgba(0, 0, 0, 0.15); padding: 12px; border-radius: 14px; border: 1px solid rgba(255,255,255,0.02); align-items: flex-start; margin-bottom: 8px;">
-                                <img src="https://mc-heads.net/avatar/${comm.minecraft_name}/28" style="width: 28px; height: 28px; image-rendering: pixelated; border-radius: 6px; flex-shrink: 0;">
+                                <img src="https://mc-heads.net/avatar/${comm.minecraft_name}/28" style="width: 28px; height: 28px; image-rendering: pixelated; border-radius: 6px; flex-shrink: 0; cursor: pointer;" onclick="openPlayerModal({minecraft_uuid: '${comm.minecraft_uuid}', minecraft_name: '${comm.minecraft_name}'})">
                                 <div style="display: flex; flex-direction: column; text-align: left; width: 100%; overflow: hidden;">
                                     <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap; width: 100%;">
-                                        <span style="font-size: 0.8rem; font-weight: 600; color: #fff;">${comm.minecraft_name}</span>
+                                        <span style="font-size: 0.8rem; font-weight: 600; color: #fff; cursor: pointer;" onclick="openPlayerModal({minecraft_uuid: '${comm.minecraft_uuid}', minecraft_name: '${comm.minecraft_name}'})">${comm.minecraft_name}</span>
                                         <span style="font-size: 0.7rem; color: var(--text-muted);">${formatDate(comm.created_at)}</span>
                                         ${commDeleteBtn}
                                     </div>
@@ -2166,14 +2194,36 @@
                                 </div>
                             </div>
                         `;
-                    });
+                    }
+
+                    // Реализация сворачивания комментариев (выводим только первые 2)
+                    let commentsListHtml = '';
+                    if (postComments.length <= 2) {
+                        postComments.forEach(comm => {
+                            commentsListHtml += renderCommentItem(comm);
+                        });
+                    } else {
+                        for (let i = 0; i < 2; i++) {
+                            commentsListHtml += renderCommentItem(postComments[i]);
+                        }
+                        commentsListHtml += `<div id="hidden-comments-${post.id}" style="display: none;">`;
+                        for (let i = 2; i < postComments.length; i++) {
+                            commentsListHtml += renderCommentItem(postComments[i]);
+                        }
+                        commentsListHtml += `</div>`;
+                        commentsListHtml += `
+                            <button id="toggle-comments-btn-${post.id}" data-hidden-count="${postComments.length - 2}" style="background: none; border: none; color: #b388ff; font-family: var(--font-sans); font-size: 0.82rem; font-weight: 600; cursor: pointer; padding: 4px 0; margin-top: 4px; display: block; text-align: left; outline: none;" onclick="toggleHiddenComments('${post.id}')">
+                                Показать ещё ${postComments.length - 2}
+                            </button>
+                        `;
+                    }
 
                     let commentInputFormHtml = '';
                     if (currentUserSession && currentUserLinkedData) {
                         commentInputFormHtml = `
                             <div style="display: flex; gap: 10px; margin-top: 15px; border-top: 1px solid rgba(255,255,255,0.04); padding-top: 15px;">
                                 <input type="text" id="comment-input-${post.id}" style="flex: 1; background: rgba(0,0,0,0.25); border: 1px solid rgba(255,255,255,0.05); border-radius: 12px; padding: 10px 14px; color: #fff; font-family: var(--font-sans); font-size: 0.88rem; outline: none;" placeholder="Написать ответ...">
-                                <button class="btn-primary" style="padding: 8px 18px; font-size: 0.82rem; border-radius: 12px;" onclick="createComment(${post.id})">Ответить</button>
+                                <button class="btn-primary" style="padding: 8px 18px; font-size: 0.82rem; border-radius: 12px;" onclick="createComment('${post.id}')">Ответить</button>
                             </div>
                         `;
                     } else {
@@ -2192,12 +2242,13 @@
                     card.style.padding = '24px';
                     card.style.textAlign = 'left';
 
+                    // Добавлен кликабельный профиль игрока на аватар и ник в постах
                     card.innerHTML = `
                         <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 14px;">
                             <div style="display: flex; align-items: center; gap: 14px;">
-                                <img src="https://mc-heads.net/avatar/${post.minecraft_name}/40" style="width: 40px; height: 40px; image-rendering: pixelated; border-radius: 8px; border: 1px solid rgba(255,255,255,0.04);">
+                                <img src="https://mc-heads.net/avatar/${post.minecraft_name}/40" style="width: 40px; height: 40px; image-rendering: pixelated; border-radius: 8px; border: 1px solid rgba(255,255,255,0.04); cursor: pointer;" onclick="openPlayerModal({minecraft_uuid: '${post.minecraft_uuid}', minecraft_name: '${post.minecraft_name}'})">
                                 <div>
-                                    <h4 style="font-size: 0.98rem; font-weight: 600; color: #fff;">${post.minecraft_name}</h4>
+                                    <h4 style="font-size: 0.98rem; font-weight: 600; color: #fff; cursor: pointer;" onclick="openPlayerModal({minecraft_uuid: '${post.minecraft_uuid}', minecraft_name: '${post.minecraft_name}'})">${post.minecraft_name}</h4>
                                     <span style="font-size: 0.75rem; color: var(--text-muted);">${formatDate(post.created_at)}</span>
                                 </div>
                             </div>
@@ -2206,11 +2257,11 @@
                         <p style="font-size: 0.94rem; color: rgba(255,255,255,0.9); line-height: 1.55; white-space: pre-wrap; word-break: break-word; margin-bottom: 20px;">${post.content}</p>
                         
                         <div style="display: flex; gap: 12px; align-items: center;">
-                            <button style="display: flex; align-items: center; gap: 8px; background: ${activeLikeBg}; border: 1px solid rgba(255,255,255,0.03); color: ${activeLikeColor}; padding: 8px 16px; border-radius: 14px; font-family: var(--font-sans); font-size: 0.85rem; font-weight: 600; cursor: pointer; transition: all 0.2s;" onclick="toggleLike(${post.id})">
+                            <button style="display: flex; align-items: center; gap: 8px; background: ${activeLikeBg}; border: 1px solid rgba(255,255,255,0.03); color: ${activeLikeColor}; padding: 8px 16px; border-radius: 14px; font-family: var(--font-sans); font-size: 0.85rem; font-weight: 600; cursor: pointer; transition: all 0.2s;" onclick="toggleLike('${post.id}')">
                                 ❤️ <span>${post.likes_count ?? 0}</span>
                             </button>
-                            <button style="display: flex; align-items: center; gap: 8px; background: rgba(255,255,255,0.01); border: 1px solid rgba(255,255,255,0.03); color: var(--text-muted); padding: 8px 16px; border-radius: 14px; font-family: var(--font-sans); font-size: 0.85rem; font-weight: 500; cursor: pointer; transition: all 0.2s;" onclick="toggleCommentsDisplay(${post.id})">
-                                Answer 💬 (<span>${postComments.length}</span>)
+                            <button style="display: flex; align-items: center; gap: 8px; background: rgba(255,255,255,0.01); border: 1px solid rgba(255,255,255,0.03); color: var(--text-muted); padding: 8px 16px; border-radius: 14px; font-family: var(--font-sans); font-size: 0.85rem; font-weight: 500; cursor: pointer; transition: all 0.2s;" onclick="toggleCommentsDisplay('${post.id}')">
+                                Ответы 💬 (<span>${postComments.length}</span>)
                             </button>
                         </div>
 
@@ -2296,6 +2347,7 @@
             }
         }
 
+        // Фикс дублирования лайков (удалено ручное обновлениеlikes_count, работу делает триггер БД)
         async function toggleLike(postId) {
             if (!currentUserLinkedData) {
                 alert('Войди и привяжи Minecraft, чтобы ставить лайки!');
@@ -2318,10 +2370,6 @@
                         .delete()
                         .eq('id', existingLike.id);
                     if (deleteError) throw deleteError;
-
-                    const { data: currentPost } = await supabaseClient.from('forum_posts').select('likes_count').eq('id', postId).single();
-                    const nextCount = Math.max(0, (currentPost?.likes_count ?? 1) - 1);
-                    await supabaseClient.from('forum_posts').update({ likes_count: nextCount }).eq('id', postId);
                 } else {
                     const { error: insertError } = await supabaseClient
                         .from('forum_likes')
@@ -2330,10 +2378,6 @@
                             discord_id: currentUserLinkedData.discord_id
                         });
                     if (insertError) throw insertError;
-
-                    const { data: currentPost } = await supabaseClient.from('forum_posts').select('likes_count').eq('id', postId).single();
-                    const nextCount = (currentPost?.likes_count ?? 0) + 1;
-                    await supabaseClient.from('forum_posts').update({ likes_count: nextCount }).eq('id', postId);
                 }
 
                 await loadForumFeed();
