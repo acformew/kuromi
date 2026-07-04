@@ -957,7 +957,7 @@
                         <div class="mechanic-img-box"><div class="mechanic-placeholder-icon">⛓️</div></div>
                         <div class="mechanic-text-block">
                             <h3>Арест и Конвоирование</h3>
-                            <p>Ролевая система задержания нарушителей. Позволяет временно заковать игрока в наручники и конвоировать его за собой на РП-поводке до выяснения обстоятельств администрацией.</p>
+                            <p>Ролевая система задержания нарушителей. Позволяет временно заковать игрока в наручники и конвоировать его за собой на РП-поводке до выяснения обстоятельства администрацией.</p>
                         </div>
                     </div>
                     <div class="mechanic-card">
@@ -1866,6 +1866,7 @@
             }
         }
 
+        // Функция загрузки баланса игровой валюты
         async function loadWalletBalance(uuid) {
             try {
                 const { data, error } = await supabaseClient
@@ -1887,6 +1888,7 @@
             }
         }
 
+        // Динамическое создание модального окна кошелька
         async function openWalletModal(uuid) {
             const oldOverlay = document.getElementById('wallet-modal-overlay');
             if (oldOverlay) oldOverlay.remove();
@@ -1940,6 +1942,7 @@
             switchWalletTab('overview', uuid);
         }
 
+        // Логика переключения содержимого табов в кошельке
         async function switchWalletTab(tab, uuid) {
             ['overview', 'history', 'season'].forEach(t => {
                 const btn = document.getElementById(`wtab-${t}`);
@@ -2171,7 +2174,6 @@
                     const activeLikeColor = isLiked ? 'var(--accent-pink)' : 'var(--text-muted)';
                     const activeLikeBg = isLiked ? 'rgba(255, 0, 127, 0.05)' : 'rgba(255, 255, 255, 0.01)';
 
-                    // Исправлен баг синтаксиса UUID (добавлены кавычки в onclick)
                     const deleteBtnHtml = isUserModerator ? `
                         <button style="background: rgba(255, 0, 127, 0.1); border: 1px solid rgba(255, 0, 127, 0.2); color: var(--accent-pink); padding: 6px 14px; border-radius: 10px; font-family: var(--font-sans); font-size: 0.75rem; cursor: pointer; transition: all 0.2s;" onclick="deletePost('${post.id}')">Удалить</button>
                     ` : '';
@@ -2242,7 +2244,7 @@
                     card.style.padding = '24px';
                     card.style.textAlign = 'left';
 
-                    // Добавлен кликабельный профиль игрока на аватар и ник в постах
+                    // Добавлен кликабельный профиль игрока на аватар и ник в постах, а также ФИКС кавычек для toggleCommentsDisplay
                     card.innerHTML = `
                         <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 14px;">
                             <div style="display: flex; align-items: center; gap: 14px;">
@@ -2347,7 +2349,7 @@
             }
         }
 
-        // Фикс дублирования лайков (удалено ручное обновлениеlikes_count, работу делает триггер БД)
+        // Фикс дублирования лайков + задержка 200мс для корректной работы триггеров БД перед обновлением интерфейса
         async function toggleLike(postId) {
             if (!currentUserLinkedData) {
                 alert('Войди и привяжи Minecraft, чтобы ставить лайки!');
@@ -2380,6 +2382,8 @@
                     if (insertError) throw insertError;
                 }
 
+                // Микро-таймаут для завершения асинхронных операций на стороне СУБД Supabase (PostgreSQL)
+                await new Promise(resolve => setTimeout(resolve, 200));
                 await loadForumFeed();
             } catch (e) {
                 console.error(e);
