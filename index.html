@@ -736,7 +736,7 @@
             header { width: calc(100% - 32px); margin: 25px auto 15px auto; padding: 16px; border-radius: 24px; gap: 14px; }
             
             .donate-layout { flex-direction: column; gap: 24px; }
-            .roulette-wrapper { width: 280px; height: 360px; }
+            .rou roulette-wrapper { width: 280px; height: 360px; }
             .roulette-container { width: 260px; height: 260px; padding: 12px; }
             .roulette-stand { width: 120px; height: 45px; margin-top: -10px; }
             .donate-grid { grid-template-columns: 1fr; }
@@ -978,7 +978,7 @@
                         <div class="mechanic-img-box"><div class="mechanic-placeholder-icon">📰</div></div>
                         <div class="mechanic-text-block">
                             <h3>Газета Kuromi Times</h3>
-                            <p>Информационный вестник сервера. Люгой житель SMP может отправить свою статью или расследование через форму на сайте. Публикация происходит после модерации редакцией.</p>
+                            <p>Информационный вестник сервера. Любой житель SMP может отправить свою статью или расследование через форму на сайте. Публикация происходит после модерации редакцией.</p>
                         </div>
                     </div>
                     <div class="mechanic-card">
@@ -2238,7 +2238,7 @@
                         commentInputFormHtml = `
                             <div style="display: flex; gap: 10px; margin-top: 15px; border-top: 1px solid rgba(255,255,255,0.04); padding-top: 15px;">
                                 <input type="text" id="comment-input-${post.id}" style="flex: 1; background: rgba(0,0,0,0.25); border: 1px solid rgba(255,255,255,0.05); border-radius: 12px; padding: 10px 14px; color: #fff; font-family: var(--font-sans); font-size: 0.88rem; outline: none;" placeholder="Написать ответ...">
-                                <button class="btn-primary" style="padding: 8px 18px; font-size: 0.82rem; border-radius: 12px;" onclick="createComment('${post.id}')">Ответить</button>
+                                <button class="btn-primary" style="padding: 8px 18px; font-size: 0.82rem; border-radius: 12px;" data-action="submit-comment" data-post-id="${post.id}">Ответить</button>
                             </div>
                         `;
                     } else {
@@ -2333,62 +2333,90 @@
             }
         }
 
+        // ПОЛНОСТЬЮ ПЕРЕПИСАННАЯ С НУЛЯ ФУНКЦИЯ ОТПРАВКИ КОММЕНТАРИЕВ
         async function createComment(postId) {
             if (!postId) {
-                console.error("Критическая ошибка: Параметр postId равен undefined или null.");
+                alert("Критическая ошибка: postId отсутствует.");
                 return;
             }
 
-            const commentInputEl = document.getElementById(`comment-input-${postId}`);
-            if (!commentInputEl) {
-                console.error(`Критическая ошибка: Элемент ввода comment-input-${postId} не найден в DOM дереве.`);
+            const inputField = document.getElementById(`comment-input-${postId}`);
+            if (!inputField) {
+                alert(`Критическая ошибка DOM: Поле ввода comment-input-${postId} не найдено.`);
                 return;
             }
 
-            const commentText = commentInputEl.value.trim();
-            if (!commentText) {
-                alert('Поле комментария не должно быть пустым или состоять из одних пробелов!');
+            const rawText = inputField.value;
+            const cleanText = rawText ? rawText.trim() : "";
+            
+            if (!cleanText) {
+                alert("Поле комментария пустое! Напишите текст перед отправкой.");
                 return;
             }
 
-            if (!currentUserLinkedData || !currentUserLinkedData.minecraft_name || !currentUserLinkedData.minecraft_uuid || !currentUserLinkedData.discord_id) {
-                console.error("Попытка отправки комментария без полной структуры currentUserLinkedData:", currentUserLinkedData);
-                alert('Ошибка отправки: Профиль игрока не загружен или отсутствует связь с аккаунтом. Обновите страницу профиля.');
+            if (!currentUserLinkedData) {
+                alert("Вы не авторизованы или данные аккаунта не синхронизированы. Выполните повторный вход в профиль.");
                 return;
             }
+
+            const payload = {
+                post_id: postId,
+                content: cleanText,
+                discord_id: currentUserLinkedData.discord_id,
+                minecraft_uuid: currentUserLinkedData.minecraft_uuid,
+                minecraft_name: currentUserLinkedData.minecraft_name
+            };
 
             try {
-                const { error: insertError } = await supabaseClient
+                const { data, error } = await supabaseClient
                     .from('forum_comments')
-                    .insert([
-                        {
-                            post_id: postId,
-                            content: commentText,
-                            discord_id: currentUserLinkedData.discord_id,
-                            minecraft_uuid: currentUserLinkedData.minecraft_uuid,
-                            minecraft_name: currentUserLinkedData.minecraft_name
-                        }
-                    ]);
+                    .insert([payload])
+                    .select();
 
-                if (insertError) {
-                    console.error("Supabase API Error при выполнении операции INSERT в forum_comments:", insertError);
-                    alert(`Ошибка СУБД/RLS политики: ${insertError.message || 'Запрос отклонен базой данных.'}`);
+                if (error) {
+                    console.error("Supabase API Error:", error);
+                    alert(`Supabase Error [${error.code || 'RLS'}]: ${error.message}`);
                     return;
                 }
 
-                commentInputEl.value = '';
+                inputField.value = '';
 
-                const targetContainer = document.getElementById(`comments-container-${postId}`);
-                if (targetContainer) {
-                    targetContainer.style.display = 'block';
+                const commentBlock = document.getElementById(`comments-container-${postId}`);
+                if (commentBlock) {
+                    commentBlock.style.display = 'block';
                 }
 
                 await loadForumFeed();
 
-            } catch (err) {
-                console.error("Критическое исключение выполнения внутри асинхронного метода createComment:", err);
-                alert('Произошла непредвиденная ошибка на стороне клиента при отправке ответа.');
+            } catch (catchErr) {
+                console.error("Runtime exception inside createComment function:", catchErr);
+                alert(`Внутренний сбой скрипта: ${catchErr.message || catchErr}`);
             }
+        }
+
+        // НАСТРОЙКА ДЕЛЕГИРОВАНИЯ СОБЫТИЙ ДЛЯ ЛЕНТЫ ФОРУМА (УЛЬТИМАТИВНЫЙ ФИКС)
+        const feedElement = document.getElementById('forum-feed-container');
+        if (feedElement) {
+            // Перехват кликов по кнопкам "Ответить"
+            feedElement.addEventListener('click', function(event) {
+                const targetBtn = event.target.closest('button[data-action="submit-comment"]');
+                if (targetBtn) {
+                    event.preventDefault();
+                    const targetPostId = targetBtn.getAttribute('data-post-id');
+                    createComment(targetPostId);
+                }
+            });
+
+            // Перехват нажатия Enter внутри текстовых полей ответов
+            feedElement.addEventListener('keydown', function(event) {
+                if (event.target && event.target.id && event.target.id.startsWith('comment-input-')) {
+                    if (event.key === 'Enter') {
+                        event.preventDefault();
+                        const targetPostId = event.target.id.replace('comment-input-', '');
+                        createComment(targetPostId);
+                    }
+                }
+            });
         }
 
         // Задержка 200мс для корректной работы триггеров БД перед обновлением интерфейса
