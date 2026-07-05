@@ -899,7 +899,7 @@
                         </div>
                         <div>
                             <div class="ticket-price">149 ₽</div>
-                            <button class="btn-primary" style="padding: 10px 20px; font-size: 0.8rem; margin-top: 10px; width: 100%;" onclick="alert('Модуль оплаты настраивается')">В один клик</button>
+                            <button class="btn-primary" style="padding: 10px 20px; font-size: 0.8rem; margin-top: 10px; width: 100%;" onclick="alert('В один клик')">В один клик</button>
                         </div>
                     </div>
 
@@ -957,7 +957,7 @@
                         <div class="mechanic-img-box"><div class="mechanic-placeholder-icon">⛓️</div></div>
                         <div class="mechanic-text-block">
                             <h3>Арест и Конвоирование</h3>
-                            <p>Ролевая система задержания нарушителей. Позволяет временно заковать игрока в наручники и конвоировать его за собой на РП-поводке до выяснения обстоятельства администрацией.</p>
+                            <p>Ролевая система задержания нарушителей. Позволяет временно заковать игрока в наручники и конвоировать его за собой на РП-поводке до выяснения обстоятельств администрацией.</p>
                         </div>
                     </div>
                     <div class="mechanic-card">
@@ -1157,8 +1157,8 @@
             return `${hours}ч ${minutes}м`;
         }
 
-        // 1. УСОВЕРШЕНСТВОВАННАЯ ФУНКЦИЯ ВЫВОДА ВРЕМЕНИ
-        function formatDate(dateStr) {
+        // 1. УСОВЕРШЕНСТВОВАННАЯ ФУНКЦИЯ ДАТЫ С ПАРАМЕТРОМ ВЫВОДА ВРЕМЕНИ
+        function formatDate(dateStr, showTime = true) {
             if (!dateStr) return 'Неизвестно';
             const date = new Date(dateStr);
             if (isNaN(date.getTime())) return 'Неизвестно';
@@ -1171,14 +1171,14 @@
             
             const hours = String(date.getHours()).padStart(2, '0');
             const minutes = String(date.getMinutes()).padStart(2, '0');
-            const timeStr = `${hours}:${minutes}`;
+            const timeStr = showTime ? ` в ${hours}:${minutes}` : '';
             
-            if (target.getTime() === today.getTime()) return `Сегодня в ${timeStr}`;
-            if (target.getTime() === yesterday.getTime()) return `Вчера в ${timeStr}`;
+            if (target.getTime() === today.getTime()) return `Сегодня${timeStr}`;
+            if (target.getTime() === yesterday.getTime()) return `Вчера${timeStr}`;
             
             const dayStr = String(date.getDate()).padStart(2, '0');
             const monthStr = String(date.getMonth() + 1).padStart(2, '0');
-            return `${dayStr}.${monthStr}.${date.getFullYear()} в ${timeStr}`;
+            return `${dayStr}.${monthStr}.${date.getFullYear()}${timeStr}`;
         }
 
         function initRouletteGraphic() {
@@ -1363,6 +1363,15 @@
                 const discordUsername = user.user_metadata.full_name || user.user_metadata.name || 'Discord User';
                 const discordAvatarUrl = user.user_metadata.avatar_url || 'https://cdn.discordapp.com/embed/avatars/0.png';
 
+                // 3. АВТОНОМНАЯ ВЕРИФИКАЦИЯ МОДЕРАТОРА СРАЗУ ПОСЛЕ СЕССИИ DISCORD
+                const { data: modData } = await supabaseClient
+                    .from('forum_moderators')
+                    .select('*')
+                    .eq('discord_id', discordId)
+                    .maybeSingle();
+                
+                isUserModerator = !!modData;
+
                 const { data: linkedData, error: linkedError } = await supabaseClient
                     .from('linked_accounts')
                     .select('minecraft_uuid, minecraft_name')
@@ -1373,7 +1382,6 @@
 
                 if (!linkedData) {
                     currentUserLinkedData = null;
-                    isUserModerator = false;
                     
                     headerWidget.innerHTML = `<div class="widget-user-card" onclick="switchTab('profile')"><div class="widget-name" style="color: #b388ff;">${discordUsername}</div><div class="widget-status-text">⏳ Нет связи</div></div>`;
                     wrapper.innerHTML = `
@@ -1426,14 +1434,6 @@
                     discord_id: discordId
                 };
 
-                const { data: modData } = await supabaseClient
-                    .from('forum_moderators')
-                    .select('*')
-                    .eq('discord_id', discordId)
-                    .maybeSingle();
-                
-                isUserModerator = !!modData;
-
                 const { data: stats, error: statsError } = await supabaseClient
                     .from('player_stats')
                     .select('playtime_seconds, deaths, kills, last_seen, first_join')
@@ -1449,12 +1449,7 @@
                     <div id="wallet-widget" onclick="openWalletModal('${linkedData.minecraft_uuid}')">
                         💎 <span id="wallet-balance-display">0</span>
                     </div>
-                    <div class="widget-user-card" onclick="switchTab('profile')">
-                        <img src="https://mc-heads.net/avatar/${linkedData.minecraft_name}/44" class="widget-avatar">
-                        <div class="widget-name">${linkedData.minecraft_name}</div>
-                        <div class="widget-status-text" style="color: var(--accent-pink);">● Профиль</div>
-                    </div>
-                `;
+                    <div class="widget-user-card" onclick="switchTab('profile')"><img src="https://mc-heads.net/avatar/${linkedData.minecraft_name}/44" class="widget-avatar"><div class="widget-name">${linkedData.minecraft_name}</div><div class="widget-status-text" style="color: var(--accent-pink);">● Профиль</div></div>`;
                 
                 loadWalletBalance(linkedData.minecraft_uuid);
                 updateForumForm();
@@ -1467,7 +1462,7 @@
                                 <div style="text-align: left;">
                                     <h2 style="font-size: 1.5rem; font-weight: 700; color: #fff;">${linkedData.minecraft_name}</h2>
                                     <div style="font-size: 0.85rem; color: var(--text-muted); margin-top: 4px;">Discord: ${discordUsername}</div>
-                                    <div style="font-size: 0.82rem; color: #b388ff; margin-top: 4px;">На сервере с ${formatDate(currentStats.first_join)}</div>
+                                    <div style="font-size: 0.82rem; color: #b388ff; margin-top: 4px;">На сервере с ${formatDate(currentStats.first_join, false)}</div>
                                 </div>
                             </div>
                             <button class="btn-secondary" style="padding: 8px 16px; font-size: 0.8rem;" onclick="handleSignOut()">Выйти</button>
@@ -1487,10 +1482,10 @@
                             </div>
                             <div class="stat-card" style="background: rgba(255,255,255,0.01); border: 1px solid rgba(255,255,255,0.03); padding: 20px; border-radius: 20px; text-align: left;">
                                 <div class="stat-label" style="font-size: 0.8rem; color: var(--accent-pink); margin-bottom: 4px;">📊 K/D</div>
-                                <div class="stat-value" style="font-size: 1.4rem; font-weight: 700; color: var(--accent-pink);">${kd}</div>
+                                <div class="stat-value" style="font-size: 1.4rem; font-weight: 700;">${kd}</div>
                             </div>
                         </div>
-                        <div style="text-align: left; margin-top: 20px; font-size: 0.85rem; color: var(--text-muted);">Последний раз онлайн: ${formatDate(currentStats.last_seen)}</div>
+                        <div style="text-align: left; margin-top: 20px; font-size: 0.85rem; color: var(--text-muted);">Последний раз онлайн: ${formatDate(currentStats.last_seen, false)}</div>
                     </div>`;
             } catch (e) {
                 console.error(e);
@@ -1710,7 +1705,7 @@
                     </div>
                     
                     <div style="font-size: 0.85rem; color: var(--text-muted); text-align: left; border-top: 1px solid rgba(255,255,255,0.04); padding-top: 15px;">
-                        Последний раз онлайн: <span style="color: #fff; font-weight: 600;">${formatDate(playerData.last_seen)}</span>
+                        Последний раз онлайн: <span style="color: #fff; font-weight: 600;">${formatDate(playerData.last_seen, false)}</span>
                     </div>
                 </div>
             `;
@@ -1731,7 +1726,7 @@
             if(tabName === 'profile') loadProfileData();
             if(tabName === 'forum') {
                 loadProfileData().then(() => {
-                    loadForumFeed(false); // Первичная загрузка с показом лоадера
+                    loadForumFeed(false); 
                 });
             }
 
@@ -2006,7 +2001,7 @@
                                 <span style="font-size: 1.1rem; flex-shrink: 0;">${badge}</span>
                                 <div style="overflow: hidden;">
                                     <div style="font-size: 0.85rem; font-weight: 500; color: #fff; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">${tx.description || 'Операция'}</div>
-                                    <div style="font-size: 0.72rem; color: var(--text-muted); margin-top: 2px;">${formatDate(tx.created_at)}</div>
+                                    <div style="font-size: 0.72rem; color: var(--text-muted); margin-top: 2px;">${formatDate(tx.created_at, false)}</div>
                                 </div>
                             </div>
                             <div style="font-size: 0.9rem; font-weight: 700; color: ${color}; white-space: nowrap; margin-left: 10px;">
@@ -2125,17 +2120,14 @@
             }
         }
 
-        // 2. БЕСШОВНОЕ СИНХРОННОЕ ОБНОВЛЕНИЕ БЕЗ МЕРЦАНИЯ КАРКАСА
         async function loadForumFeed(isSilent = false) {
             const feedContainer = document.getElementById('forum-feed-container');
             if (!feedContainer) return;
 
-            // Индикатор вызывается исключительно при первичном входе на вкладку форума
             if (!isSilent) {
                 feedContainer.innerHTML = `<div style="color: var(--text-muted); text-align: center; padding: 30px 0; font-size: 0.95rem;">Синхронизация ленты форума...</div>`;
             }
 
-            // Кэшируем состояние развернутых блоков комментариев и незавершенного пользовательского ввода текста
             const openCommentBoxes = [];
             const typedTexts = {};
             document.querySelectorAll('[id^="comments-container-"]').forEach(box => {
@@ -2188,7 +2180,6 @@
                     });
                 }
 
-                // Строим виртуальное DOM-дерево во фрагменте памяти для атомарного рендеринга
                 const fragment = document.createDocumentFragment();
 
                 posts.forEach(post => {
@@ -2269,6 +2260,7 @@
                     card.style.padding = '24px';
                     card.style.textAlign = 'left';
 
+                    // НАЗНАЧАЕМ ИДЕНТИФИКАТОР КНОПКЕ ЛАЙКА ДЛЯ ПРЯМОГО ОБРАЩЕНИЯ Скрипта
                     card.innerHTML = `
                         <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 14px;">
                             <div style="display: flex; align-items: center; gap: 14px;">
@@ -2283,7 +2275,7 @@
                         <p style="font-size: 0.94rem; color: rgba(255,255,255,0.9); line-height: 1.55; white-space: pre-wrap; word-break: break-word; margin-bottom: 20px;">${post.content}</p>
                         
                         <div style="display: flex; gap: 12px; align-items: center;">
-                            <button style="display: flex; align-items: center; gap: 8px; background: ${activeLikeBg}; border: 1px solid rgba(255,255,255,0.03); color: ${activeLikeColor}; padding: 8px 16px; border-radius: 14px; font-family: var(--font-sans); font-size: 0.85rem; font-weight: 600; cursor: pointer; transition: all 0.2s;" onclick="toggleLike('${post.id}')">
+                            <button id="like-btn-${post.id}" style="display: flex; align-items: center; gap: 8px; background: ${activeLikeBg}; border: 1px solid rgba(255,255,255,0.03); color: ${activeLikeColor}; padding: 8px 16px; border-radius: 14px; font-family: var(--font-sans); font-size: 0.85rem; font-weight: 600; cursor: pointer; transition: all 0.2s;" onclick="toggleLike('${post.id}')">
                                 ❤️ <span>${post.likes_count ?? 0}</span>
                             </button>
                             <button style="display: flex; align-items: center; gap: 8px; background: rgba(255,255,255,0.01); border: 1px solid rgba(255,255,255,0.03); color: var(--text-muted); padding: 8px 16px; border-radius: 14px; font-family: var(--font-sans); font-size: 0.85rem; font-weight: 500; cursor: pointer; transition: all 0.2s;" onclick="toggleCommentsDisplay('${post.id}')">
@@ -2301,7 +2293,6 @@
                     fragment.appendChild(card);
                 });
 
-                // Мгновенная атомарная подмена контента в один такт
                 feedContainer.innerHTML = '';
                 feedContainer.appendChild(fragment);
             } catch (e) {
@@ -2338,7 +2329,7 @@
 
                 if (error) throw error;
                 textarea.value = '';
-                await loadForumFeed(true); // Фоновое обновление
+                await loadForumFeed(true); 
             } catch (e) {
                 console.error(e);
                 alert('Не удалось опубликовать запись на форуме.');
@@ -2395,7 +2386,7 @@
                     commentBlock.style.display = 'block';
                 }
 
-                await loadForumFeed(true); // Фоновое обновление
+                await loadForumFeed(true); 
 
             } catch (catchErr) {
                 console.error(catchErr);
@@ -2426,10 +2417,29 @@
             });
         }
 
+        // 2. ОПТИМИСТИЧНЫЕ МГНОВЕННЫЕ ЛАЙКИ БЕЗ ОЖИДАНИЯ СЕТЕВОГО ОКНА
         async function toggleLike(postId) {
             if (!currentUserLinkedData) {
                 alert('Войди и привяжи Minecraft, чтобы ставить лайки!');
                 return;
+            }
+
+            const likeBtn = document.getElementById(`like-btn-${postId}`);
+            if (!likeBtn) return;
+
+            const countSpan = likeBtn.querySelector('span');
+            let currentCount = parseInt(countSpan ? countSpan.textContent : '0') || 0;
+            const isCurrentlyLiked = likeBtn.style.color === 'var(--accent-pink)';
+
+            // Мгновенное (оптимистичное) обновление стилей во фронтенде
+            if (isCurrentlyLiked) {
+                likeBtn.style.color = 'var(--text-muted)';
+                likeBtn.style.background = 'rgba(255, 255, 255, 0.01)';
+                if (countSpan) countSpan.textContent = Math.max(0, currentCount - 1);
+            } else {
+                likeBtn.style.color = 'var(--accent-pink)';
+                likeBtn.style.background = 'rgba(255, 0, 127, 0.05)';
+                if (countSpan) countSpan.textContent = currentCount + 1;
             }
 
             try {
@@ -2459,10 +2469,20 @@
                     if (insertError) throw insertError;
                 }
 
-                await new Promise(resolve => setTimeout(resolve, 200));
-                await loadForumFeed(true); // Фоновое обновление
+                await loadForumFeed(true); 
             } catch (e) {
                 console.error(e);
+                // Откат интерфейса назад при падении бэкенда
+                if (isCurrentlyLiked) {
+                    likeBtn.style.color = 'var(--accent-pink)';
+                    likeBtn.style.background = 'rgba(255, 0, 127, 0.05)';
+                    if (countSpan) countSpan.textContent = currentCount;
+                } else {
+                    likeBtn.style.color = 'var(--text-muted)';
+                    likeBtn.style.background = 'rgba(255, 255, 255, 0.01)';
+                    if (countSpan) countSpan.textContent = currentCount;
+                }
+                alert('Не удалось зафиксировать лайк. Ошибка сети.');
             }
         }
 
@@ -2478,7 +2498,7 @@
                     alert('Нет прав на удаление');
                     throw error;
                 }
-                await loadForumFeed(true); // Фоновое обновление
+                await loadForumFeed(true); 
             } catch (e) {
                 console.error(e);
             }
@@ -2496,7 +2516,7 @@
                     alert('Нет прав на удаление');
                     throw error;
                 }
-                await loadForumFeed(true); // Фоновое обновление
+                await loadForumFeed(true); 
             } catch (e) {
                 console.error(e);
             }
