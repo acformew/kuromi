@@ -81,7 +81,7 @@
         
         .logo-img-left, .logo-img-right {
             position: absolute;
-            height: 440px; 
+            height: 460px; 
             width: auto;
             object-fit: contain;
             z-index: 1;
@@ -408,8 +408,8 @@
         .ticket-price { font-size: 1.4rem; font-weight: 700; color: var(--accent-pink); white-space: nowrap; text-align: right; }
 
         .info-notice-box {
-            background: rgba(138, 43, 226, 0.03);
-            border: 1px solid rgba(138, 43, 226, 0.15);
+            background: rgba(13, 9, 21, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.03);
             border-radius: 20px;
             padding: 24px 30px;
             text-align: left;
@@ -824,7 +824,6 @@
     </header>
 
     <div class="content-container">
-        <!-- Вертикальный сайдбар, объединяющий профиль, баланс и кнопку форума -->
         <div class="header-profile-sidebar">
             <div id="header-profile-auth" style="display: flex; flex-direction: column; gap: 10px; width: 100%;"></div>
             <button id="forum-fixed-btn" class="widget-login-btn" onclick="switchTab('forum')">💬 Форум</button>
@@ -1094,7 +1093,6 @@
             </div>
         </div>
 
-        <!-- Секция Форума -->
         <div id="section-forum" class="content-section">
             <div class="ux-panel">
                 <div class="panel-title">💬 Форум сообщества</div>
@@ -2133,6 +2131,14 @@
 
             feedContainer.innerHTML = `<div style="color: var(--text-muted); text-align: center; padding: 30px 0; font-size: 0.95rem;">Синхронизация ленты форума...</div>`;
 
+            // Ультимативное кэширование открытых блоков комментариев перед очисткой контейнера
+            const openCommentBoxes = [];
+            document.querySelectorAll('[id^="comments-container-"]').forEach(box => {
+                if (box.style.display === 'block') {
+                    openCommentBoxes.push(box.id.replace('comments-container-', ''));
+                }
+            });
+
             try {
                 const { data: posts, error: postsError } = await supabaseClient
                     .from('forum_posts')
@@ -2243,6 +2249,10 @@
                         `;
                     }
 
+                    // Проверяем, должен ли этот блок комментариев остаться открытым
+                    const isBoxOpen = openCommentBoxes.includes(post.id);
+                    const boxDisplayStyle = isBoxOpen ? 'block' : 'none';
+
                     const card = document.createElement('div');
                     card.style.width = '100%';
                     card.style.background = 'rgba(255, 255, 255, 0.01)';
@@ -2251,7 +2261,6 @@
                     card.style.padding = '24px';
                     card.style.textAlign = 'left';
 
-                    // Исправлен баг синтаксиса UUID в кнопке «Ответы» и вызове openPlayerModal
                     card.innerHTML = `
                         <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 14px;">
                             <div style="display: flex; align-items: center; gap: 14px;">
@@ -2274,7 +2283,7 @@
                             </button>
                         </div>
 
-                        <div id="comments-container-${post.id}" style="display: none; background: rgba(5, 3, 8, 0.4); border-radius: 18px; padding: 16px; border: 1px solid rgba(255,255,255,0.02); margin-top: 14px;">
+                        <div id="comments-container-${post.id}" style="display: ${boxDisplayStyle}; background: rgba(5, 3, 8, 0.4); border-radius: 18px; padding: 16px; border: 1px solid rgba(255,255,255,0.02); margin-top: 14px;">
                             <div id="comments-list-${post.id}" style="max-height: 280px; overflow-y: auto; padding-right: 4px;" class="wallet-scroll">
                                 ${commentsListHtml || '<div style="color: var(--text-muted); font-size: 0.82rem; text-align: center; padding: 15px 0;">Комментариев нет. Оставьте свой ответ первым!</div>'}
                             </div>
@@ -2346,17 +2355,19 @@
 
                 if (error) throw error;
                 input.value = '';
-                await loadForumFeed();
                 
-                const box = document.getElementById(`comments-container-${postId}`);
-                if (box) box.style.display = 'block';
+                // Принудительно выставляем флаг, чтобы блок остался открытым в кэше DOM перед рендером ленты
+                const currentContainer = document.getElementById(`comments-container-${postId}`);
+                if (currentContainer) currentContainer.style.display = 'block';
+
+                await loadForumFeed();
             } catch (e) {
                 console.error(e);
                 alert('Ошибка при отправке комментария.');
             }
         }
 
-        // Фикс дублирования лайков + задержка 200мс для корректной работы триггеров БД перед обновлением интерфейса
+        // Задержка 200мс для корректной работы триггеров БД перед обновлением интерфейса
         async function toggleLike(postId) {
             if (!currentUserLinkedData) {
                 alert('Войди и привяжи Minecraft, чтобы ставить лайки!');
