@@ -899,7 +899,7 @@
                         </div>
                         <div>
                             <div class="ticket-price">149 ₽</div>
-                            <button class="btn-primary" style="padding: 10px 20px; font-size: 0.8rem; margin-top: 10px; width: 100%;" onclick="alert('В один клик')">В один клик</button>
+                            <button class="btn-primary" style="padding: 10px 20px; font-size: 0.8rem; margin-top: 10px; width: 100%;" onclick="alert('Модуль оплаты настраивается')">В один клик</button>
                         </div>
                     </div>
 
@@ -978,7 +978,7 @@
                         <div class="mechanic-img-box"><div class="mechanic-placeholder-icon">📰</div></div>
                         <div class="mechanic-text-block">
                             <h3>Газета Kuromi Times</h3>
-                            <p>Информационный вестник сервера. Любой житель SMP может отправить свою статью или расследование через форму на сайте. Публикация происходит после модерации редакцией.</p>
+                            <p>Информационный вестник сервера. Люгой житель SMP может отправить свою статью или расследование через форму на сайте. Публикация происходит после модерации редакцией.</p>
                         </div>
                     </div>
                     <div class="mechanic-card">
@@ -1001,7 +1001,7 @@
                     <div class="ticket-card" style="padding: 20px 25px; border-radius: 20px; grid-column: span 2;">
                         <div class="ticket-info">
                             <h3>Пропуск «Навсегда»</h3>
-                            <p>Полноценный вечный доступ на сервер без ограничений по сезонам.</p>
+                            <p>Полноценный вечный доступ на server без ограничений по сезонам.</p>
                         </div>
                         <div class="ticket-price" style="font-size: 1.15rem;">349 ₽</div>
                     </div>
@@ -1363,14 +1363,21 @@
                 const discordUsername = user.user_metadata.full_name || user.user_metadata.name || 'Discord User';
                 const discordAvatarUrl = user.user_metadata.avatar_url || 'https://cdn.discordapp.com/embed/avatars/0.png';
 
-                // 3. АВТОНОМНАЯ ВЕРИФИКАЦИЯ МОДЕРАТОРА СРАЗУ ПОСЛЕ СЕССИИ DISCORD
-                const { data: modData } = await supabaseClient
+                // 3. АВТОНОМНАЯ ИНСПЕКЦИЯ МОДЕРАТОРА С ВЫВОДОМ ПОЛНЫХ ДИАГНОСТИЧЕСКИХ ЛОГОВ В КОНСОЛЬ
+                console.log("[Moderation Check] Начинаем верификацию прав для discordId:", discordId);
+                const { data: modData, error: modError } = await supabaseClient
                     .from('forum_moderators')
                     .select('*')
                     .eq('discord_id', discordId)
                     .maybeSingle();
                 
+                if (modError) {
+                    console.error("[Moderation Check] Сбой селекта из forum_moderators. Возможно, заблокировано RLS:", modError);
+                }
+                console.log("[Moderation Check] Ответ СУБД из таблицы модераторов (raw data):", modData);
+                
                 isUserModerator = !!modData;
+                console.log("[Moderation Check] Итоговый флаг статуса модератора выставлен фронтендом в:", isUserModerator);
 
                 const { data: linkedData, error: linkedError } = await supabaseClient
                     .from('linked_accounts')
@@ -2100,7 +2107,7 @@
             } else {
                 container.innerHTML = `
                     <div style="width: 100%; background: rgba(138, 43, 226, 0.02); border: 1px solid rgba(138, 43, 226, 0.15); padding: 20px; border-radius: 20px; text-align: center; color: var(--text-muted); font-size: 0.95rem; font-weight: 500;">
-                        🔒 Войди и привяжи Minecraft, чтобы публиковать посты.
+                        🔒 Войди и привяжи Minecraft, чтобы публикувать посты.
                     </div>
                 `;
             }
@@ -2260,7 +2267,6 @@
                     card.style.padding = '24px';
                     card.style.textAlign = 'left';
 
-                    // НАЗНАЧАЕМ ИДЕНТИФИКАТОР КНОПКЕ ЛАЙКА ДЛЯ ПРЯМОГО ОБРАЩЕНИЯ Скрипта
                     card.innerHTML = `
                         <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 14px;">
                             <div style="display: flex; align-items: center; gap: 14px;">
@@ -2394,7 +2400,6 @@
             }
         }
 
-        // НАСТРОЙКА ДЕЛЕГИРОВАНИЯ СОБЫТИЙ ДЛЯ ЛЕНТЫ ФОРУМА
         const feedElement = document.getElementById('forum-feed-container');
         if (feedElement) {
             feedElement.addEventListener('click', function(event) {
@@ -2417,7 +2422,7 @@
             });
         }
 
-        // 2. ОПТИМИСТИЧНЫЕ МГНОВЕННЫЕ ЛАЙКИ БЕЗ ОЖИДАНИЯ СЕТЕВОГО ОКНА
+        // 2. МГНОВЕННЫЕ ОПТИМИСТИЧНЫЕ ЛАЙКИ БЕЗ ОЖИДАНИЯ ОТВЕТА СЕРВЕРА
         async function toggleLike(postId) {
             if (!currentUserLinkedData) {
                 alert('Войди и привяжи Minecraft, чтобы ставить лайки!');
@@ -2431,7 +2436,6 @@
             let currentCount = parseInt(countSpan ? countSpan.textContent : '0') || 0;
             const isCurrentlyLiked = likeBtn.style.color === 'var(--accent-pink)';
 
-            // Мгновенное (оптимистичное) обновление стилей во фронтенде
             if (isCurrentlyLiked) {
                 likeBtn.style.color = 'var(--text-muted)';
                 likeBtn.style.background = 'rgba(255, 255, 255, 0.01)';
@@ -2472,7 +2476,6 @@
                 await loadForumFeed(true); 
             } catch (e) {
                 console.error(e);
-                // Откат интерфейса назад при падении бэкенда
                 if (isCurrentlyLiked) {
                     likeBtn.style.color = 'var(--accent-pink)';
                     likeBtn.style.background = 'rgba(255, 0, 127, 0.05)';
