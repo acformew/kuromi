@@ -736,7 +736,7 @@
             header { width: calc(100% - 32px); margin: 25px auto 15px auto; padding: 16px; border-radius: 24px; gap: 14px; }
             
             .donate-layout { flex-direction: column; gap: 24px; }
-            .rou roulette-wrapper { width: 280px; height: 360px; }
+            .roulette-wrapper { width: 280px; height: 360px; }
             .roulette-container { width: 260px; height: 260px; padding: 12px; }
             .roulette-stand { width: 120px; height: 45px; margin-top: -10px; }
             .donate-grid { grid-template-columns: 1fr; }
@@ -879,7 +879,7 @@
 
         <div id="section-join" class="content-section">
             <div class="ux-panel">
-                <div class="panel-title">Варианны авторизации</div>
+                <div class="panel-title">Варианты авторизации</div>
                 <div class="join-row">
                     <div class="ticket-card">
                         <div class="ticket-info">
@@ -906,7 +906,7 @@
                     <div class="ticket-card">
                         <div class="ticket-info">
                             <h3>Бесплатный доступ</h3>
-                            <p>Эксклюзивный автоматический бонус для обладателей официальной Лицензии Minecraft! Пройди быстрой моментальную верификацию через нашего бота и играй совершенно бесплатно без каких-либо взносов.</p>
+                            <p>Эксклюзивный автоматический бонус для обладателей официальной Лицензии Minecraft! Пройди быструю моментальную верификацию через нашего бота и играй совершенно бесплатно без каких-либо взносов.</p>
                         </div>
                         <div>
                             <div class="ticket-price">0 ₽</div>
@@ -957,7 +957,7 @@
                         <div class="mechanic-img-box"><div class="mechanic-placeholder-icon">⛓️</div></div>
                         <div class="mechanic-text-block">
                             <h3>Арест и Конвоирование</h3>
-                            <p>Ролевая система задержания нарушителей. Позволяет временно заковать игрока в наручники и конвоировать его за собой на РП-поводке до выяснения обстоятельств администрацией.</p>
+                            <p>Ролевая система задержания нарушителей. Позволяет временно заковать игрока в наручники и конвоировать его за собой на РП-поводке до выяснения обстоятельства администрацией.</p>
                         </div>
                     </div>
                     <div class="mechanic-card">
@@ -1001,7 +1001,7 @@
                     <div class="ticket-card" style="padding: 20px 25px; border-radius: 20px; grid-column: span 2;">
                         <div class="ticket-info">
                             <h3>Пропуск «Навсегда»</h3>
-                            <p>Полноценный вечный доступ на server без ограничений по сезонам.</p>
+                            <p>Полноценный вечный доступ на сервер без ограничений по сезонам.</p>
                         </div>
                         <div class="ticket-price" style="font-size: 1.15rem;">349 ₽</div>
                     </div>
@@ -1157,6 +1157,7 @@
             return `${hours}ч ${minutes}м`;
         }
 
+        // 1. УСОВЕРШЕНСТВОВАННАЯ ФУНКЦИЯ ВЫВОДА ВРЕМЕНИ
         function formatDate(dateStr) {
             if (!dateStr) return 'Неизвестно';
             const date = new Date(dateStr);
@@ -1168,12 +1169,16 @@
             yesterday.setDate(yesterday.getDate() - 1);
             const target = new Date(date.getFullYear(), date.getMonth(), date.getDate());
             
-            if (target.getTime() === today.getTime()) return 'Сегодня';
-            if (target.getTime() === yesterday.getTime()) return 'Вчера';
+            const hours = String(date.getHours()).padStart(2, '0');
+            const minutes = String(date.getMinutes()).padStart(2, '0');
+            const timeStr = `${hours}:${minutes}`;
             
-            return String(date.getDate()).padStart(2,'0') + '.' +
-                   String(date.getMonth()+1).padStart(2,'0') + '.' +
-                   date.getFullYear();
+            if (target.getTime() === today.getTime()) return `Сегодня в ${timeStr}`;
+            if (target.getTime() === yesterday.getTime()) return `Вчера в ${timeStr}`;
+            
+            const dayStr = String(date.getDate()).padStart(2, '0');
+            const monthStr = String(date.getMonth() + 1).padStart(2, '0');
+            return `${dayStr}.${monthStr}.${date.getFullYear()} в ${timeStr}`;
         }
 
         function initRouletteGraphic() {
@@ -1638,7 +1643,6 @@
                 playerData = { ...player };
             }
             
-            // Если поля статистики отсутствуют (запрос из элементов форума), догружаем их асинхронно
             if (playerData.playtime_seconds === undefined || playerData.kills === undefined) {
                 try {
                     const { data, error } = await supabaseClient
@@ -1727,7 +1731,7 @@
             if(tabName === 'profile') loadProfileData();
             if(tabName === 'forum') {
                 loadProfileData().then(() => {
-                    loadForumFeed();
+                    loadForumFeed(false); // Первичная загрузка с показом лоадера
                 });
             }
 
@@ -1871,7 +1875,6 @@
             }
         }
 
-        // Функция загрузки баланса игровой валюты
         async function loadWalletBalance(uuid) {
             try {
                 const { data, error } = await supabaseClient
@@ -1893,7 +1896,6 @@
             }
         }
 
-        // Динамическое создание модального окна кошелька
         async function openWalletModal(uuid) {
             const oldOverlay = document.getElementById('wallet-modal-overlay');
             if (oldOverlay) oldOverlay.remove();
@@ -1947,7 +1949,6 @@
             switchWalletTab('overview', uuid);
         }
 
-        // Логика переключения содержимого табов в кошельке
         async function switchWalletTab(tab, uuid) {
             ['overview', 'history', 'season'].forEach(t => {
                 const btn = document.getElementById(`wtab-${t}`);
@@ -2110,7 +2111,6 @@
             }
         }
 
-        // Вспомогательная функция для сворачивания/разворачивания скрытых комментариев
         function toggleHiddenComments(postId) {
             const hidden = document.getElementById(`hidden-comments-${postId}`);
             const btn = document.getElementById(`toggle-comments-btn-${postId}`);
@@ -2125,18 +2125,27 @@
             }
         }
 
-        async function loadForumFeed() {
+        // 2. БЕСШОВНОЕ СИНХРОННОЕ ОБНОВЛЕНИЕ БЕЗ МЕРЦАНИЯ КАРКАСА
+        async function loadForumFeed(isSilent = false) {
             const feedContainer = document.getElementById('forum-feed-container');
             if (!feedContainer) return;
 
-            feedContainer.innerHTML = `<div style="color: var(--text-muted); text-align: center; padding: 30px 0; font-size: 0.95rem;">Синхронизация ленты форума...</div>`;
+            // Индикатор вызывается исключительно при первичном входе на вкладку форума
+            if (!isSilent) {
+                feedContainer.innerHTML = `<div style="color: var(--text-muted); text-align: center; padding: 30px 0; font-size: 0.95rem;">Синхронизация ленты форума...</div>`;
+            }
 
-            // Ультимативное кэширование открытых блоков комментариев перед очисткой контейнера
+            // Кэшируем состояние развернутых блоков комментариев и незавершенного пользовательского ввода текста
             const openCommentBoxes = [];
+            const typedTexts = {};
             document.querySelectorAll('[id^="comments-container-"]').forEach(box => {
                 if (box.style.display === 'block') {
                     openCommentBoxes.push(box.id.replace('comments-container-', ''));
                 }
+            });
+            document.querySelectorAll('[id^="comment-input-"]').forEach(input => {
+                const pId = input.id.replace('comment-input-', '');
+                typedTexts[pId] = input.value;
             });
 
             try {
@@ -2179,7 +2188,8 @@
                     });
                 }
 
-                feedContainer.innerHTML = '';
+                // Строим виртуальное DOM-дерево во фрагменте памяти для атомарного рендеринга
+                const fragment = document.createDocumentFragment();
 
                 posts.forEach(post => {
                     const postComments = commentsByPost[post.id] || [];
@@ -2191,7 +2201,6 @@
                         <button style="background: rgba(255, 0, 127, 0.1); border: 1px solid rgba(255, 0, 127, 0.2); color: var(--accent-pink); padding: 6px 14px; border-radius: 10px; font-family: var(--font-sans); font-size: 0.75rem; cursor: pointer; transition: all 0.2s;" onclick="deletePost('${post.id}')">Удалить</button>
                     ` : '';
 
-                    // Функция для сборки разметки отдельного комментария с фиксом клика по аватарке/нику
                     function renderCommentItem(comm) {
                         const commDeleteBtn = isUserModerator ? `
                             <span style="color: var(--accent-pink); cursor: pointer; font-size: 0.75rem; margin-left: auto;" onclick="deleteComment('${comm.id}')">Удалить</span>
@@ -2211,7 +2220,6 @@
                         `;
                     }
 
-                    // Реализация сворачивания комментариев (выводим только первые 2)
                     let commentsListHtml = '';
                     if (postComments.length <= 2) {
                         postComments.forEach(comm => {
@@ -2235,9 +2243,10 @@
 
                     let commentInputFormHtml = '';
                     if (currentUserSession && currentUserLinkedData) {
+                        const savedInputText = typedTexts[post.id] ? typedTexts[post.id].replace(/"/g, '&quot;') : '';
                         commentInputFormHtml = `
                             <div style="display: flex; gap: 10px; margin-top: 15px; border-top: 1px solid rgba(255,255,255,0.04); padding-top: 15px;">
-                                <input type="text" id="comment-input-${post.id}" style="flex: 1; background: rgba(0,0,0,0.25); border: 1px solid rgba(255,255,255,0.05); border-radius: 12px; padding: 10px 14px; color: #fff; font-family: var(--font-sans); font-size: 0.88rem; outline: none;" placeholder="Написать ответ...">
+                                <input type="text" id="comment-input-${post.id}" style="flex: 1; background: rgba(0,0,0,0.25); border: 1px solid rgba(255,255,255,0.05); border-radius: 12px; padding: 10px 14px; color: #fff; font-family: var(--font-sans); font-size: 0.88rem; outline: none;" placeholder="Написать ответ..." value="${savedInputText}">
                                 <button class="btn-primary" style="padding: 8px 18px; font-size: 0.82rem; border-radius: 12px;" data-action="submit-comment" data-post-id="${post.id}">Ответить</button>
                             </div>
                         `;
@@ -2249,7 +2258,6 @@
                         `;
                     }
 
-                    // Проверяем, должен ли этот блок комментариев остаться открытым
                     const isBoxOpen = openCommentBoxes.includes(post.id);
                     const boxDisplayStyle = isBoxOpen ? 'block' : 'none';
 
@@ -2290,8 +2298,12 @@
                             ${commentInputFormHtml}
                         </div>
                     `;
-                    feedContainer.appendChild(card);
+                    fragment.appendChild(card);
                 });
+
+                // Мгновенная атомарная подмена контента в один такт
+                feedContainer.innerHTML = '';
+                feedContainer.appendChild(fragment);
             } catch (e) {
                 console.error("Ошибка при генерации ленты форума:", e);
                 feedContainer.innerHTML = `<div style="color: var(--accent-pink); text-align: center; padding: 20px;">Не удалось подгрузить посты форума.</div>`;
@@ -2326,14 +2338,13 @@
 
                 if (error) throw error;
                 textarea.value = '';
-                await loadForumFeed();
+                await loadForumFeed(true); // Фоновое обновление
             } catch (e) {
                 console.error(e);
                 alert('Не удалось опубликовать запись на форуме.');
             }
         }
 
-        // ПОЛНОСТЬЮ ПЕРЕПИСАННАЯ С НУЛЯ ФУНКЦИЯ ОТПРАВКИ КОММЕНТАРИЕВ
         async function createComment(postId) {
             if (!postId) {
                 alert("Критическая ошибка: postId отсутствует.");
@@ -2342,7 +2353,7 @@
 
             const inputField = document.getElementById(`comment-input-${postId}`);
             if (!inputField) {
-                alert(`Критическая ошибка DOM: Поле ввода comment-input-${postId} не найдено.`);
+                alert(`Критическая ошибка DOM: Поле ввода не найдено.`);
                 return;
             }
 
@@ -2350,12 +2361,12 @@
             const cleanText = rawText ? rawText.trim() : "";
             
             if (!cleanText) {
-                alert("Поле комментария пустое! Напишите текст перед отправкой.");
+                alert("Поле комментария пустое!");
                 return;
             }
 
             if (!currentUserLinkedData) {
-                alert("Вы не авторизованы или данные аккаунта не синхронизированы. Выполните повторный вход в профиль.");
+                alert("Вы не авторизованы. Выполните повторный вход в профиль.");
                 return;
             }
 
@@ -2368,14 +2379,12 @@
             };
 
             try {
-                const { data, error } = await supabaseClient
+                const { error: insertError } = await supabaseClient
                     .from('forum_comments')
-                    .insert([payload])
-                    .select();
+                    .insert([payload]);
 
-                if (error) {
-                    console.error("Supabase API Error:", error);
-                    alert(`Supabase Error [${error.code || 'RLS'}]: ${error.message}`);
+                if (insertError) {
+                    alert(`Ошибка СУБД/RLS политики: ${insertError.message}`);
                     return;
                 }
 
@@ -2386,18 +2395,17 @@
                     commentBlock.style.display = 'block';
                 }
 
-                await loadForumFeed();
+                await loadForumFeed(true); // Фоновое обновление
 
             } catch (catchErr) {
-                console.error("Runtime exception inside createComment function:", catchErr);
-                alert(`Внутренний сбой скрипта: ${catchErr.message || catchErr}`);
+                console.error(catchErr);
+                alert(`Внутренний сбой скрипта.`);
             }
         }
 
-        // НАСТРОЙКА ДЕЛЕГИРОВАНИЯ СОБЫТИЙ ДЛЯ ЛЕНТЫ ФОРУМА (УЛЬТИМАТИВНЫЙ ФИКС)
+        // НАСТРОЙКА ДЕЛЕГИРОВАНИЯ СОБЫТИЙ ДЛЯ ЛЕНТЫ ФОРУМА
         const feedElement = document.getElementById('forum-feed-container');
         if (feedElement) {
-            // Перехват кликов по кнопкам "Ответить"
             feedElement.addEventListener('click', function(event) {
                 const targetBtn = event.target.closest('button[data-action="submit-comment"]');
                 if (targetBtn) {
@@ -2407,7 +2415,6 @@
                 }
             });
 
-            // Перехват нажатия Enter внутри текстовых полей ответов
             feedElement.addEventListener('keydown', function(event) {
                 if (event.target && event.target.id && event.target.id.startsWith('comment-input-')) {
                     if (event.key === 'Enter') {
@@ -2419,7 +2426,6 @@
             });
         }
 
-        // Задержка 200мс для корректной работы триггеров БД перед обновлением интерфейса
         async function toggleLike(postId) {
             if (!currentUserLinkedData) {
                 alert('Войди и привяжи Minecraft, чтобы ставить лайки!');
@@ -2453,9 +2459,8 @@
                     if (insertError) throw insertError;
                 }
 
-                // Микро-таймаут для завершения асинхронных операций на стороне СУБД Supabase (PostgreSQL)
                 await new Promise(resolve => setTimeout(resolve, 200));
-                await loadForumFeed();
+                await loadForumFeed(true); // Фоновое обновление
             } catch (e) {
                 console.error(e);
             }
@@ -2473,7 +2478,7 @@
                     alert('Нет прав на удаление');
                     throw error;
                 }
-                await loadForumFeed();
+                await loadForumFeed(true); // Фоновое обновление
             } catch (e) {
                 console.error(e);
             }
@@ -2491,7 +2496,7 @@
                     alert('Нет прав на удаление');
                     throw error;
                 }
-                await loadForumFeed();
+                await loadForumFeed(true); // Фоновое обновление
             } catch (e) {
                 console.error(e);
             }
