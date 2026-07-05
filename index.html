@@ -978,7 +978,7 @@
                         <div class="mechanic-img-box"><div class="mechanic-placeholder-icon">📰</div></div>
                         <div class="mechanic-text-block">
                             <h3>Газета Kuromi Times</h3>
-                            <p>Информационный вестник сервера. Любой житель SMP может отправить свою статью или расследование через форму на сайте. Публикация происходит после модерации редакцией.</p>
+                            <p>Информационный вестник сервера. Люгой житель SMP может отправить свою статью или расследование через форму на сайте. Публикация происходит после модерации редакцией.</p>
                         </div>
                     </div>
                     <div class="mechanic-card">
@@ -1481,7 +1481,7 @@
                                 <div class="stat-value" style="font-size: 1.4rem; font-weight: 700;">${currentStats.kills}</div>
                             </div>
                             <div class="stat-card" style="background: rgba(255,255,255,0.01); border: 1px solid rgba(255,255,255,0.03); padding: 20px; border-radius: 20px; text-align: left;">
-                                <div class="stat-label" style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 4px;">📊 K/D</div>
+                                <div class="stat-label" style="font-size: 0.8rem; color: var(--accent-pink); margin-bottom: 4px;">📊 K/D</div>
                                 <div class="stat-value" style="font-size: 1.4rem; font-weight: 700; color: var(--accent-pink);">${kd}</div>
                             </div>
                         </div>
@@ -2334,36 +2334,60 @@
         }
 
         async function createComment(postId) {
-            const input = document.getElementById(`comment-input-${postId}`);
-            if (!input) return;
-            const text = input.value.trim();
-            if (!text) {
-                alert('Поле комментария не должно быть пустым!');
+            if (!postId) {
+                console.error("Критическая ошибка: Параметр postId равен undefined или null.");
+                return;
+            }
+
+            const commentInputEl = document.getElementById(`comment-input-${postId}`);
+            if (!commentInputEl) {
+                console.error(`Критическая ошибка: Элемент ввода comment-input-${postId} не найден в DOM дереве.`);
+                return;
+            }
+
+            const commentText = commentInputEl.value.trim();
+            if (!commentText) {
+                alert('Поле комментария не должно быть пустым или состоять из одних пробелов!');
+                return;
+            }
+
+            if (!currentUserLinkedData || !currentUserLinkedData.minecraft_name || !currentUserLinkedData.minecraft_uuid || !currentUserLinkedData.discord_id) {
+                console.error("Попытка отправки комментария без полной структуры currentUserLinkedData:", currentUserLinkedData);
+                alert('Ошибка отправки: Профиль игрока не загружен или отсутствует связь с аккаунтом. Обновите страницу профиля.');
                 return;
             }
 
             try {
-                const { error } = await supabaseClient
+                const { error: insertError } = await supabaseClient
                     .from('forum_comments')
-                    .insert({
-                        post_id: postId,
-                        minecraft_name: currentUserLinkedData.minecraft_name,
-                        minecraft_uuid: currentUserLinkedData.minecraft_uuid,
-                        discord_id: currentUserLinkedData.discord_id,
-                        content: text
-                    });
+                    .insert([
+                        {
+                            post_id: postId,
+                            content: commentText,
+                            discord_id: currentUserLinkedData.discord_id,
+                            minecraft_uuid: currentUserLinkedData.minecraft_uuid,
+                            minecraft_name: currentUserLinkedData.minecraft_name
+                        }
+                    ]);
 
-                if (error) throw error;
-                input.value = '';
-                
-                // Принудительно выставляем флаг, чтобы блок остался открытым в кэше DOM перед рендером ленты
-                const currentContainer = document.getElementById(`comments-container-${postId}`);
-                if (currentContainer) currentContainer.style.display = 'block';
+                if (insertError) {
+                    console.error("Supabase API Error при выполнении операции INSERT в forum_comments:", insertError);
+                    alert(`Ошибка СУБД/RLS политики: ${insertError.message || 'Запрос отклонен базой данных.'}`);
+                    return;
+                }
+
+                commentInputEl.value = '';
+
+                const targetContainer = document.getElementById(`comments-container-${postId}`);
+                if (targetContainer) {
+                    targetContainer.style.display = 'block';
+                }
 
                 await loadForumFeed();
-            } catch (e) {
-                console.error(e);
-                alert('Ошибка при отправке комментария.');
+
+            } catch (err) {
+                console.error("Критическое исключение выполнения внутри асинхронного метода createComment:", err);
+                alert('Произошла непредвиденная ошибка на стороне клиента при отправке ответа.');
             }
         }
 
