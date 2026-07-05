@@ -957,7 +957,7 @@
                         <div class="mechanic-img-box"><div class="mechanic-placeholder-icon">⛓️</div></div>
                         <div class="mechanic-text-block">
                             <h3>Арест и Конвоирование</h3>
-                            <p>Ролевая система задержания нарушителей. Позволяет временно заковать игрока в наручники и конвоировать его за собой на РП-поводке до выяснения обстоятельства администрацией.</p>
+                            <p>Ролевая система задержания нарушителей. Позволяет временно заковать игрока в наручники и конвоировать его за собой на РП-поводке до выяснения обстоятельств администрацией.</p>
                         </div>
                     </div>
                     <div class="mechanic-card">
@@ -2174,6 +2174,7 @@
                     const activeLikeColor = isLiked ? 'var(--accent-pink)' : 'var(--text-muted)';
                     const activeLikeBg = isLiked ? 'rgba(255, 0, 127, 0.05)' : 'rgba(255, 255, 255, 0.01)';
 
+                    // Исправлен баг синтаксиса UUID (добавлены кавычки в onclick)
                     const deleteBtnHtml = isUserModerator ? `
                         <button style="background: rgba(255, 0, 127, 0.1); border: 1px solid rgba(255, 0, 127, 0.2); color: var(--accent-pink); padding: 6px 14px; border-radius: 10px; font-family: var(--font-sans); font-size: 0.75rem; cursor: pointer; transition: all 0.2s;" onclick="deletePost('${post.id}')">Удалить</button>
                     ` : '';
@@ -2370,8 +2371,7 @@
                     const { error: deleteError } = await supabaseClient
                         .from('forum_likes')
                         .delete()
-                        .eq('post_id', postId)
-                        .eq('discord_id', currentUserLinkedData.discord_id);
+                        .eq('id', existingLike.id);
                     if (deleteError) throw deleteError;
                 } else {
                     const { error: insertError } = await supabaseClient
