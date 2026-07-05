@@ -269,6 +269,72 @@
             margin-bottom: 20px;
         }
 
+        h1 {
+            font-size: 3rem; 
+            font-weight: 600; 
+            line-height: 1.2;
+            letter-spacing: -0.02em;
+            margin-bottom: 24px;
+            color: var(--text-main);
+        }
+
+        .features-line {
+            display: flex;
+            justify-content: center;
+            gap: 28px;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            font-weight: 500;
+            margin-top: 10px;
+            flex-wrap: nowrap; 
+            white-space: nowrap; 
+        }
+        .features-line span { color: var(--text-main); }
+
+        .cta-group {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 14px;
+            margin-top: 40px;
+            width: 100%;
+        }
+
+        .btn-primary {
+            background: var(--primary-purple);
+            color: var(--text-main);
+            border: none;
+            padding: 14px 36px;
+            border-radius: 30px;
+            font-family: var(--font-sans);
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            box-shadow: 0 10px 25px rgba(138, 43, 226, 0.25);
+            transition: all 0.2s ease;
+        }
+        .btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 12px 30px rgba(138, 43, 226, 0.4);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.02);
+            color: var(--text-main);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 14px 32px;
+            border-radius: 30px;
+            font-family: var(--font-sans);
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .btn-secondary:hover {
+            border-color: var(--accent-pink);
+            background: rgba(255, 0, 127, 0.03);
+        }
+
         .online-tracker {
             background: rgba(13, 9, 21, 0.4);
             border: 1px solid rgba(255, 255, 255, 0.03);
@@ -758,7 +824,6 @@
     </header>
 
     <div class="content-container">
-        <!-- Вертикальный сайдбар, объединяющий профиль, баланс и кнопку форума -->
         <div class="header-profile-sidebar">
             <div id="header-profile-auth" style="display: flex; flex-direction: column; gap: 10px; width: 100%;"></div>
             <button id="forum-fixed-btn" class="widget-login-btn" onclick="switchTab('forum')">💬 Форум</button>
@@ -1028,7 +1093,6 @@
             </div>
         </div>
 
-        <!-- Секция Форума -->
         <div id="section-forum" class="content-section">
             <div class="ux-panel">
                 <div class="panel-title">💬 Форум сообщества</div>
@@ -2031,7 +2095,7 @@
                 container.innerHTML = `
                     <div style="width: 100%; background: rgba(255, 255, 255, 0.01); border: 1px solid rgba(255, 255, 255, 0.03); padding: 24px; border-radius: 24px; text-align: left;">
                         <h3 style="font-size: 1.1rem; font-weight: 600; margin-bottom: 12px; color: #fff;">Поделитесь новостью или мыслями</h3>
-                        <textarea id="forum-post-input" style="width: 100%; height: 110px; background: rgba(0, 0, 0, 0.3); border: 1px solid rgba(255, 255, 255, 0.06); border-radius: 14px; padding: 14px; color: #fff; font-family: var(--font-sans); font-size: 0.95rem; resize: none; outline: none; margin-bottom: 12px; transition: border-color 0.2s;" placeholder="What is happening on the server?..." onfocus="this.style.borderColor='var(--primary-purple)'" onblur="this.style.borderColor='rgba(255, 255, 255, 0.06)'"></textarea>
+                        <textarea id="forum-post-input" style="width: 100%; height: 110px; background: rgba(0, 0, 0, 0.3); border: 1px solid rgba(255, 255, 255, 0.06); border-radius: 14px; padding: 14px; color: #fff; font-family: var(--font-sans); font-size: 0.95rem; resize: none; outline: none; margin-bottom: 12px; transition: border-color 0.2s;" placeholder="Что происходит на сервере?..." onfocus="this.style.borderColor='var(--primary-purple)'" onblur="this.style.borderColor='rgba(255, 255, 255, 0.06)'"></textarea>
                         <div style="display: flex; justify-content: flex-end;">
                             <button class="btn-primary" style="padding: 10px 24px; font-size: 0.85rem;" onclick="createForumPost()">Опубликовать</button>
                         </div>
@@ -2065,15 +2129,15 @@
             const feedContainer = document.getElementById('forum-feed-container');
             if (!feedContainer) return;
 
-            // Кэшируем открытые контейнеры до очистки innerHTML
+            feedContainer.innerHTML = `<div style="color: var(--text-muted); text-align: center; padding: 30px 0; font-size: 0.95rem;">Синхронизация ленты форума...</div>`;
+
+            // Ультимативное кэширование открытых блоков комментариев перед очисткой контейнера
             const openCommentBoxes = [];
             document.querySelectorAll('[id^="comments-container-"]').forEach(box => {
                 if (box.style.display === 'block') {
                     openCommentBoxes.push(box.id.replace('comments-container-', ''));
                 }
             });
-
-            feedContainer.innerHTML = `<div style="color: var(--text-muted); text-align: center; padding: 30px 0; font-size: 0.95rem;">Синхронизация ленты форума...</div>`;
 
             try {
                 const { data: posts, error: postsError } = await supabaseClient
@@ -2171,11 +2235,10 @@
 
                     let commentInputFormHtml = '';
                     if (currentUserSession && currentUserLinkedData) {
-                        // ФИКС: Относительный поиск инпута через передачу "this" в аргументы вызова функции
                         commentInputFormHtml = `
                             <div style="display: flex; gap: 10px; margin-top: 15px; border-top: 1px solid rgba(255,255,255,0.04); padding-top: 15px;">
-                                <input type="text" style="flex: 1; background: rgba(0,0,0,0.25); border: 1px solid rgba(255,255,255,0.05); border-radius: 12px; padding: 10px 14px; color: #fff; font-family: var(--font-sans); font-size: 0.88rem; outline: none;" placeholder="Написать ответ...">
-                                <button class="btn-primary" style="padding: 8px 18px; font-size: 0.82rem; border-radius: 12px;" onclick="createComment('${post.id}', this)">Ответить</button>
+                                <input type="text" id="comment-input-${post.id}" style="flex: 1; background: rgba(0,0,0,0.25); border: 1px solid rgba(255,255,255,0.05); border-radius: 12px; padding: 10px 14px; color: #fff; font-family: var(--font-sans); font-size: 0.88rem; outline: none;" placeholder="Написать ответ...">
+                                <button class="btn-primary" style="padding: 8px 18px; font-size: 0.82rem; border-radius: 12px;" onclick="createComment('${post.id}')">Ответить</button>
                             </div>
                         `;
                     } else {
@@ -2186,6 +2249,7 @@
                         `;
                     }
 
+                    // Проверяем, должен ли этот блок комментариев остаться открытым
                     const isBoxOpen = openCommentBoxes.includes(post.id);
                     const boxDisplayStyle = isBoxOpen ? 'block' : 'none';
 
@@ -2269,12 +2333,9 @@
             }
         }
 
-        // Исправленная функция: Безопасное относительное чтение инпута из структуры DOM дерева
-        async function createComment(postId, buttonEl) {
-            if (!buttonEl) return;
-            const input = buttonEl.parentElement.querySelector('input[type="text"]');
+        async function createComment(postId) {
+            const input = document.getElementById(`comment-input-${postId}`);
             if (!input) return;
-            
             const text = input.value.trim();
             if (!text) {
                 alert('Поле комментария не должно быть пустым!');
@@ -2295,7 +2356,7 @@
                 if (error) throw error;
                 input.value = '';
                 
-                // Фиксируем открытый контейнер в памяти DOM, чтобы он не схлопнулся при синхронизации ленты
+                // Принудительно выставляем флаг, чтобы блок остался открытым в кэше DOM перед рендером ленты
                 const currentContainer = document.getElementById(`comments-container-${postId}`);
                 if (currentContainer) currentContainer.style.display = 'block';
 
@@ -2306,7 +2367,7 @@
             }
         }
 
-        // Фикс дублирования лайков + задержка 200мс для корректной работы триггеров БД перед обновлением интерфейса
+        // Задержка 200мс для корректной работы триггеров БД перед обновлением интерфейса
         async function toggleLike(postId) {
             if (!currentUserLinkedData) {
                 alert('Войди и привяжи Minecraft, чтобы ставить лайки!');
