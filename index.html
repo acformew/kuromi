@@ -408,8 +408,8 @@
         .ticket-price { font-size: 1.4rem; font-weight: 700; color: var(--accent-pink); white-space: nowrap; text-align: right; }
 
         .info-notice-box {
-            background: rgba(138, 43, 226, 0.03);
-            border: 1px solid rgba(138, 43, 226, 0.15);
+            background: rgba(13, 9, 21, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.03);
             border-radius: 20px;
             padding: 24px 30px;
             text-align: left;
@@ -2245,7 +2245,7 @@
                     card.style.padding = '24px';
                     card.style.textAlign = 'left';
 
-                    // Добавлен кликабельный профиль игрока на аватар и ник в постах, а также ФИКС кавычек для toggleCommentsDisplay
+                    // Добавлен кликабельный профиль игрока на аватар и ник в постах, а также ФИКС кавычек для toggleCommentsDisplay и toggleLike
                     card.innerHTML = `
                         <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 14px;">
                             <div style="display: flex; align-items: center; gap: 14px;">
@@ -2371,7 +2371,8 @@
                     const { error: deleteError } = await supabaseClient
                         .from('forum_likes')
                         .delete()
-                        .eq('id', existingLike.id);
+                        .eq('post_id', postId)
+                        .eq('discord_id', currentUserLinkedData.discord_id);
                     if (deleteError) throw deleteError;
                 } else {
                     const { error: insertError } = await supabaseClient
