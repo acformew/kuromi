@@ -854,26 +854,11 @@
                 </div>
             </div>
 
+            <!-- ИЗМЕНЕННЫЙ БЛОК ЛЕНТЫ НОВОСТЕЙ С ПОДДЕРЖКОЙ ДИНАМИЧЕСКИХ ФОРМ -->
             <div class="ux-panel">
                 <div class="panel-title" style="margin-bottom: 24px; text-align: left; width: 100%;">📰 Последние новости</div>
-                <div class="news-list">
-                    <div class="news-card">
-                        <div class="news-meta">
-                            <span class="news-date">23.06.2026</span>
-                            <span class="news-tag update">Обновление</span>
-                        </div>
-                        <h3>Завершение разработки экономического ядра</h3>
-                        <p>Мы полностью закончили тесты кастомного плагина для безналичных расчетов. В четвертом сезоне торговые взаимодействия между городами станут полностью цифровыми через терминалы на спавне.</p>
-                    </div>
-                    <div class="news-card">
-                        <div class="news-meta">
-                            <span class="news-date">15.06.2026</span>
-                            <span class="news-tag important">Важно</span>
-                        </div>
-                        <h3>Официальная дата запуска 4-го сезона!</h3>
-                        <p>Подготовка мира вышла на финишную прямую. Белый список будет полностью очищен и обновлен уже в конце этой недели. Успейте подать бесплатную анкету или активировать премиум-пропуск.</p>
-                    </div>
-                </div>
+                <div id="news-admin-container" style="width: 100%;"></div>
+                <div class="news-list" id="news-list-container" style="width: 100%; display: flex; flex-direction: column; gap: 16px;"></div>
             </div>
         </main>
 
@@ -899,7 +884,7 @@
                         </div>
                         <div>
                             <div class="ticket-price">149 ₽</div>
-                            <button class="btn-primary" style="padding: 10px 20px; font-size: 0.8rem; margin-top: 10px; width: 100%;" onclick="alert('Модуль оплаты настраивается')">В один клик</button>
+                            <button class="btn-primary" style="padding: 10px 20px; font-size: 0.8rem; margin-top: 10px; width: 100%;" onclick="alert('В один клик')">В один клик</button>
                         </div>
                     </div>
 
@@ -978,7 +963,7 @@
                         <div class="mechanic-img-box"><div class="mechanic-placeholder-icon">📰</div></div>
                         <div class="mechanic-text-block">
                             <h3>Газета Kuromi Times</h3>
-                            <p>Информационный вестник сервера. Люгой житель SMP может отправить свою статью или расследование через форму на сайте. Публикация происходит после модерации редакцией.</p>
+                            <p>Информационный вестник сервера. Любой житель SMP может отправить свою статью или расследование через форму на сайте. Публикация происходит после модерации редакцией.</p>
                         </div>
                     </div>
                     <div class="mechanic-card">
@@ -1001,7 +986,7 @@
                     <div class="ticket-card" style="padding: 20px 25px; border-radius: 20px; grid-column: span 2;">
                         <div class="ticket-info">
                             <h3>Пропуск «Навсегда»</h3>
-                            <p>Полноценный вечный доступ на server без ограничений по сезонам.</p>
+                            <p>Полноценный вечный доступ на сервер без ограничений по сезонам.</p>
                         </div>
                         <div class="ticket-price" style="font-size: 1.15rem;">349 ₽</div>
                     </div>
@@ -1354,6 +1339,7 @@
                             <button class="btn-primary" style="background: #5865F2; box-shadow: 0 10px 25px rgba(88,101,242,0.25);" onclick="supabaseClient.auth.signInWithOAuth({ provider: 'discord', options: { redirectTo: window.location.origin + window.location.pathname } })">Войти через Discord</button>
                         </div>`;
                     updateForumForm();
+                    updateNewsForm();
                     return;
                 }
 
@@ -1378,6 +1364,9 @@
                 
                 isUserModerator = !!modData;
                 console.log("[Moderation Check] Итоговый флаг статуса модератора выставлен фронтендом в:", isUserModerator);
+
+                // Синхронно отрисовываем админ-панель новостей на главной
+                updateNewsForm();
 
                 const { data: linkedData, error: linkedError } = await supabaseClient
                     .from('linked_accounts')
@@ -1489,7 +1478,7 @@
                             </div>
                             <div class="stat-card" style="background: rgba(255,255,255,0.01); border: 1px solid rgba(255,255,255,0.03); padding: 20px; border-radius: 20px; text-align: left;">
                                 <div class="stat-label" style="font-size: 0.8rem; color: var(--accent-pink); margin-bottom: 4px;">📊 K/D</div>
-                                <div class="stat-value" style="font-size: 1.4rem; font-weight: 700;">${kd}</div>
+                                <div class="stat-value" style="font-size: 1.4rem; font-weight: 700; color: var(--accent-pink);">${kd}</div>
                             </div>
                         </div>
                         <div style="text-align: left; margin-top: 20px; font-size: 0.85rem; color: var(--text-muted);">Последний раз онлайн: ${formatDate(currentStats.last_seen, false)}</div>
@@ -2107,7 +2096,7 @@
             } else {
                 container.innerHTML = `
                     <div style="width: 100%; background: rgba(138, 43, 226, 0.02); border: 1px solid rgba(138, 43, 226, 0.15); padding: 20px; border-radius: 20px; text-align: center; color: var(--text-muted); font-size: 0.95rem; font-weight: 500;">
-                        🔒 Войди и привяжи Minecraft, чтобы публикувать посты.
+                        🔒 Войди и привяжи Minecraft, чтобы публиковать посты.
                     </div>
                 `;
             }
@@ -2422,7 +2411,6 @@
             });
         }
 
-        // 2. МГНОВЕННЫЕ ОПТИМИСТИЧНЫЕ ЛАЙКИ БЕЗ ОЖИДАНИЯ ОТВЕТА СЕРВЕРА
         async function toggleLike(postId) {
             if (!currentUserLinkedData) {
                 alert('Войди и привяжи Minecraft, чтобы ставить лайки!');
@@ -2525,12 +2513,173 @@
             }
         }
 
+        /* --- НОВЫЙ МОДУЛЬ УПРАВЛЕНИЯ ЛЕНТОЙ НОВОСТЕЙ СЕРВЕРА --- */
+
+        function updateNewsForm() {
+            const container = document.getElementById('news-admin-container');
+            if (!container) return;
+
+            if (isUserModerator) {
+                container.innerHTML = `
+                    <div style="width: 100%; background: rgba(255, 255, 255, 0.01); border: 1px solid rgba(138, 43, 226, 0.2); padding: 20px; border-radius: 20px; text-align: left; margin-bottom: 24px;">
+                        <h4 style="font-size: 0.95rem; font-weight: 600; color: #b388ff; margin-bottom: 14px; display: flex; align-items: center; gap: 6px;">🛠 Панель публикации новостей</h4>
+                        <div style="display: flex; gap: 12px; margin-bottom: 12px; flex-wrap: wrap;">
+                            <input type="text" id="news-title-input" placeholder="Заголовок новости..." style="flex: 2; min-width: 200px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.06); border-radius: 10px; padding: 10px 14px; color: #fff; font-family: var(--font-sans); font-size: 0.9rem; outline: none;">
+                            <input type="text" id="news-tag-input" placeholder="Текст тега (напр. Обновление)..." style="flex: 1; min-width: 150px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.06); border-radius: 10px; padding: 10px 14px; color: #fff; font-family: var(--font-sans); font-size: 0.9rem; outline: none;">
+                            <select id="news-style-select" style="flex: 1; min-width: 120px; background: #16112c; border: 1px solid rgba(255,255,255,0.06); border-radius: 10px; padding: 10px 14px; color: #fff; font-family: var(--font-sans); font-size: 0.9rem; outline: none; cursor: pointer;">
+                                <option value="update">Фиолетовый (Обновление)</option>
+                                <option value="important">Розовый (Важно)</option>
+                            </select>
+                        </div>
+                        <input type="text" id="news-img-input" placeholder="Прямая URL ссылка на картинку (необязательно)..." style="width: 100%; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.06); border-radius: 10px; padding: 10px 14px; color: #fff; font-family: var(--font-sans); font-size: 0.9rem; outline: none; margin-bottom: 12px;">
+                        <textarea id="news-content-input" placeholder="Основной текст новости..." style="width: 100%; height: 90px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.06); border-radius: 10px; padding: 10px 14px; color: #fff; font-family: var(--font-sans); font-size: 0.9rem; resize: none; outline: none; margin-bottom: 12px;"></textarea>
+                        <div style="display: flex; justify-content: flex-end;">
+                            <button class="btn-primary" style="padding: 8px 20px; font-size: 0.82rem; border-radius: 12px;" onclick="createNewsPost()">Опубликовать новость</button>
+                        </div>
+                    </div>
+                `;
+            } else {
+                container.innerHTML = '';
+            }
+        }
+
+        async function createNewsPost() {
+            const titleInput = document.getElementById('news-title-input');
+            const tagInput = document.getElementById('news-tag-input');
+            const styleSelect = document.getElementById('news-style-select');
+            const imgInput = document.getElementById('news-img-input');
+            const contentInput = document.getElementById('news-content-input');
+
+            if (!titleInput || !contentInput) return;
+
+            const title = titleInput.value.trim();
+            const tagText = tagInput.value.trim() || 'Новость';
+            const tagStyle = styleSelect.value;
+            const imageUrl = imgInput.value.trim() || null;
+            const content = contentInput.value.trim();
+
+            if (!title || !content) {
+                alert('Заголовок и основной текст новости не могут быть пустыми!');
+                return;
+            }
+
+            try {
+                const { error } = await supabaseClient
+                    .from('forum_news')
+                    .insert({
+                        title: title,
+                        content: content,
+                        tag_text: tagText,
+                        tag_style: tagStyle,
+                        image_url: imageUrl
+                    });
+
+                if (error) throw error;
+
+                titleInput.value = '';
+                tagInput.value = '';
+                imgInput.value = '';
+                contentInput.value = '';
+
+                await loadNewsFeed();
+            } catch (e) {
+                console.error(e);
+                alert('Не удалось опубликовать новость: ' + e.message);
+            }
+        }
+
+        async function loadNewsFeed() {
+            const container = document.getElementById('news-list-container');
+            if (!container) return;
+
+            try {
+                const { data: news, error } = await supabaseClient
+                    .from('forum_news')
+                    .select('*')
+                    .order('created_at', { ascending: false });
+
+                if (error) throw error;
+
+                // Если новостей в базе нет, рендерим дефолтные заглушки, чтобы страница оставалась красивой
+                if (!news || news.length === 0) {
+                    container.innerHTML = `
+                        <div class="news-card">
+                            <div class="news-meta">
+                                <span class="news-date">23.06.2026</span>
+                                <span class="news-tag update">Обновление</span>
+                            </div>
+                            <h3>Завершение разработки экономического ядра</h3>
+                            <p>Мы полностью закончили тесты кастомного плагина для безналичных расчетов. В четвертом сезоне торговые взаимодействия между городами станут полностью цифровыми через терминалы на спавне.</p>
+                        </div>
+                        <div class="news-card">
+                            <div class="news-meta">
+                                <span class="news-date">15.06.2026</span>
+                                <span class="news-tag important">Важно</span>
+                            </div>
+                            <h3>Официальная дата запуска 4-го сезона!</h3>
+                            <p>Подготовка мира вышла на финишную прямую. Белый список будет полностью очищен и обновлен уже в конце этой недели. Успейте подать бесплатную анкету или активировать премиум-пропуск.</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                container.innerHTML = '';
+                news.forEach(item => {
+                    const card = document.createElement('div');
+                    card.classList.add('news-card');
+
+                    const deleteBtnHtml = isUserModerator ? `
+                        <span style="color: var(--accent-pink); cursor: pointer; font-size: 0.75rem; margin-left: auto; font-weight: 600;" onclick="deleteNews('${item.id}')">Удалить</span>
+                    ` : '';
+
+                    const imgHtml = item.image_url ? `
+                        <img src="${item.image_url}" style="max-width: 100%; max-height: 360px; object-fit: cover; border-radius: 16px; margin-top: 14px; display: block; border: 1px solid rgba(255,255,255,0.04);">
+                    ` : '';
+
+                    card.innerHTML = `
+                        <div class="news-meta">
+                            <span class="news-date">${formatDate(item.created_at, false)}</span>
+                            <span class="news-tag ${item.tag_style}">${item.tag_text}</span>
+                            ${deleteBtnHtml}
+                        </div>
+                        <h3>${item.title}</h3>
+                        <p style="white-space: pre-wrap; word-break: break-word; font-size: 0.9rem; color: var(--text-muted); line-height: 1.5;">${item.content}</p>
+                        ${imgHtml}
+                    `;
+                    container.appendChild(card);
+                });
+
+            } catch (e) {
+                console.error("Ошибка загрузки новостей из бэкенда:", e);
+            }
+        }
+
+        async function deleteNews(newsId) {
+            if (!confirm('Вы действительно хотите навсегда удалить эту новость?')) return;
+            try {
+                const { error } = await supabaseClient
+                    .from('forum_news')
+                    .delete()
+                    .eq('id', newsId);
+
+                if (error) throw error;
+                await loadNewsFeed();
+            } catch (e) {
+                console.error(e);
+                alert('Ошибка удаления новости.');
+            }
+        }
+
         /* --- КОНЕЦ ФОРУМА --- */
 
         renderPlayersList();
         updateServerStatus();
         setInterval(updateServerStatus, 60000);
-        loadProfileData();
+        
+        // Первичное развертывание профиля и ленты новостей
+        loadProfileData().then(() => {
+            loadNewsFeed();
+        });
 
         window.onload = () => {
             initRouletteGraphic();
