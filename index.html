@@ -383,8 +383,6 @@
         }
         .news-date { color: var(--text-muted); font-weight: 500; }
         .news-tag { padding: 2px 8px; border-radius: 6px; font-weight: 600; text-transform: uppercase; font-size: 0.7rem; letter-spacing: 0.02em; }
-        .news-tag.update { background: rgba(138, 43, 226, 0.15); color: #b388ff; }
-        .news-tag.important { background: rgba(255, 0, 127, 0.15); color: var(--accent-pink); }
         
         .news-card h3 { font-size: 1.15rem; font-weight: 600; color: #fff; margin-bottom: 8px; }
         .news-card p { font-size: 0.9rem; color: var(--text-muted); line-height: 1.5; }
@@ -854,7 +852,6 @@
                 </div>
             </div>
 
-            <!-- ИЗМЕНЕННЫЙ БЛОК ЛЕНТЫ НОВОСТЕЙ С ПОДДЕРЖКОЙ ДИНАМИЧЕСКИХ ФОРМ -->
             <div class="ux-panel">
                 <div class="panel-title" style="margin-bottom: 24px; text-align: left; width: 100%;">📰 Последние новости</div>
                 <div id="news-admin-container" style="width: 100%;"></div>
@@ -1142,8 +1139,8 @@
             return `${hours}ч ${minutes}м`;
         }
 
-        // 1. УСОВЕРШЕНСТВОВАННАЯ ФУНКЦИЯ ДАТЫ С ПАРАМЕТРОМ ВЫВОДА ВРЕМЕНИ
-        function formatDate(dateStr, showTime = true) {
+        // 2. УНИФИЦИРОВАННЫЙ ВЫВОД ТОЧНОГО ВРЕМЕНИ ПО ВСЕМУ САЙТУ
+        function formatDate(dateStr) {
             if (!dateStr) return 'Неизвестно';
             const date = new Date(dateStr);
             if (isNaN(date.getTime())) return 'Неизвестно';
@@ -1156,7 +1153,7 @@
             
             const hours = String(date.getHours()).padStart(2, '0');
             const minutes = String(date.getMinutes()).padStart(2, '0');
-            const timeStr = showTime ? ` в ${hours}:${minutes}` : '';
+            const timeStr = ` в ${hours}:${minutes}`;
             
             if (target.getTime() === today.getTime()) return `Сегодня${timeStr}`;
             if (target.getTime() === yesterday.getTime()) return `Вчера${timeStr}`;
@@ -1349,7 +1346,6 @@
                 const discordUsername = user.user_metadata.full_name || user.user_metadata.name || 'Discord User';
                 const discordAvatarUrl = user.user_metadata.avatar_url || 'https://cdn.discordapp.com/embed/avatars/0.png';
 
-                // 3. АВТОНОМНАЯ ИНСПЕКЦИЯ МОДЕРАТОРА С ВЫВОДОМ ПОЛНЫХ ДИАГНОСТИЧЕСКИХ ЛОГОВ В КОНСОЛЬ
                 console.log("[Moderation Check] Начинаем верификацию прав для discordId:", discordId);
                 const { data: modData, error: modError } = await supabaseClient
                     .from('forum_moderators')
@@ -1365,7 +1361,6 @@
                 isUserModerator = !!modData;
                 console.log("[Moderation Check] Итоговый флаг статуса модератора выставлен фронтендом в:", isUserModerator);
 
-                // Синхронно отрисовываем админ-панель новостей на главной
                 updateNewsForm();
 
                 const { data: linkedData, error: linkedError } = await supabaseClient
@@ -1458,7 +1453,7 @@
                                 <div style="text-align: left;">
                                     <h2 style="font-size: 1.5rem; font-weight: 700; color: #fff;">${linkedData.minecraft_name}</h2>
                                     <div style="font-size: 0.85rem; color: var(--text-muted); margin-top: 4px;">Discord: ${discordUsername}</div>
-                                    <div style="font-size: 0.82rem; color: #b388ff; margin-top: 4px;">На сервере с ${formatDate(currentStats.first_join, false)}</div>
+                                    <div style="font-size: 0.82rem; color: #b388ff; margin-top: 4px;">На сервере с ${formatDate(currentStats.first_join)}</div>
                                 </div>
                             </div>
                             <button class="btn-secondary" style="padding: 8px 16px; font-size: 0.8rem;" onclick="handleSignOut()">Выйти</button>
@@ -1481,7 +1476,7 @@
                                 <div class="stat-value" style="font-size: 1.4rem; font-weight: 700; color: var(--accent-pink);">${kd}</div>
                             </div>
                         </div>
-                        <div style="text-align: left; margin-top: 20px; font-size: 0.85rem; color: var(--text-muted);">Последний раз онлайн: ${formatDate(currentStats.last_seen, false)}</div>
+                        <div style="text-align: left; margin-top: 20px; font-size: 0.85rem; color: var(--text-muted);">Последний раз онлайн: ${formatDate(currentStats.last_seen)}</div>
                     </div>`;
             } catch (e) {
                 console.error(e);
@@ -1701,7 +1696,7 @@
                     </div>
                     
                     <div style="font-size: 0.85rem; color: var(--text-muted); text-align: left; border-top: 1px solid rgba(255,255,255,0.04); padding-top: 15px;">
-                        Последний раз онлайн: <span style="color: #fff; font-weight: 600;">${formatDate(playerData.last_seen, false)}</span>
+                        Последний раз онлайн: <span style="color: #fff; font-weight: 600;">${formatDate(playerData.last_seen)}</span>
                     </div>
                 </div>
             `;
@@ -1997,7 +1992,7 @@
                                 <span style="font-size: 1.1rem; flex-shrink: 0;">${badge}</span>
                                 <div style="overflow: hidden;">
                                     <div style="font-size: 0.85rem; font-weight: 500; color: #fff; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">${tx.description || 'Операция'}</div>
-                                    <div style="font-size: 0.72rem; color: var(--text-muted); margin-top: 2px;">${formatDate(tx.created_at, false)}</div>
+                                    <div style="font-size: 0.72rem; color: var(--text-muted); margin-top: 2px;">${formatDate(tx.created_at)}</div>
                                 </div>
                             </div>
                             <div style="font-size: 0.9rem; font-weight: 700; color: ${color}; white-space: nowrap; margin-left: 10px;">
@@ -2513,8 +2508,9 @@
             }
         }
 
-        /* --- НОВЫЙ МОДУЛЬ УПРАВЛЕНИЯ ЛЕНТОЙ НОВОСТЕЙ СЕРВЕРА --- */
+        /* --- МОДУЛЬ УПРАВЛЕНИЯ ЛЕНТОЙ НОВОСТЕЙ СЕРВЕРА --- */
 
+        // 3. ДОРАБОТКА ФОРМЫ: ИНТЕГРАЦИЯ ПАЛИТРЫ ЦВЕТОВ ДЛЯ ТЕГОВ
         function updateNewsForm() {
             const container = document.getElementById('news-admin-container');
             if (!container) return;
@@ -2523,13 +2519,13 @@
                 container.innerHTML = `
                     <div style="width: 100%; background: rgba(255, 255, 255, 0.01); border: 1px solid rgba(138, 43, 226, 0.2); padding: 20px; border-radius: 20px; text-align: left; margin-bottom: 24px;">
                         <h4 style="font-size: 0.95rem; font-weight: 600; color: #b388ff; margin-bottom: 14px; display: flex; align-items: center; gap: 6px;">🛠 Панель публикации новостей</h4>
-                        <div style="display: flex; gap: 12px; margin-bottom: 12px; flex-wrap: wrap;">
+                        <div style="display: flex; gap: 12px; margin-bottom: 12px; flex-wrap: wrap; align-items: center;">
                             <input type="text" id="news-title-input" placeholder="Заголовок новости..." style="flex: 2; min-width: 200px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.06); border-radius: 10px; padding: 10px 14px; color: #fff; font-family: var(--font-sans); font-size: 0.9rem; outline: none;">
                             <input type="text" id="news-tag-input" placeholder="Текст тега (напр. Обновление)..." style="flex: 1; min-width: 150px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.06); border-radius: 10px; padding: 10px 14px; color: #fff; font-family: var(--font-sans); font-size: 0.9rem; outline: none;">
-                            <select id="news-style-select" style="flex: 1; min-width: 120px; background: #16112c; border: 1px solid rgba(255,255,255,0.06); border-radius: 10px; padding: 10px 14px; color: #fff; font-family: var(--font-sans); font-size: 0.9rem; outline: none; cursor: pointer;">
-                                <option value="update">Фиолетовый (Обновление)</option>
-                                <option value="important">Розовый (Важно)</option>
-                            </select>
+                            <div style="display: flex; align-items: center; gap: 8px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.06); border-radius: 10px; padding: 8px 14px; height: 40px;">
+                                <span style="font-size: 0.85rem; color: var(--text-muted); white-space: nowrap;">Цвет тега:</span>
+                                <input type="color" id="news-color-input" value="#8a2be2" style="width: 30px; height: 24px; background: none; border: none; cursor: pointer; padding: 0;">
+                            </div>
                         </div>
                         <input type="text" id="news-img-input" placeholder="Прямая URL ссылка на картинку (необязательно)..." style="width: 100%; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.06); border-radius: 10px; padding: 10px 14px; color: #fff; font-family: var(--font-sans); font-size: 0.9rem; outline: none; margin-bottom: 12px;">
                         <textarea id="news-content-input" placeholder="Основной текст новости..." style="width: 100%; height: 90px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.06); border-radius: 10px; padding: 10px 14px; color: #fff; font-family: var(--font-sans); font-size: 0.9rem; resize: none; outline: none; margin-bottom: 12px;"></textarea>
@@ -2546,15 +2542,15 @@
         async function createNewsPost() {
             const titleInput = document.getElementById('news-title-input');
             const tagInput = document.getElementById('news-tag-input');
-            const styleSelect = document.getElementById('news-style-select');
+            const colorInput = document.getElementById('news-color-input');
             const imgInput = document.getElementById('news-img-input');
             const contentInput = document.getElementById('news-content-input');
 
-            if (!titleInput || !contentInput) return;
+            if (!titleInput || !contentInput || !colorInput) return;
 
             const title = titleInput.value.trim();
             const tagText = tagInput.value.trim() || 'Новость';
-            const tagStyle = styleSelect.value;
+            const tagStyle = colorInput.value; // Получаем полный Hex-код цвета
             const imageUrl = imgInput.value.trim() || null;
             const content = contentInput.value.trim();
 
@@ -2600,26 +2596,9 @@
 
                 if (error) throw error;
 
-                // Если новостей в базе нет, рендерим дефолтные заглушки, чтобы страница оставалась красивой
+                // 1. ПОЛНОЕ УДАЛЕНИЕ ХАРДКОДНЫХ КАРТОЧЕК ПРИ ОТСУТСТВИИ ЗАПИСЕЙ В СУБД
                 if (!news || news.length === 0) {
-                    container.innerHTML = `
-                        <div class="news-card">
-                            <div class="news-meta">
-                                <span class="news-date">23.06.2026</span>
-                                <span class="news-tag update">Обновление</span>
-                            </div>
-                            <h3>Завершение разработки экономического ядра</h3>
-                            <p>Мы полностью закончили тесты кастомного плагина для безналичных расчетов. В четвертом сезоне торговые взаимодействия между городами станут полностью цифровыми через терминалы на спавне.</p>
-                        </div>
-                        <div class="news-card">
-                            <div class="news-meta">
-                                <span class="news-date">15.06.2026</span>
-                                <span class="news-tag important">Важно</span>
-                            </div>
-                            <h3>Официальная дата запуска 4-го сезона!</h3>
-                            <p>Подготовка мира вышла на финишную прямую. Белый список будет полностью очищен и обновлен уже в конце этой недели. Успейте подать бесплатную анкету или активировать премиум-пропуск.</p>
-                        </div>
-                    `;
+                    container.innerHTML = `<div style="color: var(--text-muted); text-align: left; padding: 20px;">Нет опубликованных новостей.</div>`;
                     return;
                 }
 
@@ -2636,10 +2615,11 @@
                         <img src="${item.image_url}" style="max-width: 100%; max-height: 360px; object-fit: cover; border-radius: 16px; margin-top: 14px; display: block; border: 1px solid rgba(255,255,255,0.04);">
                     ` : '';
 
+                    // Динамическая инлайн-подстановка цвета палитры для тега (Hex + 26 для 15% прозрачности фона)
                     card.innerHTML = `
                         <div class="news-meta">
-                            <span class="news-date">${formatDate(item.created_at, false)}</span>
-                            <span class="news-tag ${item.tag_style}">${item.tag_text}</span>
+                            <span class="news-date">${formatDate(item.created_at)}</span>
+                            <span class="news-tag" style="background: ${item.tag_style}26; color: ${item.tag_style};">${item.tag_text}</span>
                             ${deleteBtnHtml}
                         </div>
                         <h3>${item.title}</h3>
@@ -2676,7 +2656,6 @@
         updateServerStatus();
         setInterval(updateServerStatus, 60000);
         
-        // Первичное развертывание профиля и ленты новостей
         loadProfileData().then(() => {
             loadNewsFeed();
         });
