@@ -382,7 +382,7 @@
             font-size: 0.8rem;
         }
         .news-date { color: var(--text-muted); font-weight: 500; }
-        .news-tag { padding: 2px 8px; border-radius: 6px; font-weight: 600; text-transform: uppercase; font-size: 0.7rem; letter-spacing: 0.02em; }
+        .news-tag { padding: 2px 8px; border-radius: 6px; font-weight: 600; text-transform: uppercase; font-size: 0.7rem; letter-spacing: 0.02em; border: 1px solid rgba(255,255,255,0.03); }
         
         .news-card h3 { font-size: 1.15rem; font-weight: 600; color: #fff; margin-bottom: 8px; }
         .news-card p { font-size: 0.9rem; color: var(--text-muted); line-height: 1.5; }
@@ -960,7 +960,7 @@
                         <div class="mechanic-img-box"><div class="mechanic-placeholder-icon">📰</div></div>
                         <div class="mechanic-text-block">
                             <h3>Газета Kuromi Times</h3>
-                            <p>Информационный вестник сервера. Любой житель SMP может отправить свою статью или расследование через форму на сайте. Публикация происходит после модерации редакцией.</p>
+                            <p>Информационный вестник сервера. Люгой житель SMP может отправить свою статью или расследование через форму на сайте. Публикация происходит после модерации редакцией.</p>
                         </div>
                     </div>
                     <div class="mechanic-card">
@@ -1139,8 +1139,8 @@
             return `${hours}ч ${minutes}м`;
         }
 
-        // 2. УНИФИЦИРОВАННЫЙ ВЫВОД ТОЧНОГО ВРЕМЕНИ ПО ВСЕМУ САЙТУ
-        function formatDate(dateStr) {
+        // 1. УПРАВЛЕНИЕ ОТОБРАЖЕНИЕМ ТОЧНОГО ВРЕМЕНИ ПО ФЛАГУ
+        function formatDate(dateStr, showTime = true) {
             if (!dateStr) return 'Неизвестно';
             const date = new Date(dateStr);
             if (isNaN(date.getTime())) return 'Неизвестно';
@@ -1153,7 +1153,7 @@
             
             const hours = String(date.getHours()).padStart(2, '0');
             const minutes = String(date.getMinutes()).padStart(2, '0');
-            const timeStr = ` в ${hours}:${minutes}`;
+            const timeStr = showTime ? ` в ${hours}:${minutes}` : '';
             
             if (target.getTime() === today.getTime()) return `Сегодня${timeStr}`;
             if (target.getTime() === yesterday.getTime()) return `Вчера${timeStr}`;
@@ -1445,6 +1445,7 @@
                 loadWalletBalance(linkedData.minecraft_uuid);
                 updateForumForm();
                 
+                // ВЫВОДИМ ТОЛЬКО ПОВЕРХНОСТНУЮ ДАТУ БЕЗ ВРЕМЕНИ ДЛЯ ПРОФИЛЯ
                 wrapper.innerHTML = `
                     <div style="width: 100%;">
                         <div style="display: flex; justify-content: space-between; align-items: center; width: 100%; border-bottom: 1px solid rgba(255,255,255,0.04); padding-bottom: 20px;">
@@ -1453,7 +1454,7 @@
                                 <div style="text-align: left;">
                                     <h2 style="font-size: 1.5rem; font-weight: 700; color: #fff;">${linkedData.minecraft_name}</h2>
                                     <div style="font-size: 0.85rem; color: var(--text-muted); margin-top: 4px;">Discord: ${discordUsername}</div>
-                                    <div style="font-size: 0.82rem; color: #b388ff; margin-top: 4px;">На сервере с ${formatDate(currentStats.first_join)}</div>
+                                    <div style="font-size: 0.82rem; color: #b388ff; margin-top: 4px;">На сервере с ${formatDate(currentStats.first_join, false)}</div>
                                 </div>
                             </div>
                             <button class="btn-secondary" style="padding: 8px 16px; font-size: 0.8rem;" onclick="handleSignOut()">Выйти</button>
@@ -1476,7 +1477,7 @@
                                 <div class="stat-value" style="font-size: 1.4rem; font-weight: 700; color: var(--accent-pink);">${kd}</div>
                             </div>
                         </div>
-                        <div style="text-align: left; margin-top: 20px; font-size: 0.85rem; color: var(--text-muted);">Последний раз онлайн: ${formatDate(currentStats.last_seen)}</div>
+                        <div style="text-align: left; margin-top: 20px; font-size: 0.85rem; color: var(--text-muted);">Последний раз онлайн: ${formatDate(currentStats.last_seen, false)}</div>
                     </div>`;
             } catch (e) {
                 console.error(e);
@@ -1669,6 +1670,7 @@
             const deaths = playerData.deaths || 0;
             const kd = deaths === 0 ? kills + ".0" : (kills / deaths).toFixed(2);
 
+            // ВЫВОДИМ ТОЛЬКО ПОВЕРХНОСТНУЮ ДАТУ БЕЗ ВРЕМЕНИ ДЛЯ МОДАЛЬНОГО ОКНА ИГРОКА
             modalOverlay.innerHTML = `
                 <div style="background: rgba(16, 11, 28, 0.95); border-radius: 28px; border: 1px solid rgba(138, 43, 226, 0.2); max-width: 480px; width: 100%; padding: 40px 30px; position: relative; box-shadow: 0 20px 50px rgba(0,0,0,0.6); text-align: center; font-family: var(--font-sans);">
                     <span style="position: absolute; top: 20px; right: 25px; color: var(--text-muted); font-size: 1.8rem; cursor: pointer; font-weight: bold; line-height: 1;" onclick="this.parentElement.parentElement.remove()">&times;</span>
@@ -1696,7 +1698,7 @@
                     </div>
                     
                     <div style="font-size: 0.85rem; color: var(--text-muted); text-align: left; border-top: 1px solid rgba(255,255,255,0.04); padding-top: 15px;">
-                        Последний раз онлайн: <span style="color: #fff; font-weight: 600;">${formatDate(playerData.last_seen)}</span>
+                        Последний раз онлайн: <span style="color: #fff; font-weight: 600;">${formatDate(playerData.last_seen, false)}</span>
                     </div>
                 </div>
             `;
@@ -1882,6 +1884,7 @@
             }
         }
 
+        // 2. УДАЛЕНИЕ ВКЛАДКИ ОБЗОР ИЗ МОДАЛЬНОГО ОКНА КОШЕЛЬКА
         async function openWalletModal(uuid) {
             const oldOverlay = document.getElementById('wallet-modal-overlay');
             if (oldOverlay) oldOverlay.remove();
@@ -1922,8 +1925,7 @@
                     </div>
 
                     <div style="display: flex; background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.04); padding: 4px; border-radius: 16px; gap: 4px; margin-bottom: 22px;">
-                        <button id="wtab-overview" style="flex:1; background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.02); color: #fff; padding: 10px; border-radius: 12px; font-family: var(--font-sans); font-size: 0.85rem; font-weight: 500; cursor: pointer; transition: all 0.2s;" onclick="switchWalletTab('overview', '${uuid}')">Обзор</button>
-                        <button id="wtab-history" style="flex:1; background: none; border: none; color: var(--text-muted); padding: 10px; border-radius: 12px; font-family: var(--font-sans); font-size: 0.85rem; font-weight: 500; cursor: pointer; transition: all 0.2s;" onclick="switchWalletTab('history', '${uuid}')">История</button>
+                        <button id="wtab-history" style="flex:1; background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.02); color: #fff; padding: 10px; border-radius: 12px; font-family: var(--font-sans); font-size: 0.85rem; font-weight: 500; cursor: pointer; transition: all 0.2s;" onclick="switchWalletTab('history', '${uuid}')">История</button>
                         <button id="wtab-season" style="flex:1; background: none; border: none; color: var(--text-muted); padding: 10px; border-radius: 12px; font-family: var(--font-sans); font-size: 0.85rem; font-weight: 500; cursor: pointer; transition: all 0.2s;" onclick="switchWalletTab('season', '${uuid}')">Сезон</button>
                     </div>
 
@@ -1932,11 +1934,11 @@
             `;
 
             document.body.appendChild(overlay);
-            switchWalletTab('overview', uuid);
+            switchWalletTab('history', uuid); // Сразу активируем историю
         }
 
         async function switchWalletTab(tab, uuid) {
-            ['overview', 'history', 'season'].forEach(t => {
+            ['history', 'season'].forEach(t => {
                 const btn = document.getElementById(`wtab-${t}`);
                 if (btn) {
                     if (t === tab) {
@@ -1956,7 +1958,7 @@
             container.innerHTML = `<div style="color: var(--text-muted); text-align: center; padding: 30px 0; font-size: 0.9rem;">Загрузка данных...</div>`;
 
             let transactions = [];
-            if (tab === 'overview' || tab === 'history') {
+            if (tab === 'history') {
                 try {
                     const { data, error } = await supabaseClient
                         .from('wallet_transactions')
@@ -1986,13 +1988,14 @@
                     const badge = isIn ? '💵' : '🛒';
                     const sign = isIn ? '+' : '-';
                     
+                    // ДЛЯ ТРАНЗАКЦИЙ ВЫВОДИМ ТОЛЬКО ПОВЕРХНОСТНУЮ ДАТУ БЕЗ ВРЕМЕНИ
                     html += `
                         <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(255,255,255,0.01); border: 1px solid rgba(255,255,255,0.03); padding: 12px; border-radius: 14px;">
                             <div style="display: flex; align-items: center; gap: 10px; text-align: left; overflow: hidden;">
                                 <span style="font-size: 1.1rem; flex-shrink: 0;">${badge}</span>
                                 <div style="overflow: hidden;">
                                     <div style="font-size: 0.85rem; font-weight: 500; color: #fff; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">${tx.description || 'Операция'}</div>
-                                    <div style="font-size: 0.72rem; color: var(--text-muted); margin-top: 2px;">${formatDate(tx.created_at)}</div>
+                                    <div style="font-size: 0.72rem; color: var(--text-muted); margin-top: 2px;">${formatDate(tx.created_at, false)}</div>
                                 </div>
                             </div>
                             <div style="font-size: 0.9rem; font-weight: 700; color: ${color}; white-space: nowrap; margin-left: 10px;">
@@ -2002,63 +2005,6 @@
                     `;
                 });
                 html += `</div>`;
-                container.innerHTML = html;
-
-            } else if (tab === 'overview') {
-                if (transactions.length === 0) {
-                    container.innerHTML = `<div style="color: var(--text-muted); text-align: center; padding: 30px 0; font-size: 0.9rem;">Недостаточно данных для анализа структуры</div>`;
-                    return;
-                }
-
-                const structure = {};
-                let overallSum = 0;
-                transactions.forEach(tx => {
-                    const type = tx.type || 'other';
-                    structure[type] = (structure[type] || 0) + tx.amount;
-                    overallSum += tx.amount;
-                });
-
-                const palette = ['#8a2be2', '#ff007f', '#ffb700', '#2ecc71', '#00bcd4'];
-                const keys = Object.keys(structure);
-                
-                let accumulatedAngle = 0;
-                const gradientSectors = [];
-                keys.forEach((k, index) => {
-                    const color = palette[index % palette.length];
-                    const nextAngle = accumulatedAngle + (structure[k] / overallSum) * 360;
-                    gradientSectors.push(`${color} ${accumulatedAngle}deg ${nextAngle}deg`);
-                    accumulatedAngle = nextAngle;
-                });
-
-                let html = `
-                    <div style="display: flex; flex-direction: column; align-items: center; gap: 18px; padding: 5px 0;">
-                        <div style="width: 120px; height: 120px; border-radius: 50%; background: conic-gradient(${gradientSectors.join(', ')}); border: 2px solid rgba(255,255,255,0.04); box-shadow: 0 5px 15px rgba(0,0,0,0.3);"></div>
-                        <div style="width: 100%; display: flex; flex-direction: column; gap: 8px;">
-                `;
-
-                keys.forEach((key, index) => {
-                    const color = palette[index % palette.length];
-                    const val = structure[key];
-                    const share = ((val / overallSum) * 100).toFixed(1);
-                    
-                    let friendlyName = key;
-                    if (key === 'deposit') friendlyName = 'Внесение руды';
-                    if (key === 'withdraw') friendlyName = 'Снятие в предметы';
-
-                    html += `
-                        <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.82rem; padding: 8px 12px; background: rgba(255, 255, 255, 0.01); border-radius: 10px; border: 1px solid rgba(255, 255, 255, 0.02);">
-                            <div style="display: flex; align-items: center; gap: 8px;">
-                                <span style="width: 9px; height: 9px; background: ${color}; border-radius: 50%; display: inline-block;"></span>
-                                <span style="color: #fff; text-transform: capitalize;">${friendlyName}</span>
-                            </div>
-                            <div style="color: var(--text-muted); font-weight: 500;">
-                                <span style="color: #fff; font-weight: 600; margin-right: 4px;">${val}</span> (${share}%)
-                            </div>
-                        </div>
-                    `;
-                });
-
-                html += `</div></div>`;
                 container.innerHTML = html;
 
             } else if (tab === 'season') {
@@ -2187,6 +2133,8 @@
                         const commDeleteBtn = isUserModerator ? `
                             <span style="color: var(--accent-pink); cursor: pointer; font-size: 0.75rem; margin-left: auto;" onclick="deleteComment('${comm.id}')">Удалить</span>
                         ` : '';
+                        
+                        // ФОРУМ: ТОЧНОЕ ВРЕМЯ КММЕНТАРИЕВ ОСТАВЛЕНО (ПО УМОЛЧАНИЮ TRUE)
                         return `
                             <div style="display: flex; gap: 12px; background: rgba(0, 0, 0, 0.15); padding: 12px; border-radius: 14px; border: 1px solid rgba(255,255,255,0.02); align-items: flex-start; margin-bottom: 8px;">
                                 <img src="https://mc-heads.net/avatar/${comm.minecraft_name}/28" style="width: 28px; height: 28px; image-rendering: pixelated; border-radius: 6px; flex-shrink: 0; cursor: pointer;" onclick="openPlayerModal('${comm.minecraft_uuid}', '${comm.minecraft_name}')">
@@ -2251,6 +2199,7 @@
                     card.style.padding = '24px';
                     card.style.textAlign = 'left';
 
+                    // ФОРУМ: ТОЧНОЕ ВРЕМЯ ПОСТОВ ОСТАВЛЕНО (ПО УМОЛЧАНИЮ TRUE)
                     card.innerHTML = `
                         <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 14px;">
                             <div style="display: flex; align-items: center; gap: 14px;">
@@ -2510,7 +2459,6 @@
 
         /* --- МОДУЛЬ УПРАВЛЕНИЯ ЛЕНТОЙ НОВОСТЕЙ СЕРВЕРА --- */
 
-        // 3. ДОРАБОТКА ФОРМЫ: ИНТЕГРАЦИЯ ПАЛИТРЫ ЦВЕТОВ ДЛЯ ТЕГОВ
         function updateNewsForm() {
             const container = document.getElementById('news-admin-container');
             if (!container) return;
@@ -2522,7 +2470,7 @@
                         <div style="display: flex; gap: 12px; margin-bottom: 12px; flex-wrap: wrap; align-items: center;">
                             <input type="text" id="news-title-input" placeholder="Заголовок новости..." style="flex: 2; min-width: 200px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.06); border-radius: 10px; padding: 10px 14px; color: #fff; font-family: var(--font-sans); font-size: 0.9rem; outline: none;">
                             <input type="text" id="news-tag-input" placeholder="Текст тега (напр. Обновление)..." style="flex: 1; min-width: 150px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.06); border-radius: 10px; padding: 10px 14px; color: #fff; font-family: var(--font-sans); font-size: 0.9rem; outline: none;">
-                            <div style="display: flex; align-items: center; gap: 8px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.06); border-radius: 10px; padding: 8px 14px; height: 40px;">
+                            <div style="display: flex; align-items: center; gap: 8px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.06); border-radius: 10px; padding: 6px 14px; height: 40px;">
                                 <span style="font-size: 0.85rem; color: var(--text-muted); white-space: nowrap;">Цвет тега:</span>
                                 <input type="color" id="news-color-input" value="#8a2be2" style="width: 30px; height: 24px; background: none; border: none; cursor: pointer; padding: 0;">
                             </div>
@@ -2550,7 +2498,7 @@
 
             const title = titleInput.value.trim();
             const tagText = tagInput.value.trim() || 'Новость';
-            const tagStyle = colorInput.value; // Получаем полный Hex-код цвета
+            const tagStyle = colorInput.value; 
             const imageUrl = imgInput.value.trim() || null;
             const content = contentInput.value.trim();
 
@@ -2596,7 +2544,6 @@
 
                 if (error) throw error;
 
-                // 1. ПОЛНОЕ УДАЛЕНИЕ ХАРДКОДНЫХ КАРТОЧЕК ПРИ ОТСУТСТВИИ ЗАПИСЕЙ В СУБД
                 if (!news || news.length === 0) {
                     container.innerHTML = `<div style="color: var(--text-muted); text-align: left; padding: 20px;">Нет опубликованных новостей.</div>`;
                     return;
@@ -2615,10 +2562,10 @@
                         <img src="${item.image_url}" style="max-width: 100%; max-height: 360px; object-fit: cover; border-radius: 16px; margin-top: 14px; display: block; border: 1px solid rgba(255,255,255,0.04);">
                     ` : '';
 
-                    // Динамическая инлайн-подстановка цвета палитры для тега (Hex + 26 для 15% прозрачности фона)
+                    // ЛЕНТА НОВОСТЕЙ: ВЫВОД ТОЧНОГО ВРЕМЕНИ ВКЛЮЧЕН (ПО УМОЛЧАНИЮ TRUE)
                     card.innerHTML = `
                         <div class="news-meta">
-                            <span class="news-date">${formatDate(item.created_at)}</span>
+                            <span class="news-date">${formatDate(item.created_at, true)}</span>
                             <span class="news-tag" style="background: ${item.tag_style}26; color: ${item.tag_style};">${item.tag_text}</span>
                             ${deleteBtnHtml}
                         </div>
