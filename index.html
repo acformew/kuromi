@@ -784,6 +784,32 @@
             background: rgba(255, 0, 127, 0.04);
             transform: translateY(-1px);
         }
+
+        /* Новый стиль рублевого кошелька */
+        #ruble-widget {
+            background: var(--bg-card);
+            border: 1px solid var(--accent-pink);
+            padding: 12px 14px;
+            border-radius: 22px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: #fff;
+            width: 100%;
+            transition: all 0.2s ease;
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
+        }
+        #ruble-widget:hover {
+            border-color: #fff;
+            background: rgba(255, 0, 127, 0.1);
+            transform: translateY(-1px);
+        }
         
         /* Стили кастомного скроллбара для истории транзакций внутри модалки */
         .wallet-scroll::-webkit-scrollbar {
@@ -870,7 +896,7 @@
                         </div>
                         <div>
                             <div class="ticket-price">349 ₽</div>
-                            <button class="btn-primary" style="padding: 10px 20px; font-size: 0.8rem; margin-top: 10px; width: 100%;" onclick="alert('Модуль оплаты настраивается')">Купить доступ</button>
+                            <button class="btn-primary" style="padding: 10px 20px; font-size: 0.8rem; margin-top: 10px; width: 100%;" onclick="buyServerPass(349)">Купить доступ</button>
                         </div>
                     </div>
 
@@ -881,14 +907,14 @@
                         </div>
                         <div>
                             <div class="ticket-price">149 ₽</div>
-                            <button class="btn-primary" style="padding: 10px 20px; font-size: 0.8rem; margin-top: 10px; width: 100%;" onclick="alert('В один клик')">В один клик</button>
+                            <button class="btn-primary" style="padding: 10px 20px; font-size: 0.8rem; margin-top: 10px; width: 100%;" onclick="buyServerPass(149)">В один клик</button>
                         </div>
                     </div>
 
                     <div class="ticket-card">
                         <div class="ticket-info">
                             <h3>Бесплатный доступ</h3>
-                            <p>Эксклюзивный автоматический бонус для обладателей официальной Лицензии Minecraft! Пройди быструю моментальную верификацию через нашего бота и играй совершенно бесплатно без каких-либо взносов.</p>
+                            <p>Эксклюзивный автоматический бонус для обладателей официальной Лицензии Minecraft! Пройди быстрой моментальную верификацию через нашего бота и играй совершенно бесплатно без каких-либо взносов.</p>
                         </div>
                         <div>
                             <div class="ticket-price">0 ₽</div>
@@ -985,35 +1011,50 @@
                             <h3>Пропуск «Навсегда»</h3>
                             <p>Полноценный вечный доступ на сервер без ограничений по сезонам.</p>
                         </div>
-                        <div class="ticket-price" style="font-size: 1.15rem;">349 ₽</div>
+                        <div>
+                            <div class="ticket-price" style="font-size: 1.15rem;">349 ₽</div>
+                            <button class="btn-primary" style="padding: 8px 16px; font-size: 0.8rem; margin-top: 10px; width: 100%;" onclick="buyServerPass(349)">Купить</button>
+                        </div>
                     </div>
                     <div class="ticket-card" style="padding: 20px 25px; border-radius: 20px;">
                         <div class="ticket-info">
                             <h3>Инспектор (CoreProtect)</h3>
                             <p>Доступ к логированию действий `/co i`. Узнай, кто украл ресурсы или сломал постройку.</p>
                         </div>
-                        <div class="ticket-price" style="font-size: 1.15rem;">249 ₽</div>
+                        <div>
+                            <div class="ticket-price" style="font-size: 1.15rem;">249 ₽</div>
+                            <button class="btn-primary" style="padding: 8px 16px; font-size: 0.8rem; margin-top: 10px; width: 100%;" onclick="buyPrivilege('Инспектор (CoreProtect)', 249)">Купить</button>
+                        </div>
                     </div>
                     <div class="ticket-card" style="padding: 20px 25px; border-radius: 20px;">
                         <div class="ticket-info">
                             <h3>Полицейский пропуск</h3>
                             <p>Разрешение на арест нарушителей. Веди преступников за собой на поводке.</p>
                         </div>
-                        <div class="ticket-price" style="font-size: 1.15rem;">199 ₽</div>
+                        <div>
+                            <div class="ticket-price" style="font-size: 1.15rem;">199 ₽</div>
+                            <button class="btn-primary" style="padding: 8px 16px; font-size: 0.8rem; margin-top: 10px; width: 100%;" onclick="buyPrivilege('Полицейский пропуск', 199)">Купить</button>
+                        </div>
                     </div>
                     <div class="ticket-card" style="padding: 20px 25px; border-radius: 20px;">
                         <div class="ticket-info">
                             <h3>Маска Анонимуса</h3>
                             <p>Уникальный РП-предмет. Полностью скрывает твой оригинальный никнейм на сервере.</p>
                         </div>
-                        <div class="ticket-price" style="font-size: 1.15rem;">129 ₽</div>
+                        <div>
+                            <div class="ticket-price" style="font-size: 1.15rem;">129 ₽</div>
+                            <button class="btn-primary" style="padding: 8px 16px; font-size: 0.8rem; margin-top: 10px; width: 100%;" onclick="buyPrivilege('Маска Анонимуса', 129)">Купить</button>
+                        </div>
                     </div>
                     <div class="ticket-card" style="padding: 20px 25px; border-radius: 20px;">
                         <div class="ticket-info">
                             <h3>Загробный кастом</h3>
                             <p>Уникальный звук, частицы дыма и замена текста о твоей смерти в глобальном чате.</p>
                         </div>
-                        <div class="ticket-price" style="font-size: 1.15rem;">99 ₽</div>
+                        <div>
+                            <div class="ticket-price" style="font-size: 1.15rem;">99 ₽</div>
+                            <button class="btn-primary" style="padding: 8px 16px; font-size: 0.8rem; margin-top: 10px; width: 100%;" onclick="buyPrivilege('Загробный кастом', 99)">Купить</button>
+                        </div>
                     </div>
                 </div>
 
@@ -1216,8 +1257,45 @@
             }
         }
 
-        function spinRouletteWheel() {
+        async function spinRouletteWheel() {
             if (isWheelSpinning) return;
+
+            if (!currentUserSession) {
+                alert("Сначала воооооооооооооооойти через Discord!");
+                return;
+            }
+
+            // Шлюз ограничений: Рулетка заблокирована без проходки
+            const { data: linkedAccount, error: pErr } = await supabaseClient
+                .from('linked_accounts')
+                .select('has_pass')
+                .eq('discord_id', currentUserSession.user.id)
+                .maybeSingle();
+
+            if (!linkedAccount || !linkedAccount.has_pass) {
+                alert("⛔ Доступ ограничен! Вы не можете крутить рулетку, пока не приобретете «Проходку» на сервер!");
+                return;
+            }
+
+            // Снятие 100 рублей за прокрутку
+            const { data: profile } = await supabaseClient
+                .from('profiles')
+                .select('rub_balance')
+                .eq('id', currentUserSession.user.id)
+                .single();
+
+            if (!profile || profile.rub_balance < 100) {
+                alert("❌ Недостаточно средств на рублевом балансе! Стоимость крутки: 100 ₽.");
+                return;
+            }
+
+            // Списываем рубли
+            await supabaseClient
+                .from('profiles')
+                .update({ rub_balance: profile.rub_balance - 100 })
+                .eq('id', currentUserSession.user.id);
+
+            document.getElementById('ruble-balance-display').textContent = profile.rub_balance - 100;
 
             const rand = Math.random() * 100;
             let cumulativeWeight = 0;
@@ -1346,6 +1424,14 @@
                 const discordUsername = user.user_metadata.full_name || user.user_metadata.name || 'Discord User';
                 const discordAvatarUrl = user.user_metadata.avatar_url || 'https://cdn.discordapp.com/embed/avatars/0.png';
 
+                // Подгружаем баланс в рублях
+                const { data: rubData } = await supabaseClient
+                    .from('profiles')
+                    .select('rub_balance')
+                    .eq('id', user.id)
+                    .maybeSingle();
+                const currentRubBalance = rubData?.rub_balance ?? 0;
+
                 console.log("[Moderation Check] Начинаем верификацию прав для discordId:", discordId);
                 const { data: modData, error: modError } = await supabaseClient
                     .from('forum_moderators')
@@ -1356,11 +1442,8 @@
                 if (modError) {
                     console.error("[Moderation Check] Сбой селекта из forum_moderators. Возможно, заблокировано RLS:", modError);
                 }
-                console.log("[Moderation Check] Ответ СУБД из таблицы модераторов (raw data):", modData);
                 
                 isUserModerator = !!modData;
-                console.log("[Moderation Check] Итоговый флаг статуса модератора выставлен фронтендом в:", isUserModerator);
-
                 updateNewsForm();
 
                 const { data: linkedData, error: linkedError } = await supabaseClient
@@ -1374,7 +1457,14 @@
                 if (!linkedData) {
                     currentUserLinkedData = null;
                     
-                    headerWidget.innerHTML = `<div class="widget-user-card" onclick="switchTab('profile')"><div class="widget-name" style="color: #b388ff;">${discordUsername}</div><div class="widget-status-text">⏳ Нет связи</div></div>`;
+                    headerWidget.innerHTML = `
+                        <div style="display: flex; flex-direction: column; gap: 10px; width: 100%;">
+                            <div id="ruble-widget" onclick="openTopUpModal()">
+                                ₽ <span id="ruble-balance-display">${currentRubBalance}</span>
+                            </div>
+                        </div>
+                        <div class="widget-user-card" onclick="switchTab('profile')"><div class="widget-name" style="color: #b388ff;">${discordUsername}</div><div class="widget-status-text">⏳ Нет связи</div></div>`;
+                    
                     wrapper.innerHTML = `
                         <div style="width: 100%; text-align: left;">
                             <div style="display: flex; align-items: center; gap: 14px; margin-bottom: 25px; background: rgba(255,255,255,0.02); padding: 12px 20px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.04); justify-content: space-between;">
@@ -1437,15 +1527,19 @@
                 const kd = currentStats.deaths > 0 ? (currentStats.kills / currentStats.deaths).toFixed(2) : currentStats.kills + ".0";
 
                 headerWidget.innerHTML = `
-                    <div id="wallet-widget" onclick="openWalletModal('${linkedData.minecraft_uuid}')">
-                        💎 <span id="wallet-balance-display">0</span>
+                    <div style="display: flex; flex-direction: column; gap: 10px; width: 100%;">
+                        <div id="wallet-widget" onclick="openWalletModal('${linkedData.minecraft_uuid}')">
+                            💎 <span id="wallet-balance-display">0</span>
+                        </div>
+                        <div id="ruble-widget" onclick="openTopUpModal()">
+                            ₽ <span id="ruble-balance-display">${currentRubBalance}</span>
+                        </div>
                     </div>
                     <div class="widget-user-card" onclick="switchTab('profile')"><img src="https://mc-heads.net/avatar/${linkedData.minecraft_name}/44" class="widget-avatar"><div class="widget-name">${linkedData.minecraft_name}</div><div class="widget-status-text" style="color: var(--accent-pink);">● Профиль</div></div>`;
                 
                 loadWalletBalance(linkedData.minecraft_uuid);
                 updateForumForm();
                 
-                // ВЫВОДИМ ТОЛЬКО ПОВЕРХНОСТНУЮ ДАТУ БЕЗ ВРЕМЕНИ ДЛЯ ПРОФИЛЯ
                 wrapper.innerHTML = `
                     <div style="width: 100%;">
                         <div style="display: flex; justify-content: space-between; align-items: center; width: 100%; border-bottom: 1px solid rgba(255,255,255,0.04); padding-bottom: 20px;">
@@ -1670,7 +1764,6 @@
             const deaths = playerData.deaths || 0;
             const kd = deaths === 0 ? kills + ".0" : (kills / deaths).toFixed(2);
 
-            // ВЫВОДИМ ТОЛЬКО ПОВЕРХНОСТНУЮ ДАТУ БЕЗ ВРЕМЕНИ ДЛЯ МОДАЛЬНОГО ОКНА ИГРОКА
             modalOverlay.innerHTML = `
                 <div style="background: rgba(16, 11, 28, 0.95); border-radius: 28px; border: 1px solid rgba(138, 43, 226, 0.2); max-width: 480px; width: 100%; padding: 40px 30px; position: relative; box-shadow: 0 20px 50px rgba(0,0,0,0.6); text-align: center; font-family: var(--font-sans);">
                     <span style="position: absolute; top: 20px; right: 25px; color: var(--text-muted); font-size: 1.8rem; cursor: pointer; font-weight: bold; line-height: 1;" onclick="this.parentElement.parentElement.remove()">&times;</span>
@@ -1884,7 +1977,6 @@
             }
         }
 
-        // 2. УДАЛЕНИЕ ВКЛАДКИ ОБЗОР ИЗ МОДАЛЬНОГО ОКНА КОШЕЛЬКА
         async function openWalletModal(uuid) {
             const oldOverlay = document.getElementById('wallet-modal-overlay');
             if (oldOverlay) oldOverlay.remove();
@@ -1934,7 +2026,7 @@
             `;
 
             document.body.appendChild(overlay);
-            switchWalletTab('history', uuid); // Сразу активируем историю
+            switchWalletTab('history', uuid); 
         }
 
         async function switchWalletTab(tab, uuid) {
@@ -1988,7 +2080,6 @@
                     const badge = isIn ? '💵' : '🛒';
                     const sign = isIn ? '+' : '-';
                     
-                    // ДЛЯ ТРАНЗАКЦИЙ ВЫВОДИМ ТОЛЬКО ПОВЕРХНОСТНУЮ ДАТУ БЕЗ ВРЕМЕНИ
                     html += `
                         <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(255,255,255,0.01); border: 1px solid rgba(255,255,255,0.03); padding: 12px; border-radius: 14px;">
                             <div style="display: flex; align-items: center; gap: 10px; text-align: left; overflow: hidden;">
@@ -2016,6 +2107,128 @@
                     </div>
                 `;
             }
+        }
+
+        /* --- ЛОГИКА ОПЛАТЫ LAVA.TOP И СИСТЕМНОГО БАЛАНСА В РУБЛЯХ --- */
+
+        function openTopUpModal() {
+            if (!currentUserSession) {
+                alert("Для пополнения баланса сначала авторизуйтесь через Discord!");
+                return;
+            }
+            const amountStr = prompt("Введите сумму пополнения в РУБЛЯХ:", "100");
+            if (!amountStr) return;
+
+            const amount = parseInt(amountStr);
+            if (isNaN(amount) || amount <= 0) {
+                alert("Ошибка: введите правильную сумму!");
+                return;
+            }
+
+            const userId = currentUserSession.user.id;
+            // Твоя прямая платежная ссылка от сгенерированного Web-Widget
+            const lavaWidgetUrl = `https://widget.lava.top/68d28cf6-3f9f-4529-822c-6782b66c6d80?order_id=${userId}&amount=${amount}`;
+            window.open(lavaWidgetUrl, '_blank');
+        }
+
+        async function buyServerPass(price) {
+            if (!currentUserSession) {
+                alert("Сначала авторизуйтесь через Discord!");
+                return;
+            }
+            if (!currentUserLinkedData) {
+                alert("⛔ Сначала привяжите Minecraft аккаунт в личном кабинете (Вкладка 'Профиль')!");
+                return;
+            }
+
+            const { data: linkAccount } = await supabaseClient
+                .from('linked_accounts')
+                .select('has_pass')
+                .eq('minecraft_uuid', currentUserLinkedData.minecraft_uuid)
+                .maybeSingle();
+
+            if (linkAccount && linkAccount.has_pass) {
+                alert("У вас уже куплена проходка на этот сервер!");
+                return;
+            }
+
+            const { data: profile } = await supabaseClient
+                .from('profiles')
+                .select('rub_balance')
+                .eq('id', currentUserSession.user.id)
+                .single();
+
+            if (!profile || profile.rub_balance < price) {
+                alert(`❌ Недостаточно средств! Стоимость проходки: ${price} ₽. Пополните баланс в рублях сверху.`);
+                return;
+            }
+
+            // Списание средств в рублях
+            const newBalance = profile.rub_balance - price;
+            await supabaseClient
+                .from('profiles')
+                .update({ rub_balance: newBalance })
+                .eq('id', currentUserSession.user.id);
+
+            // Обновляем флаг доступа
+            await supabaseClient
+                .from('linked_accounts')
+                .update({ has_pass: true })
+                .eq('minecraft_uuid', currentUserLinkedData.minecraft_uuid);
+
+            // Вставляем запись в вайтлист-очередь для Java-плагина
+            await supabaseClient
+                .from('whitelist_queue')
+                .insert({
+                    minecraft_name: currentUserLinkedData.minecraft_name,
+                    action: 'add'
+                });
+
+            alert(`🎉 Поздравляем! Проходка успешно куплена за ${price} ₽! Ваш никнейм [${currentUserLinkedData.minecraft_name}] добавлен в whitelist сервера.`);
+            loadProfileData();
+        }
+
+        async function buyPrivilege(privilegeName, price) {
+            if (!currentUserSession) {
+                alert("Сначала авторизуйтесь через Discord!");
+                return;
+            }
+            if (!currentUserLinkedData) {
+                alert("⛔ Привяжите Minecraft аккаунт!");
+                return;
+            }
+
+            // ШЛЮЗ ОГРАНИЧЕНИЙ (GATEKEEPING)
+            const { data: linkAccount } = await supabaseClient
+                .from('linked_accounts')
+                .select('has_pass')
+                .eq('minecraft_uuid', currentUserLinkedData.minecraft_uuid)
+                .maybeSingle();
+
+            if (!linkAccount || !linkAccount.has_pass) {
+                alert("⛔ Отказано в доступе! Вы не имеете права покупать привилегии или донат, пока не приобретена сама «Проходка» (доступ на сервер)!");
+                return;
+            }
+
+            const { data: profile } = await supabaseClient
+                .from('profiles')
+                .select('rub_balance')
+                .eq('id', currentUserSession.user.id)
+                .single();
+
+            if (!profile || profile.rub_balance < price) {
+                alert(`❌ Недостаточно рублей на балансе! Цена: ${price} ₽.`);
+                return;
+            }
+
+            const newBalance = profile.rub_balance - price;
+            await supabaseClient
+                .from('profiles')
+                .update({ rub_balance: newBalance })
+                .eq('id', currentUserSession.user.id);
+
+            alert(`🎉 Успешно приобретено: "${privilegeName}" за ${price} ₽! Донат активируется на сервере в ближайшее время.`);
+            loadProfileData();
         }
 
         /* --- ФУНКЦИОНАЛ ФОРУМА --- */
@@ -2134,7 +2347,6 @@
                             <span style="color: var(--accent-pink); cursor: pointer; font-size: 0.75rem; margin-left: auto;" onclick="deleteComment('${comm.id}')">Удалить</span>
                         ` : '';
                         
-                        // ФОРУМ: ТОЧНОЕ ВРЕМЯ КММЕНТАРИЕВ ОСТАВЛЕНО (ПО УМОЛЧАНИЮ TRUE)
                         return `
                             <div style="display: flex; gap: 12px; background: rgba(0, 0, 0, 0.15); padding: 12px; border-radius: 14px; border: 1px solid rgba(255,255,255,0.02); align-items: flex-start; margin-bottom: 8px;">
                                 <img src="https://mc-heads.net/avatar/${comm.minecraft_name}/28" style="width: 28px; height: 28px; image-rendering: pixelated; border-radius: 6px; flex-shrink: 0; cursor: pointer;" onclick="openPlayerModal('${comm.minecraft_uuid}', '${comm.minecraft_name}')">
@@ -2199,7 +2411,6 @@
                     card.style.padding = '24px';
                     card.style.textAlign = 'left';
 
-                    // ФОРУМ: ТОЧНОЕ ВРЕМЯ ПОСТОВ ОСТАВЛЕНО (ПО УМОЛЧАНИЮ TRUE)
                     card.innerHTML = `
                         <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 14px;">
                             <div style="display: flex; align-items: center; gap: 14px;">
@@ -2562,7 +2773,6 @@
                         <img src="${item.image_url}" style="max-width: 100%; max-height: 360px; object-fit: cover; border-radius: 16px; margin-top: 14px; display: block; border: 1px solid rgba(255,255,255,0.04);">
                     ` : '';
 
-                    // ЛЕНТА НОВОСТЕЙ: ВЫВОД ТОЧНОГО ВРЕМЕНИ ВКЛЮЧЕН (ПО УМОЛЧАНИЮ TRUE)
                     card.innerHTML = `
                         <div class="news-meta">
                             <span class="news-date">${formatDate(item.created_at, true)}</span>
@@ -2596,8 +2806,6 @@
                 alert('Ошибка удаления новости.');
             }
         }
-
-        /* --- КОНЕЦ ФОРУМА --- */
 
         renderPlayersList();
         updateServerStatus();
