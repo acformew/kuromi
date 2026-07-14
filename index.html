@@ -1009,7 +1009,7 @@
                     <div class="ticket-card" style="padding: 20px 25px; border-radius: 20px; grid-column: span 2;">
                         <div class="ticket-info">
                             <h3>Пропуск «Навсегда»</h3>
-                            <p>Полноценный вечный доступ на сервер без ограничений по сезонам.</p>
+                            <p>Полноценный вечный доступ на server без ограничений по сезонам.</p>
                         </div>
                         <div>
                             <div class="ticket-price" style="font-size: 1.15rem;">349 ₽</div>
@@ -1180,7 +1180,6 @@
             return `${hours}ч ${minutes}м`;
         }
 
-        // 1. УПРАВЛЕНИЕ ОТОБРАЖЕНИЕМ ТОЧНОГО ВРЕМЕНИ ПО ФЛАГУ
         function formatDate(dateStr, showTime = true) {
             if (!dateStr) return 'Неизвестно';
             const date = new Date(dateStr);
@@ -1261,35 +1260,28 @@
             if (isWheelSpinning) return;
 
             if (!currentUserSession) {
-                alert("Сначала воооооооооооооооойти через Discord!");
+                alert("Сначала войдите через Discord!");
                 return;
             }
 
-            // Шлюз ограничений: Рулетка заблокирована без проходки
-            const { data: linkedAccount, error: pErr } = await supabaseClient
-                .from('linked_accounts')
-                .select('has_pass')
-                .eq('discord_id', currentUserSession.user.id)
-                .maybeSingle();
+            // Проверяем наличие проходки в таблице profiles
+            const { data: profile } = await supabaseClient
+                .from('profiles')
+                .select('rub_balance, has_pass')
+                .eq('id', currentUserSession.user.id)
+                .single();
 
-            if (!linkedAccount || !linkedAccount.has_pass) {
+            if (!profile || !profile.has_pass) {
                 alert("⛔ Доступ ограничен! Вы не можете крутить рулетку, пока не приобретете «Проходку» на сервер!");
                 return;
             }
 
-            // Снятие 100 рублей за прокрутку
-            const { data: profile } = await supabaseClient
-                .from('profiles')
-                .select('rub_balance')
-                .eq('id', currentUserSession.user.id)
-                .single();
-
-            if (!profile || profile.rub_balance < 100) {
+            if (profile.rub_balance < 100) {
                 alert("❌ Недостаточно средств на рублевом балансе! Стоимость крутки: 100 ₽.");
                 return;
             }
 
-            // Списываем рубли
+            // Списываем рубли за крутку
             await supabaseClient
                 .from('profiles')
                 .update({ rub_balance: profile.rub_balance - 100 })
@@ -1440,7 +1432,7 @@
                     .maybeSingle();
                 
                 if (modError) {
-                    console.error("[Moderation Check] Сбой селекта из forum_moderators. Возможно, заблокировано RLS:", modError);
+                    console.error("[Moderation Check] Сбой селекта из forum_moderators:", modError);
                 }
                 
                 isUserModerator = !!modData;
@@ -1765,7 +1757,7 @@
             const kd = deaths === 0 ? kills + ".0" : (kills / deaths).toFixed(2);
 
             modalOverlay.innerHTML = `
-                <div style="background: rgba(16, 11, 28, 0.95); border-radius: 28px; border: 1px solid rgba(138, 43, 226, 0.2); max-width: 480px; width: 100%; padding: 40px 30px; position: relative; box-shadow: 0 20px 50px rgba(0,0,0,0.6); text-align: center; font-family: var(--font-sans);">
+                <div style="background: rgba(16, 11, 28, 0.95); border-radius: 28px; border: 1px solid rgba(138, 43, 226, 0.2); max-width: 480px; width: 100%; padding: 40px 30px; position: relative; box-shadow: 0 20px 50px rgba(0,0,0,0.6); text-align: center; font-family: var(--font-sans); color: #fff;">
                     <span style="position: absolute; top: 20px; right: 25px; color: var(--text-muted); font-size: 1.8rem; cursor: pointer; font-weight: bold; line-height: 1;" onclick="this.parentElement.parentElement.remove()">&times;</span>
                     
                     <img src="https://mc-heads.net/avatar/${playerData.minecraft_name}/80" style="image-rendering:pixelated; border-radius:12px; width:80px; height:80px; margin-bottom: 15px; border: 2px solid var(--primary-purple); box-shadow: 0 0 15px rgba(138, 43, 226, 0.15);">
@@ -2126,70 +2118,62 @@
             }
 
             const userId = currentUserSession.user.id;
-            // Твоя прямая платежная ссылка от сгенерированного Web-Widget
             const lavaWidgetUrl = `https://widget.lava.top/68d28cf6-3f9f-4529-822c-6782b66c6d80?order_id=${userId}&amount=${amount}`;
             window.open(lavaWidgetUrl, '_blank');
         }
 
         async function buyServerPass(price) {
-    if (!currentUserSession) {
-        alert("Сначала авторизуйтесь через Discord!");
-        return;
-    }
-    if (!currentUserLinkedData) {
-        alert("⛔ Сначала привяжите Minecraft аккаунт в личном кабинете (Вкладка 'Профиль')!");
-        return;
-    }
+            if (!currentUserSession) {
+                alert("Сначала авторизуйтесь через Discord!");
+                return;
+            }
 
-    const { data: linkAccount } = await supabaseClient
-        .from('linked_accounts')
-        .select('has_pass')
-        .eq('minecraft_uuid', currentUserLinkedData.minecraft_uuid)
-        .maybeSingle();
+            // Проверяем в профиле, куплена ли уже проходка
+            const { data: profile } = await supabaseClient
+                .from('profiles')
+                .select('rub_balance, has_pass')
+                .eq('id', currentUserSession.user.id)
+                .single();
 
-    if (linkAccount && linkAccount.has_pass) {
-        alert("У вас уже куплена проходка на этот сервер!");
-        return;
-    }
+            if (profile && profile.has_pass) {
+                alert("У вас уже куплена проходка на этот сервер!");
+                return;
+            }
 
-    const { data: profile } = await supabaseClient
-        .from('profiles')
-        .select('rub_balance')
-        .eq('id', currentUserSession.user.id)
-        .single();
+            // ЗАПРАШИВАЕМ НИКНЕЙМ ВРУЧНУЮ, так как игрока еще нет в вайтлисте сервера!
+            const mcName = prompt("Введите ваш точный игровой никнейм в Minecraft (ВНИМАТЕЛЬНО, без ошибок!):");
+            if (!mcName || mcName.trim() === "") {
+                alert("Покупка отменена: никнейм не может быть пустым.");
+                return;
+            }
+            const cleanNick = mcName.trim();
 
-    if (!profile || profile.rub_balance < price) {
-        alert(`❌ Недостаточно средств! Стоимость: ${price} ₽. Пополните баланс в рублях сверху.`);
-        return;
-    }
+            if (!profile || profile.rub_balance < price) {
+                alert(`❌ Недостаточно средств! Стоимость: ${price} ₽. Пополните баланс в рублях сверху.`);
+                return;
+            }
 
-    // Списание средств в рублях
-    const newBalance = profile.rub_balance - price;
-    await supabaseClient
-        .from('profiles')
-        .update({ rub_balance: newBalance })
-        .eq('id', currentUserSession.user.id);
+            // Списание средств в рублях и выдача проходки на аккаунт Discord
+            const newBalance = profile.rub_balance - price;
+            await supabaseClient
+                .from('profiles')
+                .update({ rub_balance: newBalance, has_pass: true })
+                .eq('id', currentUserSession.user.id);
 
-    // Обновляем флаг доступа в профиле
-    await supabaseClient
-        .from('linked_accounts')
-        .update({ has_pass: true })
-        .eq('minecraft_uuid', currentUserLinkedData.minecraft_uuid);
+            // Разделяем тип действия в зависимости от цены (349 рублей — навсегда, остальное — 30 дней)
+            const whitelistAction = (price === 349) ? 'permanent' : 'add_30d';
 
-    // ВАЖНО: Разделяем тип действия в зависимости от цены (349 рублей — навсегда, остальное — 30 дней)
-    const whitelistAction = (price === 349) ? 'permanent' : 'add_30d';
+            // Вставляем запись в вайтлист-очередь для Java-плагина
+            await supabaseClient
+                .from('whitelist_queue')
+                .insert({
+                    minecraft_name: cleanNick,
+                    action: whitelistAction
+                });
 
-    // Вставляем запись в вайтлист-очередь для Java-плагина
-    await supabaseClient
-        .from('whitelist_queue')
-        .insert({
-            minecraft_name: currentUserLinkedData.minecraft_name,
-            action: whitelistAction
-        });
-
-    alert(`🎉 Поздравляем! Проходка успешно куплена за ${price} ₽! Ваш никнейм [${currentUserLinkedData.minecraft_name}] добавлен в whitelist сервера.`);
-    loadProfileData();
-}
+            alert(`🎉 Поздравляем! Проходка успешно куплена за ${price} ₽! Никнейм [${cleanNick}] отправлен в очередь вайтлиста сервера. Теперь вы можете беспрепятственно зайти в игру и пройти верификацию!`);
+            loadProfileData();
+        }
 
         async function buyPrivilege(privilegeName, price) {
             if (!currentUserSession) {
@@ -2197,29 +2181,23 @@
                 return;
             }
             if (!currentUserLinkedData) {
-                alert("⛔ Привяжите Minecraft аккаунт!");
+                alert("⛔ Доступ ограничен! Вы не можете покупать привилегии, пока не зайдете на сервер и не свяжете аккаунт в профиле!");
                 return;
             }
 
-            // ШЛЮЗ ОГРАНИЧЕНИЙ (GATEKEEPING)
-            const { data: linkAccount } = await supabaseClient
-                .from('linked_accounts')
-                .select('has_pass')
-                .eq('minecraft_uuid', currentUserLinkedData.minecraft_uuid)
-                .maybeSingle();
-
-            if (!linkAccount || !linkAccount.has_pass) {
-                alert("⛔ Отказано в доступе! Вы не имеете права покупать привилегии или донат, пока не приобретена сама «Проходка» (доступ на сервер)!");
-                return;
-            }
-
+            // Проверяем наличие проходки в таблице profiles
             const { data: profile } = await supabaseClient
                 .from('profiles')
-                .select('rub_balance')
+                .select('rub_balance, has_pass')
                 .eq('id', currentUserSession.user.id)
                 .single();
 
-            if (!profile || profile.rub_balance < price) {
+            if (!profile || !profile.has_pass) {
+                alert("⛔ Отказано в доступе! Вы не имеете права покупать привилегии, пока не приобретена сама «Проходка»!");
+                return;
+            }
+
+            if (profile.rub_balance < price) {
                 alert(`❌ Недостаточно рублей на балансе! Цена: ${price} ₽.`);
                 return;
             }
@@ -2329,7 +2307,7 @@
                 if (comments) {
                     comments.forEach(c => {
                         if (!commentsByPost[c.post_id]) commentsByPost[c.post_id] = [];
-                        commentsByPost[c.post_id].push(c);
+                        comments ByPost[c.post_id].push(c);
                     });
                 }
 
