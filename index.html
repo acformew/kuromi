@@ -1009,7 +1009,7 @@
                     <div class="ticket-card" style="padding: 20px 25px; border-radius: 20px; grid-column: span 2;">
                         <div class="ticket-info">
                             <h3>Пропуск «Навсегда»</h3>
-                            <p>Полноценный вечный доступ на server без ограничений по сезонам.</p>
+                            <p>Полноценный вечный доступ на сервер без ограничений по сезонам.</p>
                         </div>
                         <div>
                             <div class="ticket-price" style="font-size: 1.15rem;">349 ₽</div>
@@ -2128,7 +2128,6 @@
                 return;
             }
 
-            // Проверяем в профиле, куплена ли уже проходка
             const { data: profile } = await supabaseClient
                 .from('profiles')
                 .select('rub_balance, has_pass')
@@ -2140,7 +2139,6 @@
                 return;
             }
 
-            // ЗАПРАШИВАЕМ НИКНЕЙМ ВРУЧНУЮ, так как игрока еще нет в вайтлисте сервера!
             const mcName = prompt("Введите ваш точный игровой никнейм в Minecraft (ВНИМАТЕЛЬНО, без ошибок!):");
             if (!mcName || mcName.trim() === "") {
                 alert("Покупка отменена: никнейм не может быть пустым.");
@@ -2153,17 +2151,14 @@
                 return;
             }
 
-            // Списание средств в рублях и выдача проходки на аккаунт Discord
             const newBalance = profile.rub_balance - price;
             await supabaseClient
                 .from('profiles')
                 .update({ rub_balance: newBalance, has_pass: true })
                 .eq('id', currentUserSession.user.id);
 
-            // Разделяем тип действия в зависимости от цены (349 рублей — навсегда, остальное — 30 дней)
             const whitelistAction = (price === 349) ? 'permanent' : 'add_30d';
 
-            // Вставляем запись в вайтлист-очередь для Java-плагина
             await supabaseClient
                 .from('whitelist_queue')
                 .insert({
@@ -2185,7 +2180,6 @@
                 return;
             }
 
-            // Проверяем наличие проходки в таблице profiles
             const { data: profile } = await supabaseClient
                 .from('profiles')
                 .select('rub_balance, has_pass')
@@ -2307,7 +2301,7 @@
                 if (comments) {
                     comments.forEach(c => {
                         if (!commentsByPost[c.post_id]) commentsByPost[c.post_id] = [];
-                        comments ByPost[c.post_id].push(c);
+                        commentsByPost[c.post_id].push(c);
                     });
                 }
 
