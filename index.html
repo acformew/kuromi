@@ -2132,61 +2132,64 @@
         }
 
         async function buyServerPass(price) {
-            if (!currentUserSession) {
-                alert("Сначала авторизуйтесь через Discord!");
-                return;
-            }
-            if (!currentUserLinkedData) {
-                alert("⛔ Сначала привяжите Minecraft аккаунт в личном кабинете (Вкладка 'Профиль')!");
-                return;
-            }
+    if (!currentUserSession) {
+        alert("Сначала авторизуйтесь через Discord!");
+        return;
+    }
+    if (!currentUserLinkedData) {
+        alert("⛔ Сначала привяжите Minecraft аккаунт в личном кабинете (Вкладка 'Профиль')!");
+        return;
+    }
 
-            const { data: linkAccount } = await supabaseClient
-                .from('linked_accounts')
-                .select('has_pass')
-                .eq('minecraft_uuid', currentUserLinkedData.minecraft_uuid)
-                .maybeSingle();
+    const { data: linkAccount } = await supabaseClient
+        .from('linked_accounts')
+        .select('has_pass')
+        .eq('minecraft_uuid', currentUserLinkedData.minecraft_uuid)
+        .maybeSingle();
 
-            if (linkAccount && linkAccount.has_pass) {
-                alert("У вас уже куплена проходка на этот сервер!");
-                return;
-            }
+    if (linkAccount && linkAccount.has_pass) {
+        alert("У вас уже куплена проходка на этот сервер!");
+        return;
+    }
 
-            const { data: profile } = await supabaseClient
-                .from('profiles')
-                .select('rub_balance')
-                .eq('id', currentUserSession.user.id)
-                .single();
+    const { data: profile } = await supabaseClient
+        .from('profiles')
+        .select('rub_balance')
+        .eq('id', currentUserSession.user.id)
+        .single();
 
-            if (!profile || profile.rub_balance < price) {
-                alert(`❌ Недостаточно средств! Стоимость проходки: ${price} ₽. Пополните баланс в рублях сверху.`);
-                return;
-            }
+    if (!profile || profile.rub_balance < price) {
+        alert(`❌ Недостаточно средств! Стоимость: ${price} ₽. Пополните баланс в рублях сверху.`);
+        return;
+    }
 
-            // Списание средств в рублях
-            const newBalance = profile.rub_balance - price;
-            await supabaseClient
-                .from('profiles')
-                .update({ rub_balance: newBalance })
-                .eq('id', currentUserSession.user.id);
+    // Списание средств в рублях
+    const newBalance = profile.rub_balance - price;
+    await supabaseClient
+        .from('profiles')
+        .update({ rub_balance: newBalance })
+        .eq('id', currentUserSession.user.id);
 
-            // Обновляем флаг доступа
-            await supabaseClient
-                .from('linked_accounts')
-                .update({ has_pass: true })
-                .eq('minecraft_uuid', currentUserLinkedData.minecraft_uuid);
+    // Обновляем флаг доступа в профиле
+    await supabaseClient
+        .from('linked_accounts')
+        .update({ has_pass: true })
+        .eq('minecraft_uuid', currentUserLinkedData.minecraft_uuid);
 
-            // Вставляем запись в вайтлист-очередь для Java-плагина
-            await supabaseClient
-                .from('whitelist_queue')
-                .insert({
-                    minecraft_name: currentUserLinkedData.minecraft_name,
-                    action: 'add'
-                });
+    // ВАЖНО: Разделяем тип действия в зависимости от цены (349 рублей — навсегда, остальное — 30 дней)
+    const whitelistAction = (price === 349) ? 'permanent' : 'add_30d';
 
-            alert(`🎉 Поздравляем! Проходка успешно куплена за ${price} ₽! Ваш никнейм [${currentUserLinkedData.minecraft_name}] добавлен в whitelist сервера.`);
-            loadProfileData();
-        }
+    // Вставляем запись в вайтлист-очередь для Java-плагина
+    await supabaseClient
+        .from('whitelist_queue')
+        .insert({
+            minecraft_name: currentUserLinkedData.minecraft_name,
+            action: whitelistAction
+        });
+
+    alert(`🎉 Поздравляем! Проходка успешно куплена за ${price} ₽! Ваш никнейм [${currentUserLinkedData.minecraft_name}] добавлен в whitelist сервера.`);
+    loadProfileData();
+}
 
         async function buyPrivilege(privilegeName, price) {
             if (!currentUserSession) {
