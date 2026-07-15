@@ -149,7 +149,6 @@
             position: relative;
         }
 
-        /* Единый вертикальный сайдбар для правых элементов */
         .header-profile-sidebar {
             position: absolute;
             top: 0;
@@ -759,7 +758,6 @@
             .stats-grid { grid-template-columns: 1fr; }
         }
 
-        /* Стили для виджета кошелька */
         #wallet-widget {
             background: var(--bg-card);
             border: 1px solid rgba(138, 43, 226, 0.3);
@@ -785,7 +783,6 @@
             transform: translateY(-1px);
         }
 
-        /* Новый стиль рублевого кошелька */
         #ruble-widget {
             background: var(--bg-card);
             border: 1px solid var(--accent-pink);
@@ -811,7 +808,6 @@
             transform: translateY(-1px);
         }
         
-        /* Стили кастомного скроллбара для истории транзакций внутри модалки */
         .wallet-scroll::-webkit-scrollbar {
             width: 4px;
         }
@@ -1139,6 +1135,18 @@
 
     </div>
 
+    <!-- Модульное Премиум-окно (Вместо alert/prompt) -->
+    <div id="custom-modal-overlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(5, 3, 8, 0.82); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); z-index: 20000; align-items: center; justify-content: center; padding: 20px;">
+        <div id="custom-modal-card" style="background: rgba(16, 11, 28, 0.98); border: 1px solid var(--primary-purple); border-radius: 28px; max-width: 440px; width: 100%; padding: 35px 25px; box-shadow: 0 0 30px rgba(138, 43, 226, 0.2); text-align: center; font-family: var(--font-sans); color: #fff; transform: translateY(20px); opacity: 0; transition: all 0.25s cubic-bezier(0.15, 0.85, 0.35, 1);">
+            <h3 id="custom-modal-title" style="font-size: 1.3rem; font-weight: 600; margin-bottom: 12px;"></h3>
+            <p id="custom-modal-text" style="font-size: 0.92rem; color: var(--text-muted); line-height: 1.5; margin-bottom: 22px;"></p>
+            <div id="custom-modal-input-container" style="display: none; width: 100%; margin-bottom: 22px;">
+                <input type="text" id="custom-modal-input" class="darknet-input" style="text-align: center; border-color: rgba(255,255,255,0.1); width: 100%;" placeholder="Игровой никнейм...">
+            </div>
+            <div id="custom-modal-buttons" style="display: flex; gap: 12px; justify-content: center; width: 100%;"></div>
+        </div>
+    </div>
+
     <script>
         const SUPABASE_URL = 'https://cfetfasggtlwgknlqjdb.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNmZXRmYXNnZ3Rsd2drbmxxamRiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIzMzA5NDEsImV4cCI6MjA5NzkwNjk0MX0.wtavat05QxSnPlhuMQU4TSp48VEodNdajEISEH2FKMk';
@@ -1149,7 +1157,6 @@
 
         let loadedPlayers = [];
         
-        // Глобальное состояние текущей сессии
         let currentUserSession = null;
         let currentUserLinkedData = null; 
         let isUserModerator = false;
@@ -1172,6 +1179,80 @@
 
         let currentRotation = 0; 
         let isWheelSpinning = false;
+
+        /* --- УНИВЕРСАЛЬНЫЙ СТИЛЬНЫЙ МОДУЛЬ ДИАЛОГОВЫХ ОКОН --- */
+        function openCustomModal({ title, text, showInput, buttons }) {
+            return new Promise((resolve) => {
+                const overlay = document.getElementById('custom-modal-overlay');
+                const card = document.getElementById('custom-modal-card');
+                const titleEl = document.getElementById('custom-modal-title');
+                const textEl = document.getElementById('custom-modal-text');
+                const inputContainer = document.getElementById('custom-modal-input-container');
+                const inputEl = document.getElementById('custom-modal-input');
+                const buttonsContainer = document.getElementById('custom-modal-buttons');
+
+                titleEl.innerHTML = title || '';
+                textEl.innerHTML = text || '';
+                inputContainer.style.display = showInput ? 'block' : 'none';
+                if (showInput) inputEl.value = '';
+
+                buttonsContainer.innerHTML = '';
+                buttons.forEach(btn => {
+                    const button = document.createElement('button');
+                    button.className = btn.className || 'btn-secondary';
+                    button.style.padding = '10px 24px';
+                    button.style.fontSize = '0.88rem';
+                    button.innerText = btn.text;
+                    button.onclick = () => {
+                        card.style.transform = 'translateY(20px)';
+                        card.style.opacity = '0';
+                        setTimeout(() => {
+                            overlay.style.display = 'none';
+                            resolve(btn.action(inputEl.value));
+                        }, 200);
+                    };
+                    buttonsContainer.appendChild(button);
+                });
+
+                overlay.style.display = 'flex';
+                overlay.offsetHeight; 
+                card.style.transform = 'translateY(0)';
+                card.style.opacity = '1';
+            });
+        }
+
+        function customAlert(title, text) {
+            return openCustomModal({
+                title: title,
+                text: text,
+                showInput: false,
+                buttons: [{ text: 'OK', className: 'btn-primary', action: () => true }]
+            });
+        }
+
+        function customPrompt(title, text) {
+            return openCustomModal({
+                title: title,
+                text: text,
+                showInput: true,
+                buttons: [
+                    { text: 'Отмена', className: 'btn-secondary', action: () => null },
+                    { text: 'OK', className: 'btn-primary', action: (val) => val }
+                ]
+            });
+        }
+
+        function customLowBalance(price, current) {
+            return openCustomModal({
+                title: '⛔ Недостаточно средств',
+                text: `Стоимость товара составляет **${price} ₽**. <br>На вашем рублевом балансе: **${current} ₽**.<br>Пожалуйста, пополните счет для совершения покупки.`,
+                showInput: false,
+                buttons: [
+                    { text: 'Отмена', className: 'btn-secondary', action: () => false },
+                    { text: 'Пополнить баланс', className: 'btn-primary', action: () => { openTopUpModal(); return true; } }
+                ]
+            });
+        }
 
         function formatPlaytime(seconds) {
             if (!seconds || seconds < 0) return '0ч 0м';
@@ -1260,11 +1341,10 @@
             if (isWheelSpinning) return;
 
             if (!currentUserSession) {
-                alert("Сначала войдите через Discord!");
+                customAlert("🔒 Авторизация", "Пожалуйста, сначала войдите на сайт через Discord!");
                 return;
             }
 
-            // Проверяем наличие проходки в таблице profiles
             const { data: profile } = await supabaseClient
                 .from('profiles')
                 .select('rub_balance, has_pass')
@@ -1272,16 +1352,15 @@
                 .single();
 
             if (!profile || !profile.has_pass) {
-                alert("⛔ Доступ ограничен! Вы не можете крутить рулетку, пока не приобретете «Проходку» на сервер!");
+                customAlert("⛔ Доступ ограничен", "Вы не можете крутить рулетку, пока не приобретете «Проходку» на сервер!");
                 return;
             }
 
             if (profile.rub_balance < 100) {
-                alert("❌ Недостаточно средств на рублевом балансе! Стоимость крутки: 100 ₽.");
+                customLowBalance(100, profile.rub_balance);
                 return;
             }
 
-            // Списываем рубли за крутку
             await supabaseClient
                 .from('profiles')
                 .update({ rub_balance: profile.rub_balance - 100 })
@@ -1322,7 +1401,7 @@
                 isWheelSpinning = false;
                 btn.disabled = false;
                 btn.style.opacity = '1';
-                alert(`🎉 Награда успешно выбита: [ ${roulettePrizes[winningIndex].text} ]!`);
+                customAlert("🎰 Поздравляем!", `🎉 Награда успешно выбита: [ **${roulettePrizes[winningIndex].text}** ]!`);
             }, 8000);
         }
 
@@ -1363,7 +1442,7 @@
             const reward = parseInt(rewardInput.value);
 
             if(!name || isNaN(reward) || reward <= 0) {
-                alert('Ошибка: Введите корректный никнейм и количество алмазов!');
+                customAlert("❌ Ошибка", "Введите корректный никнейм и количество алмазов!");
                 return;
             }
 
@@ -1416,7 +1495,6 @@
                 const discordUsername = user.user_metadata.full_name || user.user_metadata.name || 'Discord User';
                 const discordAvatarUrl = user.user_metadata.avatar_url || 'https://cdn.discordapp.com/embed/avatars/0.png';
 
-                // Подгружаем баланс в рублях
                 const { data: rubData } = await supabaseClient
                     .from('profiles')
                     .select('rub_balance')
@@ -1472,7 +1550,7 @@
                                     <div style="display: flex; gap: 16px; align-items: flex-start;">
                                         <div style="background: rgba(138, 43, 226, 0.15); color: #b388ff; font-weight: 700; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">1</div>
                                         <div>
-                                            <span style="font-weight: 600; color: #fff; display: block; margin-bottom: 6px;">🎮 Зайди на сервер</span>
+                                            <span style="font-weight: 600; color: #fff; display: block; margin-bottom: 6px;">🎮 Зайди на server</span>
                                             <button class="btn-secondary" id="server-ip-profile" style="padding: 6px 14px; font-size: 0.78rem; border-radius: 10px;" onclick="copyIp('play.kuromismp.ru')">play.kuromismp.ru</button>
                                         </div>
                                     </div>
@@ -1581,7 +1659,7 @@
 
         window.addEventListener('click', function(e) {
             if(window.innerWidth <= 768) return; 
-            if(e.target.closest('#snakeCanvas') || e.target.closest('.snake-footer-container') || e.target.closest('.logo-img-left') || e.target.closest('.header-profile-sidebar') || e.target.closest('#forum-fixed-btn')) return; 
+            if(e.target.closest('#snakeCanvas') || e.target.closest('.snake-footer-container') || e.target.closest('.logo-img-left') || e.target.closest('.header-profile-sidebar') || e.target.closest('#forum-fixed-btn') || e.target.closest('#custom-modal-card')) return; 
             const particleCount = 10; 
             for (let i = 0; i < particleCount; i++) { createSparkParticle(e.clientX, e.clientY); }
         });
@@ -2103,17 +2181,17 @@
 
         /* --- ЛОГИКА ОПЛАТЫ LAVA.TOP И СИСТЕМНОГО БАЛАНСА В РУБЛЯХ --- */
 
-        function openTopUpModal() {
+        async function openTopUpModal() {
             if (!currentUserSession) {
-                alert("Для пополнения баланса сначала авторизуйтесь через Discord!");
+                customAlert("🔒 Авторизация", "Для пополнения баланса сначала авторизуйтесь через Discord!");
                 return;
             }
-            const amountStr = prompt("Введите сумму пополнения в РУБЛЯХ:", "100");
+            const amountStr = await customPrompt("💳 Пополнение счета", "Введите желаемую сумму пополнения в **РУБЛЯХ**:");
             if (!amountStr) return;
 
             const amount = parseInt(amountStr);
             if (isNaN(amount) || amount <= 0) {
-                alert("Ошибка: введите правильную сумму!");
+                customAlert("❌ Ошибка", "Введена некорректная сумма пополнения счета!");
                 return;
             }
 
@@ -2124,7 +2202,7 @@
 
         async function buyServerPass(price) {
             if (!currentUserSession) {
-                alert("Сначала авторизуйтесь через Discord!");
+                customAlert("🔒 Авторизация", "Сначала авторизуйтесь через Discord!");
                 return;
             }
 
@@ -2135,21 +2213,21 @@
                 .single();
 
             if (profile && profile.has_pass) {
-                alert("У вас уже куплена проходка на этот сервер!");
+                customAlert("👑 Информация", "У вас уже успешно приобретена проходка на текущий сезон сервера!");
                 return;
             }
 
-            const mcName = prompt("Введите ваш точный игровой никнейм в Minecraft (ВНИМАТЕЛЬНО, без ошибок!):");
+            if (!profile || profile.rub_balance < price) {
+                customLowBalance(price, profile?.rub_balance || 0);
+                return;
+            }
+
+            const mcName = await customPrompt("🎮 Регистрация WhiteList", "Введите ваш точный игровой никнейм в Minecraft для добавления в очередь:");
             if (!mcName || mcName.trim() === "") {
-                alert("Покупка отменена: никнейм не может быть пустым.");
+                customAlert("⚠️ Отмена", "Покупка пропуска отменена: никнейм игрока не может быть пустым.");
                 return;
             }
             const cleanNick = mcName.trim();
-
-            if (!profile || profile.rub_balance < price) {
-                alert(`❌ Недостаточно средств! Стоимость: ${price} ₽. Пополните баланс в рублях сверху.`);
-                return;
-            }
 
             const newBalance = profile.rub_balance - price;
             await supabaseClient
@@ -2166,17 +2244,17 @@
                     action: whitelistAction
                 });
 
-            alert(`🎉 Поздравляем! Проходка успешно куплена за ${price} ₽! Никнейм [${cleanNick}] отправлен в очередь вайтлиста сервера. Теперь вы можете беспрепятственно зайти в игру и пройти верификацию!`);
+            customAlert("🎉 Успешная покупка!", `Проходка успешно куплена за **${price} ₽**! Никнейм [**${cleanNick}**] отправлен в очередь вайтлиста сервера. Можете заходить в игру!`);
             loadProfileData();
         }
 
         async function buyPrivilege(privilegeName, price) {
             if (!currentUserSession) {
-                alert("Сначала авторизуйтесь через Discord!");
+                customAlert("🔒 Авторизация", "Сначала авторизуйтесь через Discord!");
                 return;
             }
             if (!currentUserLinkedData) {
-                alert("⛔ Доступ ограничен! Вы не можете покупать привилегии, пока не зайдете на сервер и не свяжете аккаунт в профиле!");
+                customAlert("⛔ Ограничение доступа", "Вы не можете покупать сторонние донаты или привилегии, пока не зайдете на сервер и не свяжете аккаунт в личном кабинете!");
                 return;
             }
 
@@ -2187,12 +2265,12 @@
                 .single();
 
             if (!profile || !profile.has_pass) {
-                alert("⛔ Отказано в доступе! Вы не имеете права покупать привилегии, пока не приобретена сама «Проходка»!");
+                customAlert("⛔ Отказано в доступе", "Единственный товар, доступный вам для покупки — это сама «Проходка» (доступ на сервер). Купите её для разблокировки магазина!");
                 return;
             }
 
             if (profile.rub_balance < price) {
-                alert(`❌ Недостаточно рублей на балансе! Цена: ${price} ₽.`);
+                customLowBalance(price, profile.rub_balance);
                 return;
             }
 
@@ -2202,7 +2280,7 @@
                 .update({ rub_balance: newBalance })
                 .eq('id', currentUserSession.user.id);
 
-            alert(`🎉 Успешно приобретено: "${privilegeName}" за ${price} ₽! Донат активируется на сервере в ближайшее время.`);
+            customAlert("🛒 Магазин", `Вы успешно приобрели товар "**${privilegeName}**" за **${price} ₽**! Привилегия автоматически активируется на сервере в течение пары минут.`);
             loadProfileData();
         }
 
@@ -2437,7 +2515,7 @@
             if (!textarea) return;
             const text = textarea.value.trim();
             if (!text) {
-                alert('Нельзя опубликовать пустое текстовое поле!');
+                customAlert("⚠️ Предупреждение", "Нельзя опубликовать пустое текстовое поле на форуме!");
                 return;
             }
 
@@ -2457,32 +2535,25 @@
                 await loadForumFeed(true); 
             } catch (e) {
                 console.error(e);
-                alert('Не удалось опубликовать запись на форуме.');
+                customAlert("❌ Ошибка", "Не удалось опубликовать запись на форуме.");
             }
         }
 
         async function createComment(postId) {
-            if (!postId) {
-                alert("Критическая ошибка: postId отсутствует.");
-                return;
-            }
-
+            if (!postId) return;
             const inputField = document.getElementById(`comment-input-${postId}`);
-            if (!inputField) {
-                alert(`Критическая ошибка DOM: Поле ввода не найдено.`);
-                return;
-            }
+            if (!inputField) return;
 
             const rawText = inputField.value;
             const cleanText = rawText ? rawText.trim() : "";
             
             if (!cleanText) {
-                alert("Поле комментария пустое!");
+                customAlert("⚠️ Предупреждение", "Поле комментария пустое!");
                 return;
             }
 
             if (!currentUserLinkedData) {
-                alert("Вы не авторизованы. Выполните повторный вход в профиль.");
+                customAlert("🔒 Доступ", "Вы не авторизованы. Выполните повторный вход в профиль.");
                 return;
             }
 
@@ -2500,22 +2571,17 @@
                     .insert([payload]);
 
                 if (insertError) {
-                    alert(`Ошибка СУБД/RLS политики: ${insertError.message}`);
+                    customAlert("❌ Ошибка СУБД", insertError.message);
                     return;
                 }
 
                 inputField.value = '';
-
-                const commentBlock = document.getElementById(`comments-container-${postId}`);
-                if (commentBlock) {
-                    commentBlock.style.display = 'block';
-                }
+                const commentBlock = document.getElementById('comments-container-' + postId);
+                if (commentBlock) commentBlock.style.display = 'block';
 
                 await loadForumFeed(true); 
-
             } catch (catchErr) {
                 console.error(catchErr);
-                alert(`Внутренний сбой скрипта.`);
             }
         }
 
@@ -2525,8 +2591,7 @@
                 const targetBtn = event.target.closest('button[data-action="submit-comment"]');
                 if (targetBtn) {
                     event.preventDefault();
-                    const targetPostId = targetBtn.getAttribute('data-post-id');
-                    createComment(targetPostId);
+                    createComment(targetBtn.getAttribute('data-post-id'));
                 }
             });
 
@@ -2534,8 +2599,7 @@
                 if (event.target && event.target.id && event.target.id.startsWith('comment-input-')) {
                     if (event.key === 'Enter') {
                         event.preventDefault();
-                        const targetPostId = event.target.id.replace('comment-input-', '');
-                        createComment(targetPostId);
+                        createComment(event.target.id.replace('comment-input-', ''));
                     }
                 }
             });
@@ -2543,7 +2607,7 @@
 
         async function toggleLike(postId) {
             if (!currentUserLinkedData) {
-                alert('Войди и привяжи Minecraft, чтобы ставить лайки!');
+                customAlert("🔒 Доступ", "Войди и привяжи Minecraft, чтобы ставить лайки!");
                 return;
             }
 
@@ -2575,35 +2639,21 @@
                 if (checkError) throw checkError;
 
                 if (existingLike) {
-                    const { error: deleteError } = await supabaseClient
+                    await supabaseClient
                         .from('forum_likes')
                         .delete()
                         .eq('post_id', postId)
                         .eq('discord_id', currentUserLinkedData.discord_id);
-                    if (deleteError) throw deleteError;
                 } else {
-                    const { error: insertError } = await supabaseClient
+                    await supabaseClient
                         .from('forum_likes')
-                        .insert({
-                            post_id: postId,
-                            discord_id: currentUserLinkedData.discord_id
-                        });
-                    if (insertError) throw insertError;
+                        .insert({ post_id: postId, discord_id: currentUserLinkedData.discord_id });
                 }
 
                 await loadForumFeed(true); 
             } catch (e) {
                 console.error(e);
-                if (isCurrentlyLiked) {
-                    likeBtn.style.color = 'var(--accent-pink)';
-                    likeBtn.style.background = 'rgba(255, 0, 127, 0.05)';
-                    if (countSpan) countSpan.textContent = currentCount;
-                } else {
-                    likeBtn.style.color = 'var(--text-muted)';
-                    likeBtn.style.background = 'rgba(255, 255, 255, 0.01)';
-                    if (countSpan) countSpan.textContent = currentCount;
-                }
-                alert('Не удалось зафиксировать лайк. Ошибка сети.');
+                loadForumFeed(true);
             }
         }
 
@@ -2614,11 +2664,7 @@
                     .from('forum_posts')
                     .delete()
                     .eq('id', postId);
-
-                if (error) {
-                    alert('Нет прав на удаление');
-                    throw error;
-                }
+                if (error) throw error;
                 await loadForumFeed(true); 
             } catch (e) {
                 console.error(e);
@@ -2632,11 +2678,7 @@
                     .from('forum_comments')
                     .delete()
                     .eq('id', commentId);
-
-                if (error) {
-                    alert('Нет прав на удаление');
-                    throw error;
-                }
+                if (error) throw error;
                 await loadForumFeed(true); 
             } catch (e) {
                 console.error(e);
@@ -2662,7 +2704,7 @@
                             </div>
                         </div>
                         <input type="text" id="news-img-input" placeholder="Прямая URL ссылка на картинку (необязательно)..." style="width: 100%; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.06); border-radius: 10px; padding: 10px 14px; color: #fff; font-family: var(--font-sans); font-size: 0.9rem; outline: none; margin-bottom: 12px;">
-                        <textarea id="news-content-input" placeholder="Основной текст новости..." style="width: 100%; height: 90px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.06); border-radius: 10px; padding: 10px 14px; color: #fff; font-family: var(--font-sans); font-size: 0.9rem; resize: none; outline: none; margin-bottom: 12px;"></textarea>
+                        <textarea id="news-content-input" placeholder="Основной text новости..." style="width: 100%; height: 90px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.06); border-radius: 10px; padding: 10px 14px; color: #fff; font-family: var(--font-sans); font-size: 0.9rem; resize: none; outline: none; margin-bottom: 12px;"></textarea>
                         <div style="display: flex; justify-content: flex-end;">
                             <button class="btn-primary" style="padding: 8px 20px; font-size: 0.82rem; border-radius: 12px;" onclick="createNewsPost()">Опубликовать новость</button>
                         </div>
@@ -2689,7 +2731,7 @@
             const content = contentInput.value.trim();
 
             if (!title || !content) {
-                alert('Заголовок и основной текст новости не могут быть пустыми!');
+                customAlert("⚠️ Ошибка", "Заголовок и основной текст новости не могут быть пустыми!");
                 return;
             }
 
@@ -2706,15 +2748,10 @@
 
                 if (error) throw error;
 
-                titleInput.value = '';
-                tagInput.value = '';
-                imgInput.value = '';
-                contentInput.value = '';
-
+                titleInput.value = ''; tagInput.value = ''; imgInput.value = ''; contentInput.value = '';
                 await loadNewsFeed();
             } catch (e) {
                 console.error(e);
-                alert('Не удалось опубликовать новость: ' + e.message);
             }
         }
 
@@ -2762,7 +2799,7 @@
                 });
 
             } catch (e) {
-                console.error("Ошибка загрузки новостей из бэкенда:", e);
+                console.error(e);
             }
         }
 
@@ -2773,12 +2810,10 @@
                     .from('forum_news')
                     .delete()
                     .eq('id', newsId);
-
                 if (error) throw error;
                 await loadNewsFeed();
             } catch (e) {
                 console.error(e);
-                alert('Ошибка удаления новости.');
             }
         }
 
