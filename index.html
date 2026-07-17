@@ -803,7 +803,7 @@
             box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
         }
         #ruble-widget:hover {
-            border-color: #html;
+            border-color: #fff;
             background: rgba(255, 0, 127, 0.1);
             box-shadow: 0 0 20px rgba(255, 0, 127, 0.3);
             transform: scale(1.02);
@@ -823,7 +823,6 @@
             background: var(--accent-pink);
         }
 
-        /* Анимации микро-интенсивностей */
         @keyframes customHeartPop {
             0% { transform: scale(1); }
             40% { transform: scale(1.22); }
@@ -832,6 +831,23 @@
         }
         .like-active-anim {
             animation: customHeartPop 0.35s cubic-bezier(0.15, 0.85, 0.35, 1) forwards;
+        }
+
+        /* Продвинутые стили для красивой анимированной формы заявки */
+        .app-select-style {
+            appearance: none;
+            -webkit-appearance: none;
+            background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%236e6482' viewBox='0 0 24 24'><path d='M7 10l5 5 5-5z'/></svg>");
+            background-repeat: no-repeat;
+            background-position: right 16px center;
+        }
+        .app-input-glow {
+            transition: all 0.3s ease;
+        }
+        .app-input-glow:focus {
+            border-color: var(--accent-pink) !important;
+            box-shadow: 0 0 15px rgba(255, 0, 127, 0.25);
+            background: rgba(16, 11, 28, 0.9) !important;
         }
     </style>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -926,7 +942,7 @@
                         </div>
                         <div>
                             <div class="ticket-price">0 ₽</div>
-                            <button class="btn-secondary" style="padding: 10px 20px; font-size: 0.8rem; margin-top: 10px; width: 100%;" onclick="alert('Форма заявок настраивается')">Проверить</button>
+                            <button class="btn-secondary" style="padding: 10px 20px; font-size: 0.8rem; margin-top: 10px; width: 100%;" onclick="openApplicationModal()">Подать заявку</button>
                         </div>
                     </div>
                 </div>
@@ -973,7 +989,7 @@
                         <div class="mechanic-img-box"><div class="mechanic-placeholder-icon">⛓️</div></div>
                         <div class="mechanic-text-block">
                             <h3>Арест и Конвоирование</h3>
-                            <p>Ролевая система задержания нарушителей. Позволяет временно заковать игрока в наручники и конвоировать его за собой на РП-поводке до выяснения обстоятельств администрацией.</p>
+                            <p>Ролевая система задержания нарушителей. Позволяет временно заковать игрока в наручники и конвоировать его за собой на РП-поводке до выяснения обстоятельства администрацией.</p>
                         </div>
                     </div>
                     <div class="mechanic-card">
@@ -1153,9 +1169,47 @@
             <h3 id="custom-modal-title" style="font-size: 1.35rem; font-weight: 600; margin-bottom: 16px; line-height: 1.3; display: flex; align-items: center; gap: 10px;"></h3>
             <div id="custom-modal-text" style="font-size: 0.94rem; color: rgba(255,255,255,0.85); line-height: 1.6; margin-bottom: 24px;"></div>
             <div id="custom-modal-input-container" style="display: none; width: 100%; margin-bottom: 24px;">
-                <input type="text" id="custom-modal-input" class="darknet-input" style="text-align: left; border-color: rgba(255,255,255,0.1); width: 100%; padding: 14px 18px;" placeholder="">
+                <input type="text" id="custom-modal-input" class="darknet-input app-input-glow" style="text-align: left; border-color: rgba(255,255,255,0.1); width: 100%; padding: 14px 18px;" placeholder="">
             </div>
             <div id="custom-modal-buttons" style="display: flex; gap: 12px; justify-content: flex-end; width: 100%;"></div>
+        </div>
+    </div>
+
+    <!-- Красивое интерактивное окно подачи Заявки/Анкеты -->
+    <div id="app-modal-overlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(5, 3, 8, 0.85); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); z-index: 20001; align-items: center; justify-content: center; padding: 20px;">
+        <div id="app-modal-card" style="background: rgba(16, 11, 28, 0.98); border: 1px solid var(--accent-pink); border-radius: 32px; max-width: 500px; width: 100%; padding: 40px 35px; box-shadow: 0 0 40px rgba(255, 0, 127, 0.2); text-align: left; font-family: var(--font-sans); color: #fff; transform: translateY(30px) scale(0.95); opacity: 0; transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);">
+            <h3 style="font-size: 1.45rem; font-weight: 700; margin-bottom: 6px; color: #fff; display: flex; align-items: center; gap: 8px;">🌸 Бесплатный доступ</h3>
+            <p style="font-size: 0.86rem; color: var(--text-muted); margin-bottom: 24px;">Анкета верификации для владельцев официальной Лицензии Minecraft.</p>
+            
+            <div style="display: flex; flex-direction: column; gap: 20px; width: 100%; margin-bottom: 28px;">
+                <div>
+                    <label style="font-size: 0.82rem; color: var(--text-muted); display: block; margin-bottom: 6px; font-weight: 500;">Точный игровой никнейм:</label>
+                    <input type="text" id="app-mc-nick" class="darknet-input app-input-glow" style="width:100%; border-color:rgba(255,255,255,0.06); padding: 13px 18px;" placeholder="Например: Pudge">
+                </div>
+                
+                <div>
+                    <label style="font-size: 0.82rem; color: var(--text-muted); display: block; margin-bottom: 6px; font-weight: 500;">У вас есть купленная Лицензия?</label>
+                    <select id="app-has-license" class="darknet-input app-input-glow app-select-style" style="width:100%; border-color:rgba(255,255,255,0.06); padding: 13px 18px; background: #0a050f; color:#fff; outline:none; cursor: pointer;">
+                        <option value="Да">Да, у меня официальная Лицензия</option>
+                        <option value="Нет">Нет, я играю с пиратки / лаунчера</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label style="font-size: 0.82rem; color: var(--text-muted); display: block; margin-bottom: 6px; font-weight: 500;">Контакты в Telegram (для вердикта):</label>
+                    <input type="text" id="app-tg-contact" class="darknet-input app-input-glow" style="width:100%; border-color:rgba(255,255,255,0.06); padding: 13px 18px;" placeholder="@username">
+                </div>
+
+                <div>
+                    <label style="font-size: 0.82rem; color: var(--text-muted); display: block; margin-bottom: 6px; font-weight: 500;">Что планируете делать на сервере?</label>
+                    <textarea id="app-plans" class="darknet-input app-input-glow" style="width:100%; height: 100px; border-color:rgba(255,255,255,0.06); padding: 13px 18px; resize:none; font-family:var(--font-sans); line-height: 1.5;" placeholder="Опишите ваши идеи, будущие проекты или РП-планы..."></textarea>
+                </div>
+            </div>
+
+            <div style="display: flex; gap: 12px; justify-content: flex-end; width: 100%;">
+                <button class="btn-secondary" style="padding: 12px 26px; border-radius: 20px; font-weight: 600;" onclick="closeApplicationModal()">Отмена</button>
+                <button id="app-submit-btn" class="btn-primary" style="padding: 12px 28px; border-radius: 20px; background:var(--accent-pink); box-shadow: 0 4px 15px rgba(255,0,127,0.2); font-weight: 700; transition: all 0.2s;" onclick="submitServerApplication()">Отправить анкету</button>
+            </div>
         </div>
     </div>
 
@@ -1209,7 +1263,7 @@
                 
                 if (showInput) {
                     inputEl.value = '';
-                    inputEl.placeholder = placeholder || 'Введите значение...'; // Динамический плейсхолдер исправлен
+                    inputEl.placeholder = placeholder || 'Введите значение...'; 
                 }
 
                 buttonsContainer.innerHTML = '';
@@ -1264,16 +1318,97 @@
         function customLowBalance(price, current) {
             return openCustomModal({
                 title: '🛑 Недостаточно средств на балансе',
-                text: `<p style="margin-bottom: 12px;">Вы не можете завершить операцию покупки выбранной привилегии.</p>
-                       <p style="margin-bottom: 12px;">• Стоимость товара: <span style="color:var(--accent-pink); font-weight:700;">${price} ₽</span><br>
-                       • На вашем кошельке: <span style="color:var(--text-muted); font-weight:700;">${current} ₽</span></p>
-                       <p>Пожалуйста, пополните системный рублевый баланс аккаунта для автоматического совершения покупки.</p>`,
+                text: `<div style="text-align: left;">
+                         <p style="margin-bottom: 12px;">Вы не можете завершить операцию покупки выбранной привилегии.</p>
+                         <p style="margin-bottom: 12px; background: rgba(0,0,0,0.2); padding: 10px; border-radius: 12px; border-left: 3px solid var(--accent-pink);">
+                            • Стоимость товара: <strong style="color:var(--accent-pink);">${price} ₽</strong><br>
+                            • На вашем кошельке: <strong style="color:var(--text-muted);">${current} ₽</strong>
+                         </p>
+                         <p>Пожалуйста, пополните системный рублевый баланс аккаунта для автоматического совершения покупки.</p>
+                       </div>`,
                 showInput: false,
                 buttons: [
                     { text: 'Вернуться', className: 'btn-secondary', action: () => false },
                     { text: 'Пополнить баланс', className: 'btn-primary', action: () => { openTopUpModal(); return true; } }
                 ]
             });
+        }
+
+        /* --- ЛОГИКА АНИМИРОВАННОГО ОКНА ЗАЯВОК (БЕСПЛАТНЫЙ ПРОПУСК) --- */
+        function openApplicationModal() {
+            if (!currentUserSession) {
+                customAlert("🔒 Авторизация", "Для подачи анкеты на сервер сначала авторизуйтесь на сайте через Discord!");
+                return;
+            }
+            const overlay = document.getElementById('app-modal-overlay');
+            const card = document.getElementById('app-modal-card');
+            
+            overlay.style.display = 'flex';
+            overlay.offsetHeight; 
+            card.style.transform = 'translateY(0) scale(1)';
+            card.style.opacity = '1';
+        }
+
+        function closeApplicationModal() {
+            const overlay = document.getElementById('app-modal-overlay');
+            const card = document.getElementById('app-modal-card');
+            card.style.transform = 'translateY(30px) scale(0.95)';
+            card.style.opacity = '0';
+            setTimeout(() => { overlay.style.display = 'none'; }, 250);
+        }
+
+        async function submitServerApplication() {
+            const nick = document.getElementById('app-mc-nick').value.trim();
+            const license = document.getElementById('app-has-license').value;
+            const tg = document.getElementById('app-tg-contact').value.trim();
+            const plans = document.getElementById('app-plans').value.trim();
+            const submitBtn = document.getElementById('app-submit-btn');
+
+            if (!nick || !tg || !plans) {
+                customAlert("⚠️ Ошибка заполнения", "Пожалуйста, заполните абсолютно все текстовые поля анкеты куратора!");
+                return;
+            }
+
+            submitBtn.disabled = true;
+            submitBtn.innerText = "Отправка...";
+            submitBtn.style.opacity = "0.6";
+
+            try {
+                const { data: existingApp } = await supabaseClient
+                    .from('server_applications')
+                    .select('id')
+                    .eq('user_id', currentUserSession.user.id)
+                    .maybeSingle();
+
+                if (existingApp) {
+                    customAlert("👑 Информация", "Вы уже успешно отправляли анкету ранее. Пожалуйста, ожидайте вердикта администрации в Telegram!");
+                    closeApplicationModal();
+                    return;
+                }
+
+                const { error } = await supabaseClient
+                    .from('server_applications')
+                    .insert({
+                        user_id: currentUserSession.user.id,
+                        minecraft_name: nick,
+                        has_license: license,
+                        telegram_contact: tg,
+                        plans: plans
+                    });
+
+                if (error) throw error;
+
+                closeApplicationModal();
+                customAlert("🎉 Успешно отправлено!", "Ваша анкета успешно сохранена и передана кураторам KuromiSMP. Мы свяжемся с вами в Telegram после проверки!");
+
+            } catch (e) {
+                console.error(e);
+                customAlert("❌ Ошибка отправки", "Не удалось сохранить анкету из-за сбоя сети. Пожалуйста, попробуйте позже.");
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.innerText = "Отправить анкету";
+                submitBtn.style.opacity = "1";
+            }
         }
 
         function formatPlaytime(seconds) {
@@ -1374,7 +1509,7 @@
                 .single();
 
             if (!profile || !profile.has_pass) {
-                customAlert("⛔ Доступ ограничен", "Вы не имеете права крутить Колесо Фортуны, пока не приобретете базовую «Проходку» на сервер!");
+                customAlert("⛔ Доступ ограничен", "Вы не имеете права крутить Колесо Фортуны, пока не приобретете «Проходку» на сервер!");
                 return;
             }
 
@@ -1681,7 +1816,7 @@
 
         window.addEventListener('click', function(e) {
             if(window.innerWidth <= 768) return; 
-            if(e.target.closest('#snakeCanvas') || e.target.closest('.snake-footer-container') || e.target.closest('.logo-img-left') || e.target.closest('.header-profile-sidebar') || e.target.closest('#forum-fixed-btn') || e.target.closest('#custom-modal-card')) return; 
+            if(e.target.closest('#snakeCanvas') || e.target.closest('.snake-footer-container') || e.target.closest('.logo-img-left') || e.target.closest('.header-profile-sidebar') || e.target.closest('#forum-fixed-btn') || e.target.closest('#custom-modal-card') || e.target.closest('#app-modal-card')) return; 
             const particleCount = 10; 
             for (let i = 0; i < particleCount; i++) { createSparkParticle(e.clientX, e.clientY); }
         });
@@ -2208,7 +2343,6 @@
                 customAlert("🔒 Авторизация", "Для пополнения баланса сначала авторизуйтесь через Discord!");
                 return;
             }
-            // Плейсхолдер исправлен на сумму
             const amountStr = await customPrompt("💳 Пополнение счета", "Введите желаемую сумму пополнения баланса кошелька в **РУБЛЯХ**:", "Сумма пополнения в ₽...");
             if (!amountStr) return;
 
@@ -2245,7 +2379,6 @@
                 return;
             }
 
-            // Плейсхолдер исправлен на никнейм
             const mcName = await customPrompt("🎮 Регистрация WhiteList", "Введите ваш точный игровой никнейм в Minecraft для добавления в очередь:", "Ваш игровой никнейм...");
             if (!mcName || mcName.trim() === "") {
                 customAlert("⚠️ Отмена", "Покупка пропуска отменена: никнейм игрока не может быть пустым.");
@@ -2268,7 +2401,7 @@
                     action: whitelistAction
                 });
 
-            customAlert("🎉 Успешная покупка!", `Проходка успешно куплена за **${price} ₽**! Никнейм [**${cleanNick}**] отправлен в очередь вайтлиста сервера. Можете заходить в игру!`);
+            alert(`🎉 Поздравляем! Проходка успешно куплена за ${price} ₽! Никнейм [${cleanNick}] отправлен в очередь вайтлиста сервера. Теперь вы можете беспрепятственно зайти в игру и пройти верификацию!`);
             loadProfileData();
         }
 
@@ -2306,6 +2439,83 @@
 
             customAlert("🛒 Магазин", `Вы успешно приобрели товар "**${privilegeName}**" за **${price} ₽**! Привилегия автоматически активируется на сервере в течение пары минут.`);
             loadProfileData();
+        }
+
+        /* --- ЛОГИКА АНИМИРОВАННОГО ОКНА ЗАЯВОК (БЕСПЛАТНЫЙ ПРОПУСК) --- */
+        function openApplicationModal() {
+            if (!currentUserSession) {
+                customAlert("🔒 Авторизация", "Для подачи анкеты на сервер сначала авторизуйтесь на сайте через Discord!");
+                return;
+            }
+            const overlay = document.getElementById('app-modal-overlay');
+            const card = document.getElementById('app-modal-card');
+            
+            overlay.style.display = 'flex';
+            overlay.offsetHeight; 
+            card.style.transform = 'translateY(0) scale(1)';
+            card.style.opacity = '1';
+        }
+
+        function closeApplicationModal() {
+            const overlay = document.getElementById('app-modal-overlay');
+            const card = document.getElementById('app-modal-card');
+            card.style.transform = 'translateY(30px) scale(0.95)';
+            card.style.opacity = '0';
+            setTimeout(() => { overlay.style.display = 'none'; }, 250);
+        }
+
+        async function submitServerApplication() {
+            const nick = document.getElementById('app-mc-nick').value.trim();
+            const license = document.getElementById('app-has-license').value;
+            const tg = document.getElementById('app-tg-contact').value.trim();
+            const plans = document.getElementById('app-plans').value.trim();
+            const submitBtn = document.getElementById('app-submit-btn');
+
+            if (!nick || !tg || !plans) {
+                customAlert("⚠️ Ошибка заполнения", "Пожалуйста, заполните абсолютно все текстовые поля анкеты куратора!");
+                return;
+            }
+
+            submitBtn.disabled = true;
+            submitBtn.innerText = "Отправка...";
+            submitBtn.style.opacity = "0.6";
+
+            try {
+                const { data: existingApp } = await supabaseClient
+                    .from('server_applications')
+                    .select('id')
+                    .eq('user_id', currentUserSession.user.id)
+                    .maybeSingle();
+
+                if (existingApp) {
+                    customAlert("👑 Информация", "Вы уже успешно отправляли анкету ранее. Пожалуйста, ожидайте вердикта администрации в Telegram!");
+                    closeApplicationModal();
+                    return;
+                }
+
+                const { error } = await supabaseClient
+                    .from('server_applications')
+                    .insert({
+                        user_id: currentUserSession.user.id,
+                        minecraft_name: nick,
+                        has_license: license,
+                        telegram_contact: tg,
+                        plans: plans
+                    });
+
+                if (error) throw error;
+
+                closeApplicationModal();
+                customAlert("🎉 Успешно отправлено!", "Ваша анкета успешно сохранена и передана кураторам KuromiSMP. Мы свяжемся с вами в Telegram после проверки!");
+
+            } catch (e) {
+                console.error(e);
+                customAlert("❌ Ошибка отправки", "Не удалось сохранить анкету из-за сбоя сети. Пожалуйста, попробуйте позже.");
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.innerText = "Отправить анкету";
+                submitBtn.style.opacity = "1";
+            }
         }
 
         /* --- ФУНКЦИОНАЛ ФОРУМА С МИКРО-АНИМАЦИЯМИ И САЛЮТОМ ИСКР --- */
@@ -2638,7 +2848,6 @@
             const likeBtn = document.getElementById(`like-btn-${postId}`);
             if (!likeBtn) return;
 
-            // Интерактивный клик-эффект с салютом розовых искр
             likeBtn.classList.remove('like-active-anim');
             void likeBtn.offsetWidth; 
             likeBtn.classList.add('like-active-anim');
