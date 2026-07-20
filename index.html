@@ -7,7 +7,8 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    
+    <script src="https://unpkg.com/lucide@0.462.0/dist/umd/lucide.js"></script>
+
     <style>
         :root {
             --bg-main: #050308;        
@@ -629,7 +630,6 @@
             padding: 16px;
             border-radius: 20px;
             border: 1px solid rgba(255, 0, 127, 0.08);
-            align-items: center;
         }
         .darknet-input {
             background: rgba(10, 5, 15, 0.6);
@@ -824,7 +824,6 @@
             background: var(--accent-pink);
         }
 
-        /* Анимации микро-интенсивностей */
         @keyframes customHeartPop {
             0% { transform: scale(1); }
             40% { transform: scale(1.22); }
@@ -835,56 +834,166 @@
             animation: customHeartPop 0.35s cubic-bezier(0.15, 0.85, 0.35, 1) forwards;
         }
 
-        /* ИСПРАВЛЕННЫЙ ВЫПАДАЮЩИЙ СПИСОК (Принудительные цвета для option) */
-        .app-select-field {
-            width: 100%;
-            background: #110924 !important;
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            padding: 14px 18px;
-            border-radius: 12px;
-            color: #ffffff !important;
-            font-family: var(--font-sans);
-            font-size: 0.9rem;
-            outline: none;
-            cursor: pointer;
-            transition: all 0.25s ease;
+        /* Продвинутые стили для красивой анимированной формы заявки */
+        .app-select-style {
+            appearance: none;
+            -webkit-appearance: none;
+            background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%236e6482' viewBox='0 0 24 24'><path d='M7 10l5 5 5-5z'/></svg>");
+            background-repeat: no-repeat;
+            background-position: right 16px center;
         }
-        .app-select-field:focus {
-            border-color: var(--accent-pink);
-            box-shadow: 0 0 12px rgba(255, 0, 127, 0.2);
+        .app-input-glow {
+            transition: all 0.3s ease;
         }
-        .app-select-field option {
-            background-color: #110924 !important;
-            color: #ffffff !important;
-            padding: 12px;
+        .app-input-glow:focus {
+            border-color: var(--accent-pink) !important;
+            box-shadow: 0 0 15px rgba(255, 0, 127, 0.25);
+            background: rgba(16, 11, 28, 0.9) !important;
+        }
+        /* ================= АДМИН-ПАНЕЛЬ ================= */
+
+        [data-lucide] { width: 18px; height: 18px; stroke-width: 2.1; display: block; }
+
+        .icon-badge {
+            width: 40px; height: 40px; border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0;
+        }
+        .icon-badge svg { width: 20px; height: 20px; }
+        .icon-badge.b-purple { background: rgba(138, 43, 226, 0.16); color: #b985f4; }
+        .icon-badge.b-pink   { background: rgba(255, 0, 127, 0.14); color: #ff5fa8; }
+        .icon-badge.b-blue   { background: rgba(52, 152, 219, 0.16); color: #6ec3f4; }
+        .icon-badge.b-green  { background: rgba(46, 204, 113, 0.14); color: #4fdc8e; }
+        .icon-badge.b-orange { background: rgba(255, 159, 28, 0.16); color: #ffb95c; }
+        .icon-badge.b-red    { background: rgba(231, 76, 60, 0.16); color: #ff7b6e; }
+
+        #tab-admin { position: relative; }
+
+        .admin-subnav {
+            display: flex; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.04);
+            padding: 4px; border-radius: 16px; gap: 4px; margin-bottom: 28px; flex-wrap: wrap;
+        }
+        .admin-subnav button {
+            flex: 1; min-width: 120px; background: none; border: none; color: var(--text-muted);
+            padding: 11px 14px; border-radius: 12px; font-family: var(--font-sans); font-size: 0.85rem;
+            font-weight: 600; cursor: pointer; transition: all 0.2s;
+            display: flex; align-items: center; justify-content: center; gap: 7px;
+        }
+        .admin-subnav button.active { background: rgba(138, 43, 226, 0.18); color: #fff; }
+        .admin-subnav button:hover:not(.active) { color: #fff; background: rgba(255,255,255,0.03); }
+
+        .admin-card {
+            background: rgba(255,255,255,0.015); border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 20px; padding: 18px 20px; margin-bottom: 14px;
         }
 
-        @keyframes modalFadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
+        .admin-row-head {
+            display: flex; align-items: center; gap: 14px; margin-bottom: 14px;
         }
-        @keyframes cardSlideIn {
-            from { transform: translateY(24px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
-        }
+        .admin-row-head .grow { flex: 1; min-width: 0; }
 
-        /* Дополнительные стили админки */
-        .admin-nav-bar {
-            display: flex;
-            gap: 10px;
-            border-bottom: 1px solid rgba(255,255,255,0.04);
-            padding-bottom: 15px;
-            margin-bottom: 25px;
-            width: 100%;
+        .admin-field-label {
+            font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase;
+            letter-spacing: 0.05em; font-weight: 600; margin-bottom: 5px;
         }
-        .admin-sub-card {
-            background: rgba(255,255,255,0.01);
-            border: 1px solid rgba(255,255,255,0.03);
-            border-radius: 18px;
-            padding: 20px;
-            width: 100%;
-            text-align: left;
-            margin-bottom: 15px;
+        .admin-input, .admin-select, .admin-textarea {
+            width: 100%; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07);
+            border-radius: 10px; padding: 9px 12px; color: #fff; font-family: var(--font-sans);
+            font-size: 0.88rem; outline: none; transition: border-color 0.2s;
+        }
+        .admin-input:focus, .admin-select:focus, .admin-textarea:focus { border-color: var(--primary-purple); }
+        .admin-textarea { resize: vertical; min-height: 46px; }
+
+        .status-pill {
+            font-size: 0.72rem; font-weight: 700; padding: 5px 11px; border-radius: 100px;
+            border: 1px solid transparent; cursor: pointer; text-transform: uppercase; letter-spacing: 0.03em;
+        }
+        .status-pill.active { background: rgba(46, 204, 113, 0.14); color: #4fdc8e; border-color: rgba(46,204,113,0.25); }
+        .status-pill.hidden { background: rgba(110, 100, 130, 0.18); color: #a49cc0; border-color: rgba(110,100,130,0.3); }
+        .status-pill.soon   { background: rgba(255, 159, 28, 0.14); color: #ffb95c; border-color: rgba(255,159,28,0.25); }
+
+        .btn-mini {
+            background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.08); color: #fff;
+            padding: 8px 14px; border-radius: 10px; font-family: var(--font-sans); font-size: 0.8rem;
+            font-weight: 600; cursor: pointer; transition: all 0.2s; display: inline-flex; align-items: center; gap: 6px;
+        }
+        .btn-mini:hover { background: rgba(255,255,255,0.09); }
+        .btn-mini.save { background: rgba(138, 43, 226, 0.22); border-color: rgba(138,43,226,0.4); }
+        .btn-mini.save:hover { background: rgba(138, 43, 226, 0.32); }
+        .btn-mini.danger { background: rgba(231, 76, 60, 0.14); border-color: rgba(231,76,60,0.3); color: #ff7b6e; }
+        .btn-mini.danger:hover { background: rgba(231, 76, 60, 0.24); }
+        .btn-mini.give { background: rgba(46, 204, 113, 0.14); border-color: rgba(46,204,113,0.3); color: #4fdc8e; }
+        .btn-mini.give:hover { background: rgba(46, 204, 113, 0.24); }
+
+        .discount-row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-top: 12px; }
+
+        /* Журнал аудита — уровни серьёзности */
+        .log-entry {
+            display: flex; gap: 14px; padding: 14px 16px; border-radius: 16px;
+            background: rgba(255,255,255,0.015); border: 1px solid rgba(255,255,255,0.04);
+            border-left: 3px solid transparent; margin-bottom: 10px;
+        }
+        .log-entry.sev-low    { border-left-color: #2ecc71; }
+        .log-entry.sev-medium { border-left-color: #ffb95c; }
+        .log-entry.sev-high   { border-left-color: #ff4d4d; }
+        .log-dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; margin-top: 6px; }
+        .log-dot.sev-low    { background: #2ecc71; box-shadow: 0 0 8px rgba(46,204,113,0.5); }
+        .log-dot.sev-medium { background: #ffb95c; box-shadow: 0 0 8px rgba(255,185,92,0.5); }
+        .log-dot.sev-high   { background: #ff4d4d; box-shadow: 0 0 8px rgba(255,77,77,0.6); }
+        .log-diff { font-size: 0.8rem; color: var(--text-muted); margin-top: 4px; }
+        .log-diff b { color: #fff; }
+        .log-reason { font-size: 0.78rem; color: #b985f4; margin-top: 4px; font-style: italic; }
+        .log-meta { font-size: 0.72rem; color: var(--text-muted); margin-top: 6px; white-space: nowrap; }
+
+        .log-filters { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
+        .log-filter-btn {
+            background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); color: var(--text-muted);
+            padding: 7px 14px; border-radius: 100px; font-size: 0.78rem; font-weight: 600; cursor: pointer;
+            display: flex; align-items: center; gap: 6px; transition: all 0.2s;
+        }
+        .log-filter-btn.active { color: #fff; border-color: rgba(255,255,255,0.2); background: rgba(255,255,255,0.06); }
+
+        /* Топы игроков — сворачиваемые блоки */
+        .leaderboard-details { margin-bottom: 16px; }
+        .leaderboard-details summary {
+            cursor: pointer; list-style: none; display: flex; align-items: center; gap: 12px;
+            background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 16px; padding: 14px 18px; font-weight: 700; font-size: 0.95rem;
+        }
+        .leaderboard-details summary::-webkit-details-marker { display: none; }
+        .leaderboard-details summary .chev { margin-left: auto; transition: transform 0.2s; color: var(--text-muted); }
+        .leaderboard-details[open] summary .chev { transform: rotate(180deg); }
+        .leaderboard-body { padding: 14px 6px 4px; }
+        .leaderboard-row {
+            display: flex; align-items: center; gap: 12px; padding: 10px 12px; border-radius: 12px;
+        }
+        .leaderboard-row:nth-child(odd) { background: rgba(255,255,255,0.015); }
+        .leaderboard-rank {
+            width: 26px; height: 26px; border-radius: 8px; background: rgba(255,255,255,0.05);
+            display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 800;
+            color: var(--text-muted); flex-shrink: 0;
+        }
+        .leaderboard-row:nth-child(1) .leaderboard-rank { background: rgba(255,215,0,0.18); color: #ffd700; }
+        .leaderboard-row:nth-child(2) .leaderboard-rank { background: rgba(192,192,192,0.18); color: #d8d8d8; }
+        .leaderboard-row:nth-child(3) .leaderboard-rank { background: rgba(205,127,50,0.2); color: #e0a06e; }
+
+        .player-search-bar { display: flex; gap: 10px; margin-bottom: 20px; }
+        .player-search-bar input { flex: 1; }
+
+        .admin-card-grid {
+            display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin: 16px 0;
+        }
+        .admin-stat-box {
+            background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 16px; padding: 14px 16px;
+        }
+        .admin-stat-box .lbl { font-size: 0.72rem; color: var(--text-muted); margin-bottom: 4px; display:flex; align-items:center; gap:6px; }
+        .admin-stat-box .val { font-size: 1.15rem; font-weight: 700; color: #fff; }
+
+        @media (max-width: 700px) {
+            .admin-subnav button { min-width: 100%; }
+            .admin-card-grid { grid-template-columns: 1fr; }
+            .player-search-bar { flex-direction: column; }
         }
     </style>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -905,6 +1014,7 @@
             <button id="tab-players" onclick="switchTab('players')">Игроки</button>
             <button id="tab-mechanics" onclick="switchTab('mechanics')">Механики</button>
             <button id="tab-donate" onclick="switchTab('donate')">Донат</button>
+            <button id="tab-admin" onclick="switchTab('admin')" style="display:none;">Админ</button>
         </nav>
     </header>
 
@@ -912,7 +1022,6 @@
         <div class="header-profile-sidebar">
             <div id="header-profile-auth" style="display: flex; flex-direction: column; gap: 10px; width: 100%;"></div>
             <button id="forum-fixed-btn" class="widget-login-btn" onclick="switchTab('forum')">💬 Форум</button>
-            <button id="admin-fixed-btn" class="widget-login-btn" style="display:none; border-color: var(--accent-pink); background: rgba(255,0,127,0.02);" onclick="switchTab('admin')">🔑 Админка</button>
         </div>
         
         <main id="section-home" class="content-section active">
@@ -957,7 +1066,7 @@
                             <p>Твой ультимативный билет в вечное выживание! Абсолютная свобода от любых продлений, взносов и вайпов на все будущие сезоны проекта. Залетай в WhiteList один раз и забудь о суете навсегда.</p>
                         </div>
                         <div>
-                            <div class="ticket-price" id="price-card-forever">349 ₽</div>
+                            <div class="ticket-price">349 ₽</div>
                             <button class="btn-primary" style="padding: 10px 20px; font-size: 0.8rem; margin-top: 10px; width: 100%;" onclick="buyServerPass(349)">Купить доступ</button>
                         </div>
                     </div>
@@ -968,7 +1077,7 @@
                             <p>Максимальный комфорт для быстрого старта! Мгновенная автоматическая регистрация в WhiteList без томительного ожидания, скучных анкет и долгих проверок. Залетай в игру в один клик прямо сейчас на целый месяц.</p>
                         </div>
                         <div>
-                            <div class="ticket-price" id="price-card-30d">149 ₽</div>
+                            <div class="ticket-price">149 ₽</div>
                             <button class="btn-primary" style="padding: 10px 20px; font-size: 0.8rem; margin-top: 10px; width: 100%;" onclick="buyServerPass(149)">В один клик</button>
                         </div>
                     </div>
@@ -1027,7 +1136,7 @@
                         <div class="mechanic-img-box"><div class="mechanic-placeholder-icon">⛓️</div></div>
                         <div class="mechanic-text-block">
                             <h3>Арест и Конвоирование</h3>
-                            <p>Ролевая система задержания нарушителей. Позволяет временно заковать игрока в наручники и конвоировать его за собой на РП-поводке до выяснения обстоятельств администрацией.</p>
+                            <p>Ролевая система задержания нарушителей. Позволяет временно заковать игрока в наручники и конвоировать его за собой на РП-поводке до выяснения обстоятельства администрацией.</p>
                         </div>
                     </div>
                     <div class="mechanic-card">
@@ -1048,7 +1157,7 @@
                         <div class="mechanic-img-box"><div class="mechanic-placeholder-icon">📰</div></div>
                         <div class="mechanic-text-block">
                             <h3>Газета Kuromi Times</h3>
-                            <p>Информационный вестник сервера. Любой житель SMP может отправить свою статью или расследование через форму на сайте. Публикация происходит после модерации редакцией.</p>
+                            <p>Информационный вестник сервера. Люгой житель SMP может отправить свою статью или расследование через форму на сайте. Публикация происходит после модерации редакцией.</p>
                         </div>
                     </div>
                     <div class="mechanic-card">
@@ -1064,12 +1173,18 @@
 
         <div id="section-donate" class="content-section">
             <div class="ux-panel">
-                <div class="panel-title" style="margin-bottom: 10px; font-size: 1.6rem; text-align: left; width: 100%;">🛒 Магазин привилегий</div>
+                <div class="panel-title" style="margin-bottom: 10px; font-size: 1.6rem; text-align: left; width: 100%; display:flex; align-items:center; gap:10px;">
+                    <span class="icon-badge b-purple" style="width:32px;height:32px;"><i data-lucide="shopping-bag"></i></span> Магазин привилегий
+                </div>
                 <div class="eyebrow" style="margin-bottom: 30px; text-align: left; width: 100%;">Прямая покупка лицензий и кастомизации</div>
-                
-                <div id="dynamic-products-container" class="donate-grid"></div>
 
-                <div class="panel-title" style="margin-top: 40px; margin-bottom: 10px; font-size: 1.6rem; text-align: left; width: 100%;">🎰 Колесо Фортуны</div>
+                <div class="donate-grid" id="shop-front-container">
+                    <div style="grid-column: span 2; color: var(--text-muted); padding: 20px 0;">Загрузка товаров...</div>
+                </div>
+
+                <div class="panel-title" style="margin-top: 40px; margin-bottom: 10px; font-size: 1.6rem; text-align: left; width: 100%; display:flex; align-items:center; gap:10px;">
+                    <span class="icon-badge b-pink" style="width:32px;height:32px;"><i data-lucide="disc-3"></i></span> Колесо Фортуны
+                </div>
                 <div class="eyebrow" style="margin-bottom: 40px; text-align: left; width: 100%;">Испытай удачу и выбей дорогие привилегии со скидкой</div>
                 
                 <div class="donate-layout">
@@ -1100,7 +1215,7 @@
 
         <div id="section-blackmarket" class="content-section">
             <div class="ux-panel darknet-panel">
-                <div class="darknet-title">☠️ BLACK MARKET (DARKNET)</div>
+                <div class="darknet-title" style="display:flex; align-items:center; gap:10px;"><span class="icon-badge b-red" style="width:32px;height:32px;"><i data-lucide="skull"></i></span> BLACK MARKET (DARKNET)</div>
                 <div class="eyebrow" style="color: var(--accent-pink); opacity: 0.8;">Анонимная охота за головами игроков сервера</div>
                 
                 <p style="font-size: 0.9rem; color: var(--text-muted); max-width: 600px; line-height: 1.5; margin-top: 10px;">
@@ -1108,8 +1223,7 @@
                 </p>
 
                 <div class="darknet-form-box">
-                    <!-- Заменили ввод на выпадающий список (Dropdown) -->
-                    <select id="bounty-target" class="app-select-field" style="flex: 2; max-width: 300px; min-width: 180px;"></select>
+                    <input type="text" id="bounty-target" class="darknet-input" placeholder="Никнейм жертвы...">
                     <input type="number" id="bounty-reward" class="darknet-input" placeholder="Награда (алмазы)...">
                     <button class="btn-primary" style="background: var(--accent-pink); box-shadow: 0 4px 15px rgba(255, 0, 127, 0.3);" onclick="placeBountyContract()">Объявить охоту</button>
                 </div>
@@ -1122,46 +1236,6 @@
             </div>
         </div>
 
-        <!-- НАСТРОЕННАЯ АДМИН-ПАНЕЛЬ -->
-        <div id="section-admin" class="content-section">
-            <div class="ux-panel" style="border-color: var(--accent-pink);">
-                <div class="panel-title" style="color: var(--accent-pink);">🔒 Центральная Админ-Панель Kuromi</div>
-                
-                <div class="admin-nav-bar">
-                    <button class="btn-secondary active" onclick="switchAdminSubTab('shop')">🛒 Магазин</button>
-                    <button class="btn-secondary" onclick="switchAdminSubTab('apps')">🌸 Анкеты</button>
-                    <button class="btn-secondary" onclick="switchAdminSubTab('users')">👥 Игроки</button>
-                    <button class="btn-secondary" onclick="switchAdminSubTab('logs')">📝 Логи</button>
-                </div>
-
-                <div id="admin-sub-shop" class="admin-tab-content" style="width:100%;">
-                    <div id="admin-products-list"></div>
-                </div>
-
-                <div id="admin-sub-apps" class="admin-tab-content" style="width:100%; display:none;">
-                    <div id="admin-apps-list"></div>
-                </div>
-
-                <div id="admin-sub-users" class="admin-tab-content" style="width:100%; display:none;">
-                    <div class="admin-sub-card">
-                        <h4 style="margin-bottom:15px;">Управление валютой и профилями</h4>
-                        <div style="display:flex; gap:10px; margin-bottom:15px; flex-wrap:wrap;">
-                            <input type="text" id="admin-search-user" class="darknet-input" placeholder="Никнейм игрока...">
-                            <button class="btn-primary" onclick="adminSearchPlayer()">Найти</button>
-                        </div>
-                        <div id="admin-user-control-res" style="margin-top:15px;"></div>
-                    </div>
-                </div>
-
-                <div id="admin-sub-logs" class="admin-tab-content" style="width:100%; display:none;">
-                    <div class="admin-sub-card" style="max-height: 400px; overflow-y:auto;" class="wallet-scroll">
-                        <table style="width:100%; font-size:0.85rem; border-collapse:collapse;" id="admin-logs-table"></table>
-                    </div>
-                </div>
-
-            </div>
-        </div>
-
         <div id="section-profile" class="content-section">
             <div class="ux-panel" id="profile-main-wrapper">
                 <div style="color: var(--text-muted);">Загрузка профиля...</div>
@@ -1170,9 +1244,27 @@
 
         <div id="section-forum" class="content-section">
             <div class="ux-panel">
-                <div class="panel-title">💬 Форум сообщества</div>
+                <div class="panel-title" style="display:flex; align-items:center; gap:10px; justify-content:center;">
+                    <span class="icon-badge b-blue" style="width:32px;height:32px;"><i data-lucide="messages-square"></i></span> Форум сообщества
+                </div>
                 <div id="forum-form-container" style="width: 100%; margin-bottom: 30px;"></div>
                 <div id="forum-feed-container" style="width: 100%; display: flex; flex-direction: column; gap: 20px;"></div>
+            </div>
+        </div>
+
+        <div id="section-admin" class="content-section">
+            <div class="ux-panel" style="align-items: stretch;">
+                <div class="panel-title" style="margin-bottom: 22px; font-size: 1.6rem; text-align: left; width: 100%; display:flex; align-items:center; gap:10px;">
+                    <span class="icon-badge b-purple" style="width:32px;height:32px;"><i data-lucide="shield-check"></i></span> Админ-панель
+                </div>
+
+                <div class="admin-subnav">
+                    <button id="atab-shop" onclick="switchAdminTab('shop')"><i data-lucide="store" style="width:16px;height:16px;"></i> Магазин</button>
+                    <button id="atab-players" onclick="switchAdminTab('players')"><i data-lucide="users" style="width:16px;height:16px;"></i> Игроки</button>
+                    <button id="atab-logs" onclick="switchAdminTab('logs')"><i data-lucide="scroll-text" style="width:16px;height:16px;"></i> Журнал</button>
+                </div>
+
+                <div id="admin-tab-content"></div>
             </div>
         </div>
 
@@ -1191,50 +1283,52 @@
 
     </div>
 
-    <div id="custom-modal-overlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(5, 3, 8, 0.82); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); z-index: 20000; align-items: center; justify-content: center; padding: 20px; animation: modalFadeIn 0.2s ease forwards;">
-        <div id="custom-modal-card" style="background: rgba(16, 11, 28, 0.98); border: 1px solid var(--primary-purple); border-radius: 28px; max-width: 460px; width: 100%; padding: 35px 30px; box-shadow: 0 0 35px rgba(138, 43, 226, 0.25); text-align: left; font-family: var(--font-sans); color: #fff; transform: translateY(20px); opacity: 0; transition: all 0.25s cubic-bezier(0.15, 0.85, 0.35, 1); animation: cardSlideIn 0.25s 0.05s cubic-bezier(0.15, 0.85, 0.35, 1) forwards;">
+    <!-- Обновленное Премиум-окно (Выравнивание влево, адаптивные абзацы) -->
+    <div id="custom-modal-overlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(5, 3, 8, 0.82); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); z-index: 20000; align-items: center; justify-content: center; padding: 20px;">
+        <div id="custom-modal-card" style="background: rgba(16, 11, 28, 0.98); border: 1px solid var(--primary-purple); border-radius: 28px; max-width: 460px; width: 100%; padding: 35px 30px; box-shadow: 0 0 35px rgba(138, 43, 226, 0.25); text-align: left; font-family: var(--font-sans); color: #fff; transform: translateY(20px); opacity: 0; transition: all 0.25s cubic-bezier(0.15, 0.85, 0.35, 1);">
             <h3 id="custom-modal-title" style="font-size: 1.35rem; font-weight: 600; margin-bottom: 16px; line-height: 1.3; display: flex; align-items: center; gap: 10px;"></h3>
             <div id="custom-modal-text" style="font-size: 0.94rem; color: rgba(255,255,255,0.85); line-height: 1.6; margin-bottom: 24px;"></div>
             <div id="custom-modal-input-container" style="display: none; width: 100%; margin-bottom: 24px;">
-                <input type="text" id="custom-modal-input" class="darknet-input" style="text-align: left; border-color: rgba(255,255,255,0.1); width: 100%; padding: 14px 18px;" placeholder="">
+                <input type="text" id="custom-modal-input" class="darknet-input app-input-glow" style="text-align: left; border-color: rgba(255,255,255,0.1); width: 100%; padding: 14px 18px;" placeholder="">
             </div>
             <div id="custom-modal-buttons" style="display: flex; gap: 12px; justify-content: flex-end; width: 100%;"></div>
         </div>
     </div>
 
-    <div id="app-modal-overlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(5, 3, 8, 0.82); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); z-index: 20001; align-items: center; justify-content: center; padding: 20px; animation: modalFadeIn 0.2s ease forwards;">
-        <div id="app-modal-card" style="background: rgba(16, 11, 28, 0.98); border: 1px solid var(--accent-pink); border-radius: 28px; max-width: 500px; width: 100%; padding: 35px 30px; box-shadow: 0 0 35px rgba(255, 0, 127, 0.2); text-align: left; font-family: var(--font-sans); color: #fff; transform: translateY(24px); opacity: 0; animation: cardSlideIn 0.28s 0.05s cubic-bezier(0.15, 0.85, 0.35, 1) forwards; transition: all 0.25s;">
-            <h3 style="font-size: 1.4rem; font-weight: 600; margin-bottom: 8px; color: #fff; display: flex; align-items: center; gap: 8px;">🌸 Бесплатный пропуск</h3>
-            <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 24px;">Анкета верификации для обладателей официальной Лицензии Minecraft.</p>
+    <!-- Красивое интерактивное окно подачи Заявки/Анкеты -->
+    <div id="app-modal-overlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(5, 3, 8, 0.85); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); z-index: 20001; align-items: center; justify-content: center; padding: 20px;">
+        <div id="app-modal-card" style="background: rgba(16, 11, 28, 0.98); border: 1px solid var(--accent-pink); border-radius: 32px; max-width: 500px; width: 100%; padding: 40px 35px; box-shadow: 0 0 40px rgba(255, 0, 127, 0.2); text-align: left; font-family: var(--font-sans); color: #fff; transform: translateY(30px) scale(0.95); opacity: 0; transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);">
+            <h3 style="font-size: 1.45rem; font-weight: 700; margin-bottom: 6px; color: #fff; display: flex; align-items: center; gap: 8px;">🌸 Бесплатный доступ</h3>
+            <p style="font-size: 0.86rem; color: var(--text-muted); margin-bottom: 24px;">Анкета верификации для владельцев официальной Лицензии Minecraft.</p>
             
-            <div style="display: flex; flex-direction: column; gap: 18px; width: 100%; margin-bottom: 26px;">
+            <div style="display: flex; flex-direction: column; gap: 20px; width: 100%; margin-bottom: 28px;">
                 <div>
                     <label style="font-size: 0.82rem; color: var(--text-muted); display: block; margin-bottom: 6px; font-weight: 500;">Точный игровой никнейм:</label>
-                    <input type="text" id="app-mc-nick" class="darknet-input" style="width:100%; border-color:rgba(255,255,255,0.06); padding: 12px 16px;" placeholder="Например: Pudge">
+                    <input type="text" id="app-mc-nick" class="darknet-input app-input-glow" style="width:100%; border-color:rgba(255,255,255,0.06); padding: 13px 18px;" placeholder="Например: Pudge">
                 </div>
                 
                 <div>
-                    <label style="font-size: 0.82rem; color: var(--text-muted); display: block; margin-bottom: 6px; font-weight: 500;">У вас есть официальная Лицензия?</label>
-                    <select id="app-has-license" class="app-select-field">
+                    <label style="font-size: 0.82rem; color: var(--text-muted); display: block; margin-bottom: 6px; font-weight: 500;">У вас есть купленная Лицензия?</label>
+                    <select id="app-has-license" class="darknet-input app-input-glow app-select-style" style="width:100%; border-color:rgba(255,255,255,0.06); padding: 13px 18px; background: #0a050f; color:#fff; outline:none; cursor: pointer;">
                         <option value="Да">Да, у меня официальная Лицензия</option>
                         <option value="Нет">Нет, я играю с пиратки / лаунчера</option>
                     </select>
                 </div>
 
                 <div>
-                    <label style="font-size: 0.82rem; color: var(--text-muted); display: block; margin-bottom: 6px; font-weight: 500;">Юзернейм в Telegram (для связи):</label>
-                    <input type="text" id="app-tg-contact" class="darknet-input" style="width:100%; border-color:rgba(255,255,255,0.06); padding: 12px 16px;" placeholder="@username">
+                    <label style="font-size: 0.82rem; color: var(--text-muted); display: block; margin-bottom: 6px; font-weight: 500;">Контакты в Telegram (для вердикта):</label>
+                    <input type="text" id="app-tg-contact" class="darknet-input app-input-glow" style="width:100%; border-color:rgba(255,255,255,0.06); padding: 13px 18px;" placeholder="@username">
                 </div>
 
                 <div>
                     <label style="font-size: 0.82rem; color: var(--text-muted); display: block; margin-bottom: 6px; font-weight: 500;">Что планируете делать на сервере?</label>
-                    <textarea id="app-plans" class="darknet-input" style="width:100%; height: 95px; border-color:rgba(255,255,255,0.06); padding: 12px 16px; resize:none; font-family:var(--font-sans); line-height: 1.5;" placeholder="Опишите ваши идеи, будущие проекты или РП-планы на сезон..."></textarea>
+                    <textarea id="app-plans" class="darknet-input app-input-glow" style="width:100%; height: 100px; border-color:rgba(255,255,255,0.06); padding: 13px 18px; resize:none; font-family:var(--font-sans); line-height: 1.5;" placeholder="Опишите ваши идеи, будущие проекты или РП-планы..."></textarea>
                 </div>
             </div>
 
             <div style="display: flex; gap: 12px; justify-content: flex-end; width: 100%;">
-                <button class="btn-secondary" style="padding: 12px 24px; border-radius: 20px; font-weight: 600;" onclick="document.getElementById('app-modal-overlay').style.display='none'">Отмена</button>
-                <button class="btn-primary" style="padding: 12px 26px; border-radius: 20px; background:var(--accent-pink); box-shadow: 0 4px 15px rgba(255,0,127,0.2); font-weight: 600;" onclick="submitServerApplication()">Отправить анкету</button>
+                <button class="btn-secondary" style="padding: 12px 26px; border-radius: 20px; font-weight: 600;" onclick="closeApplicationModal()">Отмена</button>
+                <button id="app-submit-btn" class="btn-primary" style="padding: 12px 28px; border-radius: 20px; background:var(--accent-pink); box-shadow: 0 4px 15px rgba(255,0,127,0.2); font-weight: 700; transition: all 0.2s;" onclick="submitServerApplication()">Отправить анкету</button>
             </div>
         </div>
     </div>
@@ -1248,7 +1342,6 @@
         const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
         let loadedPlayers = [];
-        let shopProducts = [];
         
         let currentUserSession = null;
         let currentUserLinkedData = null; 
@@ -1273,7 +1366,7 @@
         let currentRotation = 0; 
         let isWheelSpinning = false;
 
-        /* --- УНИВЕРСАЛЬНЫЙ МОДУЛЬ ДИАЛОГОВЫХ ОКОН --- */
+        /* --- УНИВЕРСАЛЬНЫЙ МОДУЛЬ ДИАЛОГОВЫХ ОКОН С ИСПРАВЛЕННЫМ ВЫРАВНИВАНИЕМ И ПЛЕЙСХОЛДЕРОМ --- */
         function openCustomModal({ title, text, showInput, placeholder, buttons }) {
             return new Promise((resolve) => {
                 const overlay = document.getElementById('custom-modal-overlay');
@@ -1290,7 +1383,7 @@
                 
                 if (showInput) {
                     inputEl.value = '';
-                    inputEl.placeholder = placeholder || 'Введите значение...';
+                    inputEl.placeholder = placeholder || 'Введите значение...'; 
                 }
 
                 buttonsContainer.innerHTML = '';
@@ -1303,7 +1396,7 @@
                     button.style.fontSize = '0.88rem';
                     button.innerText = btn.text;
                     button.onclick = () => {
-                        card.style.transform = 'translateY(24px)';
+                        card.style.transform = 'translateY(20px)';
                         card.style.opacity = '0';
                         setTimeout(() => {
                             overlay.style.display = 'none';
@@ -1345,10 +1438,14 @@
         function customLowBalance(price, current) {
             return openCustomModal({
                 title: '🛑 Недостаточно средств на балансе',
-                text: `<p style="margin-bottom: 12px;">Вы не можете завершить операцию покупки выбранной привилегии.</p>
-                       <p style="margin-bottom: 12px;">• Стоимость товара: <span style="color:var(--accent-pink); font-weight:700;">${price} ₽</span><br>
-                       • На вашем кошельке: <span style="color:var(--primary-purple); font-weight:700;">${current} ₽</span></p>
-                       <p>Пожалуйста, пополните системный рублевый баланс аккаунта для автоматического совершения покупки.</p>`,
+                text: `<div style="text-align: left;">
+                         <p style="margin-bottom: 12px;">Вы не можете завершить операцию покупки выбранной привилегии.</p>
+                         <p style="margin-bottom: 12px; background: rgba(0,0,0,0.2); padding: 10px; border-radius: 12px; border-left: 3px solid var(--accent-pink);">
+                            • Стоимость товара: <strong style="color:var(--accent-pink);">${price} ₽</strong><br>
+                            • На вашем кошельке: <strong style="color:var(--text-muted);">${current} ₽</strong>
+                         </p>
+                         <p>Пожалуйста, пополните системный рублевый баланс аккаунта для автоматического совершения покупки.</p>
+                       </div>`,
                 showInput: false,
                 buttons: [
                     { text: 'Вернуться', className: 'btn-secondary', action: () => false },
@@ -1357,189 +1454,27 @@
             });
         }
 
-        /* --- ЗАГРУЗКА ТОВАРОВ ИЗ СУБД С ЗАГЛУШКОЙ ОШИБКИ --- */
-        async function fetchShopProducts() {
-            try {
-                const { data, error } = await supabaseClient.from('shop_products').select('*');
-                if (!error && data) {
-                    shopProducts = data;
-                    renderShopUI();
-                } else {
-                    displayShopError();
-                }
-            } catch(e) { 
-                console.error(e); 
-                displayShopError();
-            }
-        }
-
-        function displayShopError() {
-            const container = document.getElementById('dynamic-products-container');
-            if(container) {
-                container.innerHTML = `
-                    <div style="grid-column: span 2; background: rgba(255,0,127,0.03); border: 1px dashed var(--accent-pink); padding: 30px; border-radius: 20px; color: var(--text-muted); font-size: 0.95rem; text-align: left; line-height: 1.6;">
-                        <span style="color: var(--accent-pink); font-weight: 700; display: block; margin-bottom: 6px; font-size: 1.1rem;">⚠️ Ошибка синхронизации магазина</span>
-                        Товары не найдены в базе данных. Скорее всего, ты забыл создать таблицу или наполнить её дефолтными значениями. Зайди в панель <strong>Supabase -> SQL Editor</strong> и запусти скрипт финализации таблиц, чтобы товары появились на сайте автоматически.
-                    </div>`;
-            }
-        }
-
-        function renderShopUI() {
-            const container = document.getElementById('dynamic-products-container');
-            if(!container) return;
-            container.innerHTML = '';
-
-            const privileges = shopProducts.filter(p => p.id !== 'pass_forever' && p.id !== 'pass_30d');
-            
-            if(privileges.length === 0) {
-                displayShopError();
-                return;
-            }
-            
-            privileges.forEach(p => {
-                const isDiscount = p.discount_active && p.original_price > p.price;
-                const priceHTML = isDiscount 
-                    ? `<span style="text-decoration:line-through; font-size:0.9rem; color:var(--text-muted); margin-right:8px;">${p.original_price} ₽</span>${p.price} ₽`
-                    : `${p.price} ₽`;
-
-                const card = document.createElement('div');
-                card.className = 'ticket-card';
-                card.style.borderRadius = '20px';
-                card.innerHTML = `
-                    <div class="ticket-info">
-                        <h3>${p.name} ${p.discount_active ? '<span style="color:var(--accent-pink); font-size:0.8rem; font-weight:700;">% СКИДКА</span>':''}</h3>
-                        <p>${p.description}</p>
-                    </div>
-                    <div>
-                        <div class="ticket-price" style="font-size: 1.15rem;">${priceHTML}</div>
-                        <button class="btn-primary" style="padding: 8px 16px; font-size: 0.8rem; margin-top: 10px; width: 100%;" onclick="buyPrivilege('${p.name}', ${p.price})">Купить</button>
-                    </div>
-                `;
-                container.appendChild(card);
-            });
-
-            const passForever = shopProducts.find(p => p.id === 'pass_forever');
-            const pass30 = shopProducts.find(p => p.id === 'pass_30d');
-            if(passForever) document.getElementById('price-card-forever').textContent = passForever.price + ' ₽';
-            if(pass30) document.getElementById('price-card-30d').textContent = pass30.price + ' ₽';
-        }
-
-        /* --- ЛОГИКА ОПЛАТЫ LAVA.TOP И СИСТЕМНОГО БАЛАНСА В РУБЛЯХ --- */
-
-        async function openTopUpModal() {
-            if (!currentUserSession) {
-                customAlert("🔒 Авторизация", "Для пополнения баланса сначала авторизуйтесь через Discord!");
-                return;
-            }
-            const amountStr = await customPrompt("💳 Пополнение счета", "Введите желаемую сумму пополнения баланса кошелька в **РУБЛЯХ**:", "Сумма пополнения в ₽...");
-            if (!amountStr) return;
-
-            const amount = parseInt(amountStr);
-            if (isNaN(amount) || amount <= 0) {
-                customAlert("❌ Ошибка", "Введена некорректная сумма пополнения счета!");
-                return;
-            }
-
-            const userId = currentUserSession.user.id;
-            const lavaWidgetUrl = `https://widget.lava.top/68d28cf6-3f9f-4529-822c-6782b66c6d80?order_id=${userId}&amount=${amount}`;
-            window.open(lavaWidgetUrl, '_blank');
-        }
-
-        async function buyServerPass(price) {
-            if (!currentUserSession) {
-                customAlert("🔒 Авторизация", "Сначала авторизуйтесь через Discord!");
-                return;
-            }
-
-            const { data: profile } = await supabaseClient
-                .from('profiles')
-                .select('rub_balance, has_pass')
-                .eq('id', currentUserSession.user.id)
-                .single();
-
-            if (profile && profile.has_pass) {
-                customAlert("👑 Информация", "У вас уже успешно приобретена проходка на текущий сезон сервера!");
-                return;
-            }
-
-            if (!profile || profile.rub_balance < price) {
-                customLowBalance(price, profile?.rub_balance || 0);
-                return;
-            }
-
-            const mcName = await customPrompt("🎮 Регистрация WhiteList", "Введите ваш точный игровой никнейм в Minecraft для добавления в очередь:", "Ваш игровой никнейм...");
-            if (!mcName || mcName.trim() === "") {
-                customAlert("⚠️ Отмена", "Покупка пропуска отменена: никнейм игрока не может быть пустым.");
-                return;
-            }
-            const cleanNick = mcName.trim();
-
-            const newBalance = profile.rub_balance - price;
-            await supabaseClient
-                .from('profiles')
-                .update({ rub_balance: newBalance, has_pass: true })
-                .eq('id', currentUserSession.user.id);
-
-            const whitelistAction = (price === 349) ? 'permanent' : 'add_30d';
-
-            await supabaseClient
-                .from('whitelist_queue')
-                .insert({
-                    minecraft_name: cleanNick,
-                    action: whitelistAction
-                });
-
-            customAlert("🎉 Успешная покупка!", `Проходка успешно куплена за **${price} ₽**! Никнейм [**${cleanNick}**] отправлен в очередь вайтлиста сервера. Можете заходить в игру!`);
-            loadProfileData();
-        }
-
-        async function buyPrivilege(privilegeName, price) {
-            if (!currentUserSession) {
-                customAlert("🔒 Авторизация", "Сначала авторизуйтесь через Discord!");
-                return;
-            }
-            if (!currentUserLinkedData) {
-                customAlert("⛔ Ограничение доступа", "Вы не можете покупать сторонние донаты или привилегии, пока не зайдете на сервер и не свяжете аккаунт в личном кабинете!");
-                return;
-            }
-
-            const { data: profile } = await supabaseClient
-                .from('profiles')
-                .select('rub_balance, has_pass')
-                .eq('id', currentUserSession.user.id)
-                .single();
-
-            if (!profile || !profile.has_pass) {
-                customAlert("⛔ Отказано в доступе", "Единственный товар, доступный вам для покупки — это сама «Проходка» (доступ на сервер). Купите её для разблокировки магазина!");
-                return;
-            }
-
-            if (profile.rub_balance < price) {
-                customLowBalance(price, profile.rub_balance);
-                return;
-            }
-
-            const newBalance = profile.rub_balance - price;
-            await supabaseClient
-                .from('profiles')
-                .update({ rub_balance: newBalance })
-                .eq('id', currentUserSession.user.id);
-
-            customAlert("🛒 Магазин", `Вы успешно приобрели товар "**${privilegeName}**" за **${price} ₽**! Привилегия автоматически активируется на сервере в течение пары минут.`);
-            loadProfileData();
-        }
-
-        /* --- ЛОГИКА ПОДАЧИ АНКЕТ НА БЕСПЛАТНЫЙ ПРОПУСК --- */
-
+        /* --- ЛОГИКА АНИМИРОВАННОГО ОКНА ЗАЯВОК (БЕСПЛАТНЫЙ ПРОПУСК) --- */
         function openApplicationModal() {
             if (!currentUserSession) {
-                customAlert("🔒 Авторизация", "Для подачи анкеты на сервер сначала авторизуйтесь через ваш Discord-аккаунт!");
+                customAlert("🔒 Авторизация", "Для подачи анкеты на сервер сначала авторизуйтесь на сайте через Discord!");
                 return;
             }
-            document.getElementById('app-mc-nick').value = '';
-            document.getElementById('app-tg-contact').value = '';
-            document.getElementById('app-plans').value = '';
-            document.getElementById('app-modal-overlay').style.display = 'flex';
+            const overlay = document.getElementById('app-modal-overlay');
+            const card = document.getElementById('app-modal-card');
+            
+            overlay.style.display = 'flex';
+            overlay.offsetHeight; 
+            card.style.transform = 'translateY(0) scale(1)';
+            card.style.opacity = '1';
+        }
+
+        function closeApplicationModal() {
+            const overlay = document.getElementById('app-modal-overlay');
+            const card = document.getElementById('app-modal-card');
+            card.style.transform = 'translateY(30px) scale(0.95)';
+            card.style.opacity = '0';
+            setTimeout(() => { overlay.style.display = 'none'; }, 250);
         }
 
         async function submitServerApplication() {
@@ -1547,11 +1482,16 @@
             const license = document.getElementById('app-has-license').value;
             const tg = document.getElementById('app-tg-contact').value.trim();
             const plans = document.getElementById('app-plans').value.trim();
+            const submitBtn = document.getElementById('app-submit-btn');
 
             if (!nick || !tg || !plans) {
-                customAlert("⚠️ Ошибка заполнения", "Пожалуйста, корректно заполните все разделы анкеты перед отправкой!");
+                customAlert("⚠️ Ошибка заполнения", "Пожалуйста, заполните абсолютно все текстовые поля анкеты куратора!");
                 return;
             }
+
+            submitBtn.disabled = true;
+            submitBtn.innerText = "Отправка...";
+            submitBtn.style.opacity = "0.6";
 
             try {
                 const { data: existingApp } = await supabaseClient
@@ -1562,7 +1502,7 @@
 
                 if (existingApp) {
                     customAlert("👑 Информация", "Вы уже успешно отправляли анкету ранее. Пожалуйста, ожидайте вердикта администрации в Telegram!");
-                    document.getElementById('app-modal-overlay').style.display = 'none';
+                    closeApplicationModal();
                     return;
                 }
 
@@ -1578,282 +1518,223 @@
 
                 if (error) throw error;
 
-                document.getElementById('app-modal-overlay').style.display = 'none';
-                customAlert("🎉 Успешно отправлено!", "Ваша анкеты успешно сохранена и передана кураторам KuromiSMP. Мы свяжемся с вами в Telegram после проверки модераторами!");
+                closeApplicationModal();
+                customAlert("🎉 Успешно отправлено!", "Ваша анкета успешно сохранена и передана кураторам KuromiSMP. Мы свяжемся с вами в Telegram после проверки!");
 
             } catch (e) {
                 console.error(e);
-                customAlert("❌ Критическая ошибка", "Не удалось отправить анкету из-за сбоя сети. Перезагрузите страницу.");
+                customAlert("❌ Ошибка отправки", "Не удалось сохранить анкету из-за сбоя сети. Пожалуйста, попробуйте позже.");
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.innerText = "Отправить анкету";
+                submitBtn.style.opacity = "1";
             }
         }
 
-        /* --- ЖЕСТКИЙ ПРОВЕРЯЕМЫЙ ЧЕРНЫЙ РЫНОК (ДАРКНЕТ) --- */
+        function formatPlaytime(seconds) {
+            if (!seconds || seconds < 0) return '0ч 0м';
+            const hours = Math.floor(seconds / 3600);
+            const minutes = Math.floor((seconds % 3600) / 60);
+            return `${hours}ч ${minutes}м`;
+        }
 
-        async function populateBountyDropdown() {
-            const select = document.getElementById('bounty-target');
-            if(!select) return;
-            select.innerHTML = '<option value="">-- Выберите цель розыска --</option>';
+        function formatDate(dateStr, showTime = true) {
+            if (!dateStr) return 'Неизвестно';
+            const date = new Date(dateStr);
+            if (isNaN(date.getTime())) return 'Неизвестно';
             
-            try {
-                const { data, error } = await supabaseClient.from('linked_accounts').select('minecraft_name');
-                if(!error && data && data.length > 0) {
-                    data.forEach(p => {
-                        const opt = document.createElement('option');
-                        opt.value = p.minecraft_name;
-                        opt.textContent = p.minecraft_name;
-                        select.appendChild(opt);
-                    });
-                } else {
-                    const opt = document.createElement('option');
-                    opt.value = "";
-                    opt.textContent = "Нет зарегистрированных игроков";
-                    select.appendChild(opt);
-                }
-            } catch(e) { console.error(e); }
+            const now = new Date();
+            const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+            const yesterday = new Date(today);
+            yesterday.setDate(yesterday.getDate() - 1);
+            const target = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+            
+            const hours = String(date.getHours()).padStart(2, '0');
+            const minutes = String(date.getMinutes()).padStart(2, '0');
+            const timeStr = showTime ? ` в ${hours}:${minutes}` : '';
+            
+            if (target.getTime() === today.getTime()) return `Сегодня${timeStr}`;
+            if (target.getTime() === yesterday.getTime()) return `Вчера${timeStr}`;
+            
+            const dayStr = String(date.getDate()).padStart(2, '0');
+            const monthStr = String(date.getMonth() + 1).padStart(2, '0');
+            return `${dayStr}.${monthStr}.${date.getFullYear()}${timeStr}`;
         }
 
-        async function placeBountyContract() {
-            if (!currentUserLinkedData) { 
-                customAlert("🔒 Ошибка шлюза", "Сначала привяжите свой Minecraft аккаунт в личном кабинете!"); 
-                return; 
-            }
-            const targetSelect = document.getElementById('bounty-target');
-            const rewardInput = document.getElementById('bounty-reward');
-            const name = targetSelect.value;
-            const reward = parseInt(rewardInput.value);
+        function initRouletteGraphic() {
+            const svg = document.getElementById('wheel');
+            if(!svg) return;
+            svg.innerHTML = ''; 
 
-            if(!name || isNaN(reward) || reward <= 0) {
-                customAlert("❌ Ошибка выполнения", "Выберите цель из списка и укажите корректную сумму награды в алмазах!");
-                return;
-            }
+            const numSectors = roulettePrizes.length;
+            const arcSize = 360 / numSectors; 
+            const radius = 150;
+            const center = 150;
 
-            try {
-                const { data: stats } = await supabaseClient
-                    .from('player_stats')
-                    .select('currency_balance')
-                    .eq('minecraft_uuid', currentUserLinkedData.minecraft_uuid)
-                    .single();
-
-                if (!stats || stats.currency_balance < reward) {
-                    customAlert("💎 Недостаточно алмазов", `У вас нет столько алмазов в банке сервера! <br><br>• Требуется: **${reward}** 💎<br>• В наличии: **${stats ? stats.currency_balance : 0}** 💎`);
-                    return;
-                }
-
-                await supabaseClient
-                    .from('player_stats')
-                    .update({ currency_balance: stats.currency_balance - reward })
-                    .eq('minecraft_uuid', currentUserLinkedData.minecraft_uuid);
-
-                bountyDatabase.unshift({ id: Date.now(), name: name, reward: reward, date: 'Сегодня' });
-                rewardInput.value = ''; targetSelect.value = '';
+            for (let i = 0; i < numSectors; i++) {
+                const startAngle = i * arcSize;
+                const endAngle = startAngle + arcSize;
                 
-                renderBountyBoard();
-                loadProfileData(); 
-                customAlert("☠️ Контракт заключен", `Анонимная охота за головой **${name}** успешно объявлена за **${reward}** алмазов!`);
+                const startRad = (startAngle * Math.PI) / 180;
+                const endRad = (endAngle * Math.PI) / 180;
 
-            } catch(e) {
-                console.error(e);
+                const x1 = center + radius * Math.cos(startRad);
+                const y1 = center + radius * Math.sin(startRad);
+                const x2 = center + radius * Math.cos(endRad);
+                const y2 = center + radius * Math.sin(endRad);
+
+                const pathData = `M ${center} ${center} L ${x1} ${y1} A ${radius} ${radius} 0 0 1 ${x2} ${y2} Z`;
+                
+                const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+                path.setAttribute("d", pathData);
+                path.setAttribute("fill", roulettePrizes[i].color);
+                path.setAttribute("stroke", "#050308");
+                path.setAttribute("stroke-width", "4");
+                svg.appendChild(path);
+
+                const textAngle = startAngle + arcSize / 2;
+                const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
+                
+                text.setAttribute("transform", `translate(${center}, ${center}) rotate(${textAngle}) translate(${radius - 22}, 0)`);
+                text.setAttribute("text-anchor", "end");
+                text.setAttribute("dominant-baseline", "central");
+                text.textContent = roulettePrizes[i].text;
+                
+                text.setAttribute("font-family", "sans-serif");
+                text.setAttribute("font-weight", "bold");
+                text.setAttribute("font-size", "11px");
+                
+                if (roulettePrizes[i].color === '#ffffff') {
+                    text.setAttribute("fill", "#050308");
+                } else {
+                    text.setAttribute("fill", "#ffffff");
+                }
+                
+                svg.appendChild(text);
             }
         }
 
-        /* --- ПОЛНОЦЕННЫЙ МОДУЛЬ ЦЕНТРАЛЬНОЙ АДМИН-ПАНЕЛИ --- */
+        async function spinRouletteWheel() {
+            if (isWheelSpinning) return;
 
-        function switchAdminSubTab(subTab) {
-            document.querySelectorAll('.admin-tab-content').forEach(el => el.style.display = 'none');
-            document.querySelectorAll('.admin-nav-bar button').forEach(btn => btn.classList.remove('active'));
-            
-            document.getElementById(`admin-sub-${subTab}`).style.display = 'block';
-            event.target.classList.add('active');
-
-            if(subTab === 'shop') loadAdminShopList();
-            if(subTab === 'apps') loadAdminAppsList();
-            if(subTab === 'logs') loadAdminLogsList();
-        }
-
-        async function logAdminAction(action, details) {
-            if(!currentUserSession) return;
-            await supabaseClient.from('admin_logs').insert({
-                moderator_name: currentUserSession.user.user_metadata.full_name || 'Модератор',
-                action: action,
-                details: details
-            });
-        }
-
-        async function loadAdminShopList() {
-            const container = document.getElementById('admin-products-list');
-            container.innerHTML = '<div style="color:var(--text-muted)">Загрузка товаров...</div>';
-            
-            const { data } = await supabaseClient.from('shop_products').select('*');
-            if(!data || data.length === 0) {
-                container.innerHTML = '<div style="color:var(--text-muted)">Товары не найдены в базе.</div>';
+            if (!currentUserSession) {
+                customAlert("🔒 Авторизация", "Пожалуйста, сначала войдите на сайт через ваш Discord-аккаунт!");
                 return;
             }
 
-            container.innerHTML = '<h4 style="margin-bottom:15px;">Редактирование цен и описаний</h4>';
-            data.forEach(p => {
+            const { data: profile } = await supabaseClient
+                .from('profiles')
+                .select('rub_balance, has_pass')
+                .eq('id', currentUserSession.user.id)
+                .single();
+
+            if (!profile || !profile.has_pass) {
+                customAlert("⛔ Доступ ограничен", "Вы не имеете права крутить Колесо Фортуны, пока не приобретете «Проходку» на сервер!");
+                return;
+            }
+
+            if (profile.rub_balance < 100) {
+                customLowBalance(100, profile.rub_balance);
+                return;
+            }
+
+            await supabaseClient
+                .from('profiles')
+                .update({ rub_balance: profile.rub_balance - 100 })
+                .eq('id', currentUserSession.user.id);
+
+            document.getElementById('ruble-balance-display').textContent = profile.rub_balance - 100;
+
+            const rand = Math.random() * 100;
+            let cumulativeWeight = 0;
+            let winningIndex = 0;
+
+            for (let i = 0; i < roulettePrizes.length; i++) {
+                cumulativeWeight += roulettePrizes[i].weight;
+                if (rand <= cumulativeWeight) {
+                    winningIndex = i;
+                    break;
+                }
+            }
+
+            isWheelSpinning = true;
+            const btn = document.getElementById('spin-button');
+            const wheel = document.getElementById('wheel');
+            btn.disabled = true;
+            btn.style.opacity = '0.5';
+
+            const numSectors = roulettePrizes.length;
+            const arcSize = 360 / numSectors;
+            const targetSectorAngle = (winningIndex * arcSize) + (arcSize / 2);
+            
+            let targetAngle = (270 - targetSectorAngle + 360) % 360;
+            let currentAngleOffset = currentRotation % 360;
+            let additionalRotation = (targetAngle - currentAngleOffset + 360) % 360;
+            
+            currentRotation += (360 * 6) + additionalRotation;
+            wheel.style.transform = `rotate(${currentRotation}deg)`;
+
+            setTimeout(() => {
+                isWheelSpinning = false;
+                btn.disabled = false;
+                btn.style.opacity = '1';
+                customAlert("🎰 Поздравляем!", `🎉 Вы выиграли игровой кастомный предмет: [ <span style="color:var(--primary-purple); font-weight:700;">${roulettePrizes[winningIndex].text}</span> ]! Награда будет выдана при следующем заходе.`);
+            }, 8000);
+        }
+
+        function renderBountyBoard() {
+            const container = document.getElementById('bounty-board-container');
+            if(!container) return;
+            container.innerHTML = '';
+
+            if(bountyDatabase.length === 0) {
+                container.innerHTML = `<div style="grid-column: span 2; color: var(--text-muted); padding: 20px;">Нет активных заказов. Все цели мертвы.</div>`;
+                return;
+            }
+
+            bountyDatabase.forEach(bounty => {
                 const card = document.createElement('div');
-                card.className = 'admin-sub-card';
+                card.classList.add('bounty-card');
                 card.innerHTML = `
-                    <p style="font-weight:700; color:var(--accent-pink); margin-bottom:8px;">${p.name} (ID: ${p.id})</p>
-                    <div style="display:flex; gap:10px; margin-bottom:10px; flex-wrap:wrap;">
-                        <input type="number" id="adm-p-price-${p.id}" class="darknet-input" value="${p.price}" placeholder="Цена...">
-                        <input type="number" id="adm-p-orig-${p.id}" class="darknet-input" value="${p.original_price || p.price}" placeholder="Старая цена...">
-                        <select id="adm-p-disc-${p.id}" class="app-select-field" style="max-width:120px;">
-                            <option value="true" ${p.discount_active?'selected':''}>Скидка: ДА</option>
-                            <option value="false" ${!p.discount_active?'selected':''}>Скидка: НЕТ</option>
-                        </select>
+                    <div class="bounty-info">
+                        <img src="https://minotar.net/helm/${bounty.name}/56.png" alt="${bounty.name}" class="player-head-render" style="background: rgba(255,0,127,0.05); border-radius: 12px;">
+                        <div class="bounty-meta">
+                            <h4>${bounty.name}</h4>
+                            <span>Размещен: ${bounty.date}</span>
+                        </div>
                     </div>
-                    <textarea id="adm-p-desc-${p.id}" class="darknet-input" style="width:100%; height:50px; margin-bottom:10px; resize:none;">${p.description}</textarea>
-                    <button class="btn-primary" style="padding:6px 14px; font-size:0.8rem;" onclick="saveAdminProduct('${p.id}')">Сохранить изменения</button>
+                    <div class="bounty-price">
+                        <div class="bounty-amount">💎 x${bounty.reward}</div>
+                        <div class="bounty-status">В Розыске</div>
+                    </div>
                 `;
                 container.appendChild(card);
             });
         }
 
-        async function saveAdminProduct(id) {
-            const price = parseFloat(document.getElementById(`adm-p-price-${id}`).value);
-            const orig = document.getElementById(`adm-p-orig-${id}`).value;
-            const disc = document.getElementById(`adm-p-disc-${id}`).value === 'true';
-            const desc = document.getElementById(`adm-p-desc-${id}`).value;
+        function placeBountyContract() {
+            const targetInput = document.getElementById('bounty-target');
+            const rewardInput = document.getElementById('bounty-reward');
+            const name = targetInput.value.trim();
+            const reward = parseInt(rewardInput.value);
 
-            await supabaseClient.from('shop_products').update({
-                price: price,
-                original_price: orig ? parseFloat(orig) : price,
-                discount_active: disc,
-                description: desc
-            }).eq('id', id);
-
-            await logAdminAction('Редактирование товара', `Изменил параметры товара с ID: ${id}`);
-            customAlert("⚙️ Успешно", "Параметры товара сохранены в СУБД!");
-            fetchShopProducts();
-        }
-
-        async function loadAdminAppsList() {
-            const container = document.getElementById('admin-apps-list');
-            container.innerHTML = '<div style="color:var(--text-muted)">Загрузка анкет...</div>';
-
-            const { data } = await supabaseClient.from('server_applications').select('*').eq('status', 'pending');
-            if(!data || data.length === 0) {
-                container.innerHTML = '<div style="color:var(--text-muted)">Нет новых анкет в ожидании проверки.</div>';
+            if(!name || isNaN(reward) || reward <= 0) {
+                customAlert("❌ Ошибка выполнения", "Укажите корректный игровой никнейм цели и сумму награды в алмазах!");
                 return;
             }
 
-            container.innerHTML = '';
-            data.forEach(app => {
-                const div = document.createElement('div');
-                div.className = 'admin-sub-card';
-                div.innerHTML = `
-                    <p><b>Игрок:</b> ${app.minecraft_name} | <b>Лицензия:</b> ${app.has_license}</p>
-                    <p><b>Telegram для связи:</b> <span style="color:var(--accent-pink)">${app.telegram_contact}</span></p>
-                    <p style="margin:8px 0; color:var(--text-muted); font-size:0.88rem;"><b>Планы:</b> ${app.plans}</p>
-                    <div style="display:flex; gap:10px;">
-                        <button class="btn-primary" style="padding:6px 14px; font-size:0.8rem; background:#2ecc71;" onclick="processAdminApp(${app.id}, '${app.minecraft_name}', 'approved')">Одобрить</button>
-                        <button class="btn-primary" style="padding:6px 14px; font-size:0.8rem; background:var(--accent-pink);" onclick="processAdminApp(${app.id}, '${app.minecraft_name}', 'rejected')">Отклонить</button>
-                    </div>
-                `;
-                container.appendChild(div);
-            });
+            bountyDatabase.unshift({ id: Date.now(), name: name, reward: reward, date: 'Сегодня' });
+            targetInput.value = ''; rewardInput.value = '';
+            renderBountyBoard();
         }
 
-        async function processAdminApp(id, nick, status) {
-            await supabaseClient.from('server_applications').update({ status: status }).eq('id', id);
-            
-            if(status === 'approved') {
-                await supabaseClient.from('whitelist_queue').insert({ minecraft_name: nick, action: 'add_30d' });
-                await logAdminAction('Одобрение анкеты', `Принял анкету игрока ${nick}`);
-            } else {
-                await logAdminAction('Отклонение анкеты', `Отклонил анкету игрока ${nick}`);
-            }
-
-            customAlert("⚙️ Выполнено", `Статус анкеты изменен на [${status}]!`);
-            loadAdminAppsList();
-        }
-
-        async function adminSearchPlayer() {
-            const query = document.getElementById('admin-search-user').value.trim();
-            const resContainer = document.getElementById('admin-user-control-res');
-            if(!query) return;
-
-            resContainer.innerHTML = 'Поиск...';
-
-            const { data: link } = await supabaseClient.from('linked_accounts').select('*').eq('minecraft_name', query).maybeSingle();
-            if(!link) {
-                resContainer.innerHTML = '<span style="color:var(--accent-pink)">Игрок не привязан к сайту!</span>';
-                return;
-            }
-
-            const { data: stats } = await supabaseClient.from('player_stats').select('currency_balance').eq('minecraft_uuid', link.minecraft_uuid).maybeSingle();
-            const { data: prof } = await supabaseClient.from('profiles').select('rub_balance, id').eq('id', link.discord_id).maybeSingle();
-
-            resContainer.innerHTML = `
-                <div style="margin-top:10px;">
-                    <p>• Найдена связка: <b>${link.minecraft_name}</b> (UUID: ${link.minecraft_uuid.substring(0,8)}...)</p>
-                    <p style="margin:6px 0;">• Рублевый баланс профиля: <b style="color:var(--accent-pink);">${prof?prof.rub_balance:0} ₽</b></p>
-                    <p>• Алмазный игровой баланс: <b style="color:#ffb700;">${stats?stats.currency_balance:0} 💎</b></p>
-                    
-                    <div style="margin-top:15px; display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
-                        <input type="number" id="adm-action-amount" class="darknet-input" style="max-width:110px;" placeholder="Кол-во...">
-                        <button class="btn-primary" style="padding:6px 12px; font-size:0.82rem;" onclick="executeAdminBalanceChange('${prof.id}', '${link.minecraft_uuid}', 'rub', 'add', '${link.minecraft_name}')">+ Рубли</button>
-                        <button class="btn-secondary" style="padding:6px 12px; font-size:0.82rem;" onclick="executeAdminBalanceChange('${prof.id}', '${link.minecraft_uuid}', 'rub', 'sub', '${link.minecraft_name}')">- Рубли</button>
-                        <button class="btn-primary" style="padding:6px 12px; font-size:0.82rem; background:#ffb700; color:#000;" onclick="executeAdminBalanceChange('${prof.id}', '${link.minecraft_uuid}', 'diamonds', 'add', '${link.minecraft_name}')">+ Алмазы</button>
-                        <button class="btn-secondary" style="padding:6px 12px; font-size:0.82rem;" onclick="executeAdminBalanceChange('${prof.id}', '${link.minecraft_uuid}', 'diamonds', 'sub', '${link.minecraft_name}')">- Алмазы</button>
-                    </div>
-                </div>
-            `;
-        }
-
-        async function executeAdminBalanceChange(profileId, uuid, type, operation, name) {
-            const val = parseInt(document.getElementById('adm-action-amount').value);
-            if(isNaN(val) || val <= 0) return;
-
-            if(type === 'rub') {
-                const { data } = await supabaseClient.from('profiles').select('rub_balance').eq('id', profileId).single();
-                const current = data?.rub_balance ?? 0;
-                const finalAmt = (operation === 'add') ? current + val : Math.max(0, current - val);
-                await supabaseClient.from('profiles').update({ rub_balance: finalAmt }).eq('id', profileId);
-                await logAdminAction('Изменение баланса (Рубли)', `${operation==='add'?'Выдал':'Забрал'} ${val} рублей у ${name}`);
-            } else {
-                const { data } = await supabaseClient.from('player_stats').select('currency_balance').eq('minecraft_uuid', uuid).single();
-                const current = data?.currency_balance ?? 0;
-                const finalAmt = (operation === 'add') ? current + val : Math.max(0, current - val);
-                await supabaseClient.from('player_stats').update({ currency_balance: finalAmt }).eq('minecraft_uuid', uuid);
-                await logAdminAction('Изменение баланса (Алмазы)', `${operation==='add'?'Выдал':'Забрал'} ${val} алмазов у ${name}`);
-            }
-
-            customAlert("⚙️ Успешно", "Баланс игрока успешно отредактирован администрацией!");
-            adminSearchPlayer();
-            loadProfileData();
-        }
-
-        async function loadAdminLogsList() {
-            const table = document.getElementById('admin-logs-table');
-            table.innerHTML = '<tr><td>Загрузка логов...</td></tr>';
-
-            const { data } = await supabaseClient.from('admin_logs').select('*').order('created_at', { ascending: false }).limit(40);
-            if(!data || data.length === 0) {
-                table.innerHTML = '<tr><td>Лента системных действий пуста.</td></tr>';
-                return;
-            }
-
-            table.innerHTML = `
-                <tr style="border-bottom:1px solid rgba(255,255,255,0.1); color:var(--accent-pink); font-weight:700;">
-                    <td style="padding:6px;">Модератор</td>
-                    <td style="padding:6px;">Действие</td>
-                    <td style="padding:6px;">Детали</td>
-                    <td style="padding:6px;">Дата</td>
-                </tr>
-            `;
-            data.forEach(log => {
-                const tr = document.createElement('tr');
-                tr.style.borderBottom = '1px solid rgba(255,255,255,0.02)';
-                tr.innerHTML = `
-                    <td style="padding:6px; font-weight:600;">${log.moderator_name}</td>
-                    <td style="padding:6px; color:#b388ff;">${log.action}</td>
-                    <td style="padding:6px; color:var(--text-muted);">${log.details}</td>
-                    <td style="padding:6px; font-size:0.75rem;">${formatDate(log.created_at, true)}</td>
-                `;
-                table.appendChild(tr);
-            });
+        function openBlackMarket() {
+            document.querySelectorAll('.content-section').forEach(section => section.classList.remove('active'));
+            document.querySelectorAll('nav button').forEach(button => button.classList.remove('active'));
+            const section = document.getElementById('section-blackmarket');
+            section.classList.add('active');
+            renderBountyBoard();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
         async function loadProfileData() {
@@ -1870,7 +1751,6 @@
                     currentUserLinkedData = null;
                     isUserModerator = false;
                     
-                    document.getElementById('admin-fixed-btn').style.display = 'none'; // Скрываем админку при логауте
                     headerWidget.innerHTML = `<button class="widget-login-btn" onclick="switchTab('profile')">🔑 Войти в профиль</button>`;
                     wrapper.innerHTML = `
                         <div style="display: flex; flex-direction: column; align-items: center; text-align: center; padding: 20px 0;">
@@ -1900,20 +1780,18 @@
                 const currentRubBalance = rubData?.rub_balance ?? 0;
 
                 console.log("[Moderation Check] Начинаем верификацию прав для discordId:", discordId);
-                const { data: modData } = await supabaseClient
+                const { data: modData, error: modError } = await supabaseClient
                     .from('forum_moderators')
                     .select('*')
                     .eq('discord_id', discordId)
                     .maybeSingle();
                 
+                if (modError) {
+                    console.error("[Moderation Check] Сбой селекта из forum_moderators:", modError);
+                }
+                
                 isUserModerator = !!modData;
                 updateNewsForm();
-
-                // ИСПРАВЛЕНО ТРИГГЕР ОТКРЫТИЯ КНОПКИ АДМИНКИ:
-                const adminBtn = document.getElementById('admin-fixed-btn');
-                if (adminBtn) {
-                    adminBtn.style.display = isUserModerator ? 'flex' : 'none';
-                }
 
                 const { data: linkedData, error: linkedError } = await supabaseClient
                     .from('linked_accounts')
@@ -2028,15 +1906,15 @@
                                 <div class="stat-value" style="font-size: 1.4rem; font-weight: 700;">${formatPlaytime(currentStats.playtime_seconds)}</div>
                             </div>
                             <div class="stat-card" style="background: rgba(255,255,255,0.01); border: 1px solid rgba(255,255,255,0.03); padding: 20px; border-radius: 20px; text-align: left;">
-                                <div class="stat-label" style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 4px;">💀 Смертей</div>
+                                <div class="stat-label" style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 4px;"><i data-lucide="skull" style="width:13px;height:13px;display:inline;vertical-align:-2px;"></i> Смертей</div>
                                 <div class="stat-value" style="font-size: 1.4rem; font-weight: 700;">${currentStats.deaths}</div>
                             </div>
                             <div class="stat-card" style="background: rgba(255,255,255,0.01); border: 1px solid rgba(255,255,255,0.03); padding: 20px; border-radius: 20px; text-align: left;">
-                                <div class="stat-label" style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 4px;">⚔️ Убийств</div>
+                                <div class="stat-label" style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 4px;"><i data-lucide="swords" style="width:13px;height:13px;display:inline;vertical-align:-2px;"></i> Убийств</div>
                                 <div class="stat-value" style="font-size: 1.4rem; font-weight: 700;">${currentStats.kills}</div>
                             </div>
                             <div class="stat-card" style="background: rgba(255,255,255,0.01); border: 1px solid rgba(255,255,255,0.03); padding: 20px; border-radius: 20px; text-align: left;">
-                                <div class="stat-label" style="font-size: 0.8rem; color: var(--accent-pink); margin-bottom: 4px;">📊 K/D</div>
+                                <div class="stat-label" style="font-size: 0.8rem; color: var(--accent-pink); margin-bottom: 4px;"><i data-lucide="bar-chart-2" style="width:13px;height:13px;display:inline;vertical-align:-2px;"></i> K/D</div>
                                 <div class="stat-value" style="font-size: 1.4rem; font-weight: 700; color: var(--accent-pink);">${kd}</div>
                             </div>
                         </div>
@@ -2044,6 +1922,7 @@
                     </div>`;
             } catch (e) {
                 console.error(e);
+                wrapper.innerHTML = `<div style="color: var(--accent-pink);">Ошибка загрузки профиля.</div>`;
             }
         }
 
@@ -2052,8 +1931,6 @@
             currentUserSession = null;
             currentUserLinkedData = null;
             isUserModerator = false;
-            const adminBtn = document.getElementById('admin-fixed-btn');
-            if (adminBtn) adminBtn.style.display = 'none';
             loadProfileData();
         }
 
@@ -2139,6 +2016,7 @@
                 displayPlayers(loadedPlayers);
             } catch (e) {
                 console.error(e);
+                container.innerHTML = `<div style="grid-column: span 2; color: var(--accent-pink); padding: 20px;">Ошибка загрузки списка игроков</div>`;
             }
         }
 
@@ -2242,19 +2120,19 @@
                     
                     <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; width: 100%; margin-bottom: 25px;">
                         <div style="background: rgba(255,255,255,0.01); border: 1px solid rgba(255,255,255,0.03); border-radius: 20px; padding: 16px; text-align: left;">
-                            <div style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 4px;">⏱ Время онлайна</div>
+                            <div style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 4px;"><i data-lucide="clock" style="width:13px;height:13px;display:inline;vertical-align:-2px;"></i> Время онлайна</div>
                             <div style="font-size: 1.3rem; font-weight: 700; color: #fff;">${formatPlaytime(playerData.playtime_seconds)}</div>
                         </div>
                         <div style="background: rgba(255,255,255,0.01); border: 1px solid rgba(255,255,255,0.03); border-radius: 20px; padding: 16px; text-align: left;">
-                            <div style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 4px;">💀 Смертей</div>
+                            <div style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 4px;"><i data-lucide="skull" style="width:13px;height:13px;display:inline;vertical-align:-2px;"></i> Смертей</div>
                             <div style="font-size: 1.3rem; font-weight: 700; color: #fff;">${deaths}</div>
                         </div>
                         <div style="background: rgba(255,255,255,0.01); border: 1px solid rgba(255,255,255,0.03); border-radius: 20px; padding: 16px; text-align: left;">
-                            <div style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 4px;">⚔️ Убийств</div>
+                            <div style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 4px;"><i data-lucide="swords" style="width:13px;height:13px;display:inline;vertical-align:-2px;"></i> Убийств</div>
                             <div style="font-size: 1.3rem; font-weight: 700; color: #fff;">${kills}</div>
                         </div>
                         <div style="background: rgba(255,255,255,0.01); border: 1px solid rgba(255,255,255,0.03); border-radius: 20px; padding: 16px; text-align: left;">
-                            <div style="font-size: 0.8rem; color: var(--accent-pink); margin-bottom: 4px;">📊 K/D</div>
+                            <div style="font-size: 0.8rem; color: var(--accent-pink); margin-bottom: 4px;"><i data-lucide="bar-chart-2" style="width:13px;height:13px;display:inline;vertical-align:-2px;"></i> K/D</div>
                             <div style="font-size: 1.3rem; font-weight: 700; color: var(--accent-pink);">${kd}</div>
                         </div>
                     </div>
@@ -2266,6 +2144,7 @@
             `;
             
             document.body.appendChild(modalOverlay);
+            if (window.lucide) lucide.createIcons();
         }
 
         function switchTab(tabName) {
@@ -2277,12 +2156,20 @@
             const targetTabBtn = document.getElementById(`tab-${tabName}`);
             if(targetTabBtn) targetTabBtn.classList.add('active');
             
-            if(tabName === 'donate') initRouletteGraphic();
+            if(tabName === 'donate') { initRouletteGraphic(); renderShopFront(); }
             if(tabName === 'profile') loadProfileData();
             if(tabName === 'forum') {
                 loadProfileData().then(() => {
                     loadForumFeed(false); 
                 });
+            }
+            if(tabName === 'admin') {
+                if (!isUserModerator) {
+                    customAlert("🔒 Доступ закрыт", "Эта страница доступна только модераторам сервера.");
+                    switchTab('home');
+                    return;
+                }
+                switchAdminTab(currentAdminTab || 'shop');
             }
 
             window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -2476,7 +2363,7 @@
                 <div style="background: rgba(16, 11, 28, 0.96); border-radius: 28px; border: 1px solid rgba(138, 43, 226, 0.2); max-width: 440px; width: 100%; padding: 35px 25px; position: relative; box-shadow: 0 25px 60px rgba(0,0,0,0.65); font-family: var(--font-sans); color: #fff;">
                     <span style="position: absolute; top: 16px; right: 22px; color: var(--text-muted); font-size: 1.7rem; cursor: pointer; font-weight: bold; line-height: 1;" onclick="document.getElementById('wallet-modal-overlay').remove()">&times;</span>
                     
-                    <h2 style="font-size: 1.4rem; font-weight: 600; margin-bottom: 5px; display: flex; align-items: center; gap: 8px; justify-content: center;">💎 Кошелёк</h2>
+                    <h2 style="font-size: 1.4rem; font-weight: 600; margin-bottom: 5px; display: flex; align-items: center; gap: 8px; justify-content: center;"><span class="icon-badge b-purple" style="width:28px;height:28px;"><i data-lucide="gem"></i></span> Кошелёк</h2>
                     
                     <div style="text-align: center; margin: 22px 0;">
                         <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.06em; font-weight: 600; margin-bottom: 4px;">Твой баланс</div>
@@ -2495,6 +2382,7 @@
             `;
 
             document.body.appendChild(overlay);
+            if (window.lucide) lucide.createIcons();
             switchWalletTab('history', uuid); 
         }
 
@@ -2643,7 +2531,7 @@
                     action: whitelistAction
                 });
 
-            customAlert("🎉 Успешная покупка!", `Проходка успешно куплена за **${price} ₽**! Никнейм [**${cleanNick}**] отправлен в очередь вайтлиста сервера. Можете заходить в игру!`);
+            alert(`🎉 Поздравляем! Проходка успешно куплена за ${price} ₽! Никнейм [${cleanNick}] отправлен в очередь вайтлиста сервера. Теперь вы можете беспрепятственно зайти в игру и пройти верификацию!`);
             loadProfileData();
         }
 
@@ -2683,17 +2571,27 @@
             loadProfileData();
         }
 
-        /* --- ЛОГИКА ПОДАЧИ АНКЕТ НА БЕСПЛАТНЫЙ ПРОПУСК --- */
-
+        /* --- ЛОГИКА АНИМИРОВАННОГО ОКНА ЗАЯВОК (БЕСПЛАТНЫЙ ПРОПУСК) --- */
         function openApplicationModal() {
             if (!currentUserSession) {
-                customAlert("🔒 Авторизация", "Для подачи анкеты на сервер сначала авторизуйтесь через ваш Discord-аккаунт!");
+                customAlert("🔒 Авторизация", "Для подачи анкеты на сервер сначала авторизуйтесь на сайте через Discord!");
                 return;
             }
-            document.getElementById('app-mc-nick').value = '';
-            document.getElementById('app-tg-contact').value = '';
-            document.getElementById('app-plans').value = '';
-            document.getElementById('app-modal-overlay').style.display = 'flex';
+            const overlay = document.getElementById('app-modal-overlay');
+            const card = document.getElementById('app-modal-card');
+            
+            overlay.style.display = 'flex';
+            overlay.offsetHeight; 
+            card.style.transform = 'translateY(0) scale(1)';
+            card.style.opacity = '1';
+        }
+
+        function closeApplicationModal() {
+            const overlay = document.getElementById('app-modal-overlay');
+            const card = document.getElementById('app-modal-card');
+            card.style.transform = 'translateY(30px) scale(0.95)';
+            card.style.opacity = '0';
+            setTimeout(() => { overlay.style.display = 'none'; }, 250);
         }
 
         async function submitServerApplication() {
@@ -2701,11 +2599,16 @@
             const license = document.getElementById('app-has-license').value;
             const tg = document.getElementById('app-tg-contact').value.trim();
             const plans = document.getElementById('app-plans').value.trim();
+            const submitBtn = document.getElementById('app-submit-btn');
 
             if (!nick || !tg || !plans) {
-                customAlert("⚠️ Ошибка заполнения", "Пожалуйста, корректно заполните все разделы анкеты перед отправкой!");
+                customAlert("⚠️ Ошибка заполнения", "Пожалуйста, заполните абсолютно все текстовые поля анкеты куратора!");
                 return;
             }
+
+            submitBtn.disabled = true;
+            submitBtn.innerText = "Отправка...";
+            submitBtn.style.opacity = "0.6";
 
             try {
                 const { data: existingApp } = await supabaseClient
@@ -2716,7 +2619,7 @@
 
                 if (existingApp) {
                     customAlert("👑 Информация", "Вы уже успешно отправляли анкету ранее. Пожалуйста, ожидайте вердикта администрации в Telegram!");
-                    document.getElementById('app-modal-overlay').style.display = 'none';
+                    closeApplicationModal();
                     return;
                 }
 
@@ -2732,288 +2635,20 @@
 
                 if (error) throw error;
 
-                document.getElementById('app-modal-overlay').style.display = 'none';
-                customAlert("🎉 Успешно отправлено!", "Ваша анкеты успешно сохранена и передана кураторам KuromiSMP. Мы свяжемся с вами в Telegram после проверки модераторами!");
+                closeApplicationModal();
+                customAlert("🎉 Успешно отправлено!", "Ваша анкета успешно сохранена и передана кураторам KuromiSMP. Мы свяжемся с вами в Telegram после проверки!");
 
             } catch (e) {
                 console.error(e);
-                customAlert("❌ Критическая ошибка", "Не удалось отправить анкету из-за сбоя сети. Перезагрузите страницу.");
+                customAlert("❌ Ошибка отправки", "Не удалось сохранить анкету из-за сбоя сети. Пожалуйста, попробуйте позже.");
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.innerText = "Отправить анкету";
+                submitBtn.style.opacity = "1";
             }
         }
 
-        /* --- ЖЕСТКИЙ ПРОВЕРЯЕМЫЙ ЧЕРНЫЙ РЫНОК (ДАРКНЕТ) --- */
-
-        async function populateBountyDropdown() {
-            const select = document.getElementById('bounty-target');
-            if(!select) return;
-            select.innerHTML = '<option value="">-- Выберите цель розыска --</option>';
-            
-            try {
-                const { data, error } = await supabaseClient.from('linked_accounts').select('minecraft_name');
-                if(!error && data && data.length > 0) {
-                    data.forEach(p => {
-                        const opt = document.createElement('option');
-                        opt.value = p.minecraft_name;
-                        opt.textContent = p.minecraft_name;
-                        select.appendChild(opt);
-                    });
-                } else {
-                    const opt = document.createElement('option');
-                    opt.value = "";
-                    opt.textContent = "Нет зарегистрированных игроков";
-                    select.appendChild(opt);
-                }
-            } catch(e) { console.error(e); }
-        }
-
-        async function placeBountyContract() {
-            if (!currentUserLinkedData) { 
-                customAlert("🔒 Ошибка шлюза", "Сначала привяжите свой Minecraft аккаунт в личном кабинете!"); 
-                return; 
-            }
-            const targetSelect = document.getElementById('bounty-target');
-            const rewardInput = document.getElementById('bounty-reward');
-            const name = targetSelect.value;
-            const reward = parseInt(rewardInput.value);
-
-            if(!name || isNaN(reward) || reward <= 0) {
-                customAlert("❌ Ошибка выполнения", "Выберите цель из списка и укажите корректную сумму награды в алмазах!");
-                return;
-            }
-
-            try {
-                // ПРОВЕРКА БАЛАНСА В АЛМАЗАХ ИЗ ТАБЛИЦЫ player_stats
-                const { data: stats } = await supabaseClient
-                    .from('player_stats')
-                    .select('currency_balance')
-                    .eq('minecraft_uuid', currentUserLinkedData.minecraft_uuid)
-                    .single();
-
-                if (!stats || stats.currency_balance < reward) {
-                    customAlert("💎 Недостаточно алмазов", `У вас нет столько алмазов в банке сервера! <br><br>• Требуется: **${reward}** 💎<br>• В наличии: **${stats ? stats.currency_balance : 0}** 💎`);
-                    return;
-                }
-
-                // Списываем алмазы из СУБД
-                await supabaseClient
-                    .from('player_stats')
-                    .update({ currency_balance: stats.currency_balance - reward })
-                    .eq('minecraft_uuid', currentUserLinkedData.minecraft_uuid);
-
-                bountyDatabase.unshift({ id: Date.now(), name: name, reward: reward, date: 'Сегодня' });
-                rewardInput.value = ''; targetSelect.value = '';
-                
-                renderBountyBoard();
-                loadProfileData(); 
-                customAlert("☠️ Контракт заключен", `Анонимная охота за головой **${name}** успешно объявлена за **${reward}** алмазов!`);
-
-            } catch(e) {
-                console.error(e);
-            }
-        }
-
-        /* --- ПОЛНОЦЕННЫЙ МОДУЛЬ ЦЕНТРАЛЬНОЙ АДМИН-ПАНЕЛИ --- */
-
-        function switchAdminSubTab(subTab) {
-            document.querySelectorAll('.admin-tab-content').forEach(el => el.style.display = 'none');
-            document.querySelectorAll('.admin-nav-bar button').forEach(btn => btn.classList.remove('active'));
-            
-            document.getElementById(`admin-sub-${subTab}`).style.display = 'block';
-            event.target.classList.add('active');
-
-            if(subTab === 'shop') loadAdminShopList();
-            if(subTab === 'apps') loadAdminAppsList();
-            if(subTab === 'logs') loadAdminLogsList();
-        }
-
-        async function logAdminAction(action, details) {
-            if(!currentUserSession) return;
-            await supabaseClient.from('admin_logs').insert({
-                moderator_name: currentUserSession.user.user_metadata.full_name || 'Модератор',
-                action: action,
-                details: details
-            });
-        }
-
-        async function loadAdminShopList() {
-            const container = document.getElementById('admin-products-list');
-            container.innerHTML = '<div style="color:var(--text-muted)">Загрузка товаров...</div>';
-            
-            const { data } = await supabaseClient.from('shop_products').select('*');
-            if(!data || data.length === 0) {
-                container.innerHTML = '<div style="color:var(--text-muted)">Товары не найдены в базе.</div>';
-                return;
-            }
-
-            container.innerHTML = '<h4 style="margin-bottom:15px;">Редактирование цен и описаний</h4>';
-            data.forEach(p => {
-                const card = document.createElement('div');
-                card.className = 'admin-sub-card';
-                card.innerHTML = `
-                    <p style="font-weight:700; color:var(--accent-pink); margin-bottom:8px;">${p.name} (ID: ${p.id})</p>
-                    <div style="display:flex; gap:10px; margin-bottom:10px; flex-wrap:wrap;">
-                        <input type="number" id="adm-p-price-${p.id}" class="darknet-input" value="${p.price}" placeholder="Цена...">
-                        <input type="number" id="adm-p-orig-${p.id}" class="darknet-input" value="${p.original_price || p.price}" placeholder="Старая цена...">
-                        <select id="adm-p-disc-${p.id}" class="app-select-field" style="max-width:120px;">
-                            <option value="true" ${p.discount_active?'selected':''}>Скидка: ДА</option>
-                            <option value="false" ${!p.discount_active?'selected':''}>Скидка: НЕТ</option>
-                        </select>
-                    </div>
-                    <textarea id="adm-p-desc-${p.id}" class="darknet-input" style="width:100%; height:50px; margin-bottom:10px; resize:none;">${p.description}</textarea>
-                    <button class="btn-primary" style="padding:6px 14px; font-size:0.8rem;" onclick="saveAdminProduct('${p.id}')">Сохранить изменения</button>
-                `;
-                container.appendChild(card);
-            });
-        }
-
-        async function saveAdminProduct(id) {
-            const price = parseFloat(document.getElementById(`adm-p-price-${id}`).value);
-            const orig = document.getElementById(`adm-p-orig-${id}`).value;
-            const disc = document.getElementById(`adm-p-disc-${id}`).value === 'true';
-            const desc = document.getElementById(`adm-p-desc-${id}`).value;
-
-            await supabaseClient.from('shop_products').update({
-                price: price,
-                original_price: orig ? parseFloat(orig) : price,
-                discount_active: disc,
-                description: desc
-            }).eq('id', id);
-
-            await logAdminAction('Редактирование товара', `Изменил параметры товара с ID: ${id}`);
-            customAlert("⚙️ Успешно", "Параметры товара сохранены в СУБД!");
-            fetchShopProducts();
-        }
-
-        async function loadAdminAppsList() {
-            const container = document.getElementById('admin-apps-list');
-            container.innerHTML = '<div style="color:var(--text-muted)">Загрузка анкет...</div>';
-
-            const { data } = await supabaseClient.from('server_applications').select('*').eq('status', 'pending');
-            if(!data || data.length === 0) {
-                container.innerHTML = '<div style="color:var(--text-muted)">Нет новых анкет в ожидании проверки.</div>';
-                return;
-            }
-
-            container.innerHTML = '';
-            data.forEach(app => {
-                const div = document.createElement('div');
-                div.className = 'admin-sub-card';
-                div.innerHTML = `
-                    <p><b>Игрок:</b> ${app.minecraft_name} | <b>Лицензия:</b> ${app.has_license}</p>
-                    <p><b>Telegram для связи:</b> <span style="color:var(--accent-pink)">${app.telegram_contact}</span></p>
-                    <p style="margin:8px 0; color:var(--text-muted); font-size:0.88rem;"><b>Планы:</b> ${app.plans}</p>
-                    <div style="display:flex; gap:10px;">
-                        <button class="btn-primary" style="padding:6px 14px; font-size:0.8rem; background:#2ecc71;" onclick="processAdminApp(${app.id}, '${app.minecraft_name}', 'approved')">Одобрить</button>
-                        <button class="btn-primary" style="padding:6px 14px; font-size:0.8rem; background:var(--accent-pink);" onclick="processAdminApp(${app.id}, '${app.minecraft_name}', 'rejected')">Отклонить</button>
-                    </div>
-                `;
-                container.appendChild(div);
-            });
-        }
-
-        async function processAdminApp(id, nick, status) {
-            await supabaseClient.from('server_applications').update({ status: status }).eq('id', id);
-            
-            if(status === 'approved') {
-                // Если одобрен — пускаем в вайтлист на 30 дней бесплатно в качестве бонуса
-                await supabaseClient.from('whitelist_queue').insert({ minecraft_name: nick, action: 'add_30d' });
-                await logAdminAction('Одобрение анкеты', `Принял анкету игрока ${nick}`);
-            } else {
-                await logAdminAction('Отклонение анкеты', `Отклонил анкету игрока ${nick}`);
-            }
-
-            customAlert("⚙️ Выполнено", `Статус анкеты изменен на [${status}]!`);
-            loadAdminAppsList();
-        }
-
-        async function adminSearchPlayer() {
-            const query = document.getElementById('admin-search-user').value.trim();
-            const resContainer = document.getElementById('admin-user-control-res');
-            if(!query) return;
-
-            resContainer.innerHTML = 'Поиск...';
-
-            const { data: link } = await supabaseClient.from('linked_accounts').select('*').eq('minecraft_name', query).maybeSingle();
-            if(!link) {
-                resContainer.innerHTML = '<span style="color:var(--accent-pink)">Игрок не привязан к сайту!</span>';
-                return;
-            }
-
-            const { data: stats } = await supabaseClient.from('player_stats').select('currency_balance').eq('minecraft_uuid', link.minecraft_uuid).maybeSingle();
-            const { data: prof } = await supabaseClient.from('profiles').select('rub_balance, id').eq('id', link.discord_id).maybeSingle();
-
-            resContainer.innerHTML = `
-                <div style="margin-top:10px;">
-                    <p>• Найдена связка: <b>${link.minecraft_name}</b> (UUID: ${link.minecraft_uuid.substring(0,8)}...)</p>
-                    <p style="margin:6px 0;">• Рублевый баланс профиля: <b style="color:var(--accent-pink);">${prof?prof.rub_balance:0} ₽</b></p>
-                    <p>• Алмазный игровой баланс: <b style="color:#ffb700;">${stats?stats.currency_balance:0} 💎</b></p>
-                    
-                    <div style="margin-top:15px; display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
-                        <input type="number" id="adm-action-amount" class="darknet-input" style="max-width:110px;" placeholder="Кол-во...">
-                        <button class="btn-primary" style="padding:6px 12px; font-size:0.82rem;" onclick="executeAdminBalanceChange('${prof.id}', '${link.minecraft_uuid}', 'rub', 'add', '${link.minecraft_name}')">+ Рубли</button>
-                        <button class="btn-secondary" style="padding:6px 12px; font-size:0.82rem;" onclick="executeAdminBalanceChange('${prof.id}', '${link.minecraft_uuid}', 'rub', 'sub', '${link.minecraft_name}')">- Рубли</button>
-                        <button class="btn-primary" style="padding:6px 12px; font-size:0.82rem; background:#ffb700; color:#000;" onclick="executeAdminBalanceChange('${prof.id}', '${link.minecraft_uuid}', 'diamonds', 'add', '${link.minecraft_name}')">+ Алмазы</button>
-                        <button class="btn-secondary" style="padding:6px 12px; font-size:0.82rem;" onclick="executeAdminBalanceChange('${prof.id}', '${link.minecraft_uuid}', 'diamonds', 'sub', '${link.minecraft_name}')">- Алмазы</button>
-                    </div>
-                </div>
-            `;
-        }
-
-        async function executeAdminBalanceChange(profileId, uuid, type, operation, name) {
-            const val = parseInt(document.getElementById('adm-action-amount').value);
-            if(isNaN(val) || val <= 0) return;
-
-            if(type === 'rub') {
-                const { data } = await supabaseClient.from('profiles').select('rub_balance').eq('id', profileId).single();
-                const current = data?.rub_balance ?? 0;
-                const finalAmt = (operation === 'add') ? current + val : Math.max(0, current - val);
-                await supabaseClient.from('profiles').update({ rub_balance: finalAmt }).eq('id', profileId);
-                await logAdminAction('Изменение баланса (Рубли)', `${operation==='add'?'Выдал':'Забрал'} ${val} рублей у ${name}`);
-            } else {
-                const { data } = await supabaseClient.from('player_stats').select('currency_balance').eq('minecraft_uuid', uuid).single();
-                const current = data?.currency_balance ?? 0;
-                const finalAmt = (operation === 'add') ? current + val : Math.max(0, current - val);
-                await supabaseClient.from('player_stats').update({ currency_balance: finalAmt }).eq('minecraft_uuid', uuid);
-                await logAdminAction('Изменение баланса (Алмазы)', `${operation==='add'?'Выдал':'Забрал'} ${val} алмазов у ${name}`);
-            }
-
-            customAlert("⚙️ Успешно", "Баланс игрока успешно отредактирован администрацией!");
-            adminSearchPlayer();
-            loadProfileData();
-        }
-
-        async function loadAdminLogsList() {
-            const table = document.getElementById('admin-logs-table');
-            table.innerHTML = '<tr><td>Загрузка логов...</td></tr>';
-
-            const { data } = await supabaseClient.from('admin_logs').select('*').order('created_at', { ascending: false }).limit(40);
-            if(!data || data.length === 0) {
-                table.innerHTML = '<tr><td>Лента системных действий пуста.</td></tr>';
-                return;
-            }
-
-            table.innerHTML = `
-                <tr style="border-bottom:1px solid rgba(255,255,255,0.1); color:var(--accent-pink); font-weight:700;">
-                    <td style="padding:6px;">Модератор</td>
-                    <td style="padding:6px;">Действие</td>
-                    <td style="padding:6px;">Детали</td>
-                    <td style="padding:6px;">Дата</td>
-                </tr>
-            `;
-            data.forEach(log => {
-                const tr = document.createElement('tr');
-                tr.style.borderBottom = '1px solid rgba(255,255,255,0.02)';
-                tr.innerHTML = `
-                    <td style="padding:6px; font-weight:600;">${log.moderator_name}</td>
-                    <td style="padding:6px; color:#b388ff;">${log.action}</td>
-                    <td style="padding:6px; color:var(--text-muted);">${log.details}</td>
-                    <td style="padding:6px; font-size:0.75rem;">${formatDate(log.created_at, true)}</td>
-                `;
-                table.appendChild(tr);
-            });
-        }
-
-        /* --- СИНХРОНИЗАЦИЯ ФОРУМА С БАЗОЙ --- */
+        /* --- ФУНКЦИОНАЛ ФОРУМА С МИКРО-АНИМАЦИЯМИ И САЛЮТОМ ИСКР --- */
 
         function updateForumForm() {
             const container = document.getElementById('forum-form-container');
@@ -3210,7 +2845,7 @@
                             <button id="like-btn-${post.id}" style="display: flex; align-items: center; gap: 8px; background: ${activeLikeBg}; border: 1px solid rgba(255,255,255,0.03); color: ${activeLikeColor}; padding: 8px 16px; border-radius: 14px; font-family: var(--font-sans); font-size: 0.85rem; font-weight: 600; cursor: pointer; transition: all 0.2s;" onclick="toggleLike('${post.id}', event)">
                                 ❤️ <span>${post.likes_count ?? 0}</span>
                             </button>
-                            <button style="display: flex; align-items: center; gap: 8px; background: rgba(255, 255, 255, 0.01); border: 1px solid rgba(255, 255, 255, 0.03); color: var(--text-muted); padding: 8px 16px; border-radius: 14px; font-family: var(--font-sans); font-size: 0.85rem; font-weight: 500; cursor: pointer; transition: all 0.2s;" onclick="toggleCommentsDisplay('${post.id}')">
+                            <button style="display: flex; align-items: center; gap: 8px; background: rgba(255,255,255,0.01); border: 1px solid rgba(255,255,255,0.03); color: var(--text-muted); padding: 8px 16px; border-radius: 14px; font-family: var(--font-sans); font-size: 0.85rem; font-weight: 500; cursor: pointer; transition: all 0.2s;" onclick="toggleCommentsDisplay('${post.id}')">
                                 Ответы 💬 (<span>${postComments.length}</span>)
                             </button>
                         </div>
@@ -3427,13 +3062,20 @@
         /* --- МОДУЛЬ УПРАВЛЕНИЯ ЛЕНТОЙ НОВОСТЕЙ СЕРВЕРА --- */
 
         function updateNewsForm() {
+            const adminTabBtn = document.getElementById('tab-admin');
+            if (adminTabBtn) adminTabBtn.style.display = isUserModerator ? 'inline-block' : 'none';
+            if (!isUserModerator) {
+                const activeSection = document.getElementById('section-admin');
+                if (activeSection && activeSection.classList.contains('active')) switchTab('home');
+            }
+
             const container = document.getElementById('news-admin-container');
             if (!container) return;
 
             if (isUserModerator) {
                 container.innerHTML = `
                     <div style="width: 100%; background: rgba(255, 255, 255, 0.01); border: 1px solid rgba(138, 43, 226, 0.2); padding: 20px; border-radius: 20px; text-align: left; margin-bottom: 24px;">
-                        <h4 style="font-size: 0.95rem; font-weight: 600; color: #b388ff; margin-bottom: 14px; display: flex; align-items: center; gap: 6px;">🛠 Панель публикации новостей</h4>
+                        <h4 style="font-size: 0.95rem; font-weight: 600; color: #b388ff; margin-bottom: 14px; display: flex; align-items: center; gap: 6px;"><i data-lucide="wrench" style="width:16px;height:16px;"></i> Панель публикации новостей</h4>
                         <div style="display: flex; gap: 12px; margin-bottom: 12px; flex-wrap: wrap; align-items: center;">
                             <input type="text" id="news-title-input" placeholder="Заголовок новости..." style="flex: 2; min-width: 200px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.06); border-radius: 10px; padding: 10px 14px; color: #fff; font-family: var(--font-sans); font-size: 0.9rem; outline: none;">
                             <input type="text" id="news-tag-input" placeholder="Текст тега (напр. Обновление)..." style="flex: 1; min-width: 150px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.06); border-radius: 10px; padding: 10px 14px; color: #fff; font-family: var(--font-sans); font-size: 0.9rem; outline: none;">
@@ -3562,13 +3204,908 @@
         
         loadProfileData().then(() => {
             loadNewsFeed();
-            fetchShopProducts(); // Динамическая подгрузка магазина
-            populateBountyDropdown(); // Подгрузка выпадающего списка черного рынка
         });
 
         window.onload = () => {
             initRouletteGraphic();
+            if (window.lucide) lucide.createIcons();
         };
+    </script>
+
+    <script>
+        /* ================================================================
+           АДМИН-ПАНЕЛЬ KUROMISMP
+           Требует таблиц shop_items, promo_codes, shop_purchases,
+           admin_audit_logs и доп. колонок в linked_accounts / wallet_transactions.
+           См. schema_admin.sql — выполните его в Supabase перед использованием.
+           ================================================================ */
+
+        let currentAdminTab = 'shop';
+        let adminShopItemsCache = {};
+        let currentLogFilter = 'all';
+        let currentAdminPlayerContext = null;
+
+        function escapeHtml(str) {
+            if (str === null || str === undefined) return '';
+            return String(str).replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m]));
+        }
+
+        function getAdminIdentity() {
+            if (!currentUserSession) return { discord_id: 'unknown', name: 'Неизвестный админ' };
+            const meta = currentUserSession.user.user_metadata || {};
+            const discordId = meta.provider_id || currentUserSession.user.id;
+            const name = meta.full_name || meta.name || (currentUserLinkedData && currentUserLinkedData.minecraft_name) || 'Модератор';
+            return { discord_id: discordId, name };
+        }
+
+        function customConfirm(title, text, confirmLabel) {
+            return openCustomModal({
+                title, text, showInput: false,
+                buttons: [
+                    { text: 'Отмена', className: 'btn-secondary', action: () => false },
+                    { text: confirmLabel || 'Подтвердить', className: 'btn-primary', action: () => true }
+                ]
+            });
+        }
+
+        async function logAdminAction({ action_type, severity, target_type, target_label, reason, details }) {
+            const admin = getAdminIdentity();
+            try {
+                await supabaseClient.from('admin_audit_logs').insert({
+                    admin_discord_id: admin.discord_id,
+                    admin_name: admin.name,
+                    action_type,
+                    severity: severity || 'low',
+                    target_type: target_type || null,
+                    target_label: target_label || null,
+                    reason: reason || null,
+                    details: details || null
+                });
+            } catch (e) {
+                console.error('Не удалось записать лог действия администратора (проверьте таблицу admin_audit_logs):', e);
+            }
+            if (currentAdminTab === 'logs' && document.getElementById('admin-logs-container')) {
+                loadAuditLogs();
+            }
+        }
+
+        /* ---------- ПЕРЕКЛЮЧЕНИЕ ПОДВКЛАДОК АДМИНКИ ---------- */
+
+        function switchAdminTab(tab) {
+            currentAdminTab = tab;
+            ['shop', 'players', 'logs'].forEach(t => {
+                const btn = document.getElementById('atab-' + t);
+                if (btn) btn.classList.toggle('active', t === tab);
+            });
+            if (tab === 'shop') renderAdminShopTab();
+            if (tab === 'players') renderAdminPlayersTab();
+            if (tab === 'logs') renderAdminLogsTab();
+        }
+
+        /* ================= МАГАЗИН (АДМИН) ================= */
+
+        async function renderAdminShopTab() {
+            const c = document.getElementById('admin-tab-content');
+            c.innerHTML = `
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; flex-wrap:wrap; gap:10px;">
+                    <div class="admin-field-label" style="margin:0; font-size:0.8rem;">Товары магазина</div>
+                    <button class="btn-mini save" onclick="openCreateShopItemModal()"><i data-lucide="plus" style="width:14px;height:14px;"></i> Добавить товар</button>
+                </div>
+                <div id="admin-shop-items-container"><div style="color:var(--text-muted); padding:20px 0;">Загрузка...</div></div>
+
+                <div style="margin-top:36px; margin-bottom:16px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+                    <div class="admin-field-label" style="margin:0; font-size:0.8rem;">Промокоды</div>
+                    <button class="btn-mini save" onclick="openCreatePromoModal()"><i data-lucide="plus" style="width:14px;height:14px;"></i> Создать промокод</button>
+                </div>
+                <div id="admin-promo-container"><div style="color:var(--text-muted); padding:20px 0;">Загрузка...</div></div>
+            `;
+            if (window.lucide) lucide.createIcons();
+            await loadAdminShopItems();
+            await loadAdminPromoCodes();
+        }
+
+        function renderShopItemRow(item, stats) {
+            const categoryLabels = { privilege: 'Привилегия', pass_permanent: 'Проходка навсегда', pass_30d: 'Проходка 30 дней' };
+            const statusLabels = { active: 'В продаже', hidden: 'Скрыт', soon: 'Скоро' };
+            return `
+            <div class="admin-card">
+                <div class="admin-row-head">
+                    <div class="grow">
+                        <div class="admin-field-label">Название</div>
+                        <input type="text" class="admin-input" id="si-name-${item.id}" value="${escapeHtml(item.name)}">
+                    </div>
+                    <div>
+                        <div class="admin-field-label">Статус</div>
+                        <span class="status-pill ${item.status}" onclick="toggleItemStatus('${item.id}')" title="Нажмите, чтобы переключить">${statusLabels[item.status] || item.status}</span>
+                    </div>
+                </div>
+                <div class="admin-field-label">Описание</div>
+                <textarea class="admin-textarea" id="si-desc-${item.id}" style="margin-bottom:12px;">${escapeHtml(item.description || '')}</textarea>
+
+                <div class="discount-row">
+                    <div style="min-width:110px;">
+                        <div class="admin-field-label">Цена, ₽</div>
+                        <input type="number" class="admin-input" id="si-price-${item.id}" value="${item.base_price}">
+                    </div>
+                    <div style="min-width:130px;">
+                        <div class="admin-field-label">Скидка</div>
+                        <select class="admin-select" id="si-disc-type-${item.id}">
+                            <option value="" ${!item.discount_type ? 'selected' : ''}>Без скидки</option>
+                            <option value="percent" ${item.discount_type === 'percent' ? 'selected' : ''}>Процент, %</option>
+                            <option value="fixed" ${item.discount_type === 'fixed' ? 'selected' : ''}>Фикс. сумма, ₽</option>
+                        </select>
+                    </div>
+                    <div style="min-width:110px;">
+                        <div class="admin-field-label">Значение</div>
+                        <input type="number" class="admin-input" id="si-disc-val-${item.id}" value="${item.discount_value !== null && item.discount_value !== undefined ? item.discount_value : ''}" placeholder="—">
+                    </div>
+                    <div style="margin-left:auto; display:flex; gap:8px; align-items:flex-end; padding-top: 18px;">
+                        <button class="btn-mini save" onclick="saveShopItemRow('${item.id}')"><i data-lucide="check" style="width:14px;height:14px;"></i> Сохранить</button>
+                        <button class="btn-mini danger" onclick="deleteShopItem('${item.id}')"><i data-lucide="trash-2" style="width:14px;height:14px;"></i></button>
+                    </div>
+                </div>
+
+                <div class="admin-card-grid" style="margin-top:14px; margin-bottom:0;">
+                    <div class="admin-stat-box">
+                        <div class="lbl"><i data-lucide="shopping-cart" style="width:13px;height:13px;"></i> Категория</div>
+                        <div class="val" style="font-size:0.9rem;">${categoryLabels[item.category] || item.category}</div>
+                    </div>
+                    <div class="admin-stat-box">
+                        <div class="lbl"><i data-lucide="trending-up" style="width:13px;height:13px;"></i> Продано / выручка</div>
+                        <div class="val">${stats.count} шт · ${stats.revenue.toFixed(0)} ₽</div>
+                    </div>
+                </div>
+            </div>`;
+        }
+
+        async function loadAdminShopItems() {
+            const container = document.getElementById('admin-shop-items-container');
+            if (!container) return;
+            try {
+                const { data: items, error } = await supabaseClient.from('shop_items').select('*').order('sort_order', { ascending: true }).order('created_at', { ascending: true });
+                if (error) throw error;
+
+                adminShopItemsCache = {};
+                if (!items || items.length === 0) {
+                    container.innerHTML = `<div style="color:var(--text-muted); padding:20px 0;">Товаров пока нет. Нажмите «Добавить товар», чтобы создать первый.</div>`;
+                    return;
+                }
+
+                const { data: purchases } = await supabaseClient.from('shop_purchases').select('item_id, price_paid');
+                const statsMap = {};
+                (purchases || []).forEach(p => {
+                    if (!p.item_id) return;
+                    if (!statsMap[p.item_id]) statsMap[p.item_id] = { count: 0, revenue: 0 };
+                    statsMap[p.item_id].count += 1;
+                    statsMap[p.item_id].revenue += Number(p.price_paid) || 0;
+                });
+
+                let html = '';
+                items.forEach(item => {
+                    adminShopItemsCache[item.id] = item;
+                    const stats = statsMap[item.id] || { count: 0, revenue: 0 };
+                    html += renderShopItemRow(item, stats);
+                });
+                container.innerHTML = html;
+                if (window.lucide) lucide.createIcons();
+            } catch (e) {
+                console.error(e);
+                container.innerHTML = `<div style="color:var(--accent-pink); padding:20px 0;">Не удалось загрузить товары. Убедитесь, что таблица <b>shop_items</b> создана в Supabase (см. schema_admin.sql).</div>`;
+            }
+        }
+
+        async function saveShopItemRow(itemId) {
+            const original = adminShopItemsCache[itemId];
+            if (!original) return;
+            const name = document.getElementById(`si-name-${itemId}`).value.trim();
+            const description = document.getElementById(`si-desc-${itemId}`).value.trim();
+            const price = parseFloat(document.getElementById(`si-price-${itemId}`).value);
+            const discountType = document.getElementById(`si-disc-type-${itemId}`).value || null;
+            const discountValueRaw = document.getElementById(`si-disc-val-${itemId}`).value;
+            const discountValue = discountValueRaw === '' ? null : parseFloat(discountValueRaw);
+
+            if (!name) { customAlert('⚠️ Ошибка', 'Название товара не может быть пустым.'); return; }
+            if (isNaN(price) || price < 0) { customAlert('⚠️ Ошибка', 'Указана некорректная цена товара.'); return; }
+
+            const updates = {};
+            const logs = [];
+
+            if (name !== original.name || description !== (original.description || '')) {
+                updates.name = name;
+                updates.description = description;
+                logs.push({
+                    action_type: 'item_edit', severity: 'low', target_type: 'shop_item', target_label: name,
+                    details: { before: { name: original.name, description: original.description }, after: { name, description } }
+                });
+            }
+
+            if (price !== Number(original.base_price)) {
+                updates.base_price = price;
+                const pct = Number(original.base_price) > 0 ? Math.abs((price - original.base_price) / original.base_price) * 100 : 100;
+                const severity = pct >= 30 ? 'high' : (pct >= 10 ? 'medium' : 'low');
+                logs.push({
+                    action_type: 'price_change', severity, target_type: 'shop_item', target_label: original.name,
+                    details: { before: original.base_price, after: price }
+                });
+            }
+
+            const origDiscVal = (original.discount_value !== null && original.discount_value !== undefined) ? Number(original.discount_value) : null;
+            if (discountType !== (original.discount_type || null) || discountValue !== origDiscVal) {
+                updates.discount_type = discountType;
+                updates.discount_value = discountValue;
+                logs.push({
+                    action_type: 'discount_change', severity: 'medium', target_type: 'shop_item', target_label: original.name,
+                    details: { before: { type: original.discount_type, value: original.discount_value }, after: { type: discountType, value: discountValue } }
+                });
+            }
+
+            if (Object.keys(updates).length === 0) {
+                customAlert('ℹ️ Нет изменений', 'Вы не изменили ни одного поля этого товара.');
+                return;
+            }
+
+            updates.updated_at = new Date().toISOString();
+            const { error } = await supabaseClient.from('shop_items').update(updates).eq('id', itemId);
+            if (error) { console.error(error); customAlert('❌ Ошибка', 'Не удалось сохранить изменения товара.'); return; }
+
+            for (const log of logs) await logAdminAction(log);
+
+            customAlert('✅ Сохранено', 'Изменения товара успешно сохранены и записаны в журнал.');
+            await loadAdminShopItems();
+            renderShopFront();
+        }
+
+        async function toggleItemStatus(itemId) {
+            const original = adminShopItemsCache[itemId];
+            if (!original) return;
+            const order = ['active', 'hidden', 'soon'];
+            const next = order[(order.indexOf(original.status) + 1) % order.length];
+            const { error } = await supabaseClient.from('shop_items').update({ status: next, updated_at: new Date().toISOString() }).eq('id', itemId);
+            if (error) { console.error(error); customAlert('❌ Ошибка', 'Не удалось изменить статус товара.'); return; }
+            await logAdminAction({
+                action_type: 'item_status_change', severity: 'medium', target_type: 'shop_item', target_label: original.name,
+                details: { before: original.status, after: next }
+            });
+            await loadAdminShopItems();
+            renderShopFront();
+        }
+
+        async function deleteShopItem(itemId) {
+            const original = adminShopItemsCache[itemId];
+            if (!original) return;
+            const ok = await customConfirm('🗑️ Удалить товар', `Удалить товар «${escapeHtml(original.name)}» из магазина без возможности отмены?`, 'Удалить');
+            if (!ok) return;
+            const { error } = await supabaseClient.from('shop_items').delete().eq('id', itemId);
+            if (error) { console.error(error); customAlert('❌ Ошибка', 'Не удалось удалить товар.'); return; }
+            await logAdminAction({ action_type: 'item_delete', severity: 'high', target_type: 'shop_item', target_label: original.name, details: { deleted_price: original.base_price } });
+            await loadAdminShopItems();
+            renderShopFront();
+        }
+
+        function openCreateShopItemModal() {
+            const html = `
+                <div style="display:flex; flex-direction:column; gap:12px; text-align:left;">
+                    <div><div class="admin-field-label">Название</div><input type="text" id="new-item-name" class="admin-input" placeholder="Например: VIP-набор"></div>
+                    <div><div class="admin-field-label">Описание</div><textarea id="new-item-desc" class="admin-textarea" placeholder="Краткое описание товара..."></textarea></div>
+                    <div style="display:flex; gap:10px;">
+                        <div style="flex:1;"><div class="admin-field-label">Цена, ₽</div><input type="number" id="new-item-price" class="admin-input" placeholder="199"></div>
+                        <div style="flex:1;"><div class="admin-field-label">Категория</div>
+                            <select id="new-item-category" class="admin-select">
+                                <option value="privilege">Привилегия</option>
+                                <option value="pass_permanent">Проходка навсегда</option>
+                                <option value="pass_30d">Проходка на 30 дней</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>`;
+            openCustomModal({
+                title: '✨ Новый товар', text: html, showInput: false,
+                buttons: [
+                    { text: 'Отмена', className: 'btn-secondary', action: () => null },
+                    { text: 'Создать', className: 'btn-primary', action: () => 'confirmed' }
+                ]
+            }).then(async (result) => {
+                if (result !== 'confirmed') return;
+                const name = document.getElementById('new-item-name').value.trim();
+                const description = document.getElementById('new-item-desc').value.trim();
+                const price = parseFloat(document.getElementById('new-item-price').value);
+                const category = document.getElementById('new-item-category').value;
+                if (!name || isNaN(price) || price < 0) { customAlert('⚠️ Ошибка', 'Заполните название и корректную цену товара.'); return; }
+
+                const key = 'item_' + Date.now();
+                const { data, error } = await supabaseClient.from('shop_items').insert({
+                    key, name, description, category, base_price: price, status: 'active', sort_order: 999
+                }).select().maybeSingle();
+                if (error) { console.error(error); customAlert('❌ Ошибка', 'Не удалось создать товар. Проверьте, что таблица shop_items создана в Supabase.'); return; }
+
+                await logAdminAction({ action_type: 'item_create', severity: 'medium', target_type: 'shop_item', target_label: name, details: { price } });
+                await loadAdminShopItems();
+                renderShopFront();
+            });
+        }
+
+        /* ---------- ПРОМОКОДЫ ---------- */
+
+        async function loadAdminPromoCodes() {
+            const container = document.getElementById('admin-promo-container');
+            if (!container) return;
+            try {
+                const { data: codes, error } = await supabaseClient.from('promo_codes').select('*, shop_items(name)').order('created_at', { ascending: false });
+                if (error) throw error;
+                if (!codes || codes.length === 0) {
+                    container.innerHTML = `<div style="color:var(--text-muted); padding:20px 0;">Активных промокодов нет.</div>`;
+                    return;
+                }
+                let html = '';
+                codes.forEach(c => {
+                    const expired = c.expires_at && new Date(c.expires_at) < new Date();
+                    const usedUp = c.max_uses !== null && c.uses_count >= c.max_uses;
+                    const statusText = !c.active ? 'Выключен' : (expired ? 'Истёк' : (usedUp ? 'Исчерпан' : 'Активен'));
+                    const statusClass = (!c.active || expired || usedUp) ? 'hidden' : 'active';
+                    let discountText = c.discount_type === 'percent' ? `-${c.discount_value}%` : (c.discount_type === 'fixed' ? `-${c.discount_value} ₽` : 'Бесплатно');
+                    html += `
+                    <div class="admin-card">
+                        <div class="admin-row-head" style="margin-bottom:0;">
+                            <div class="grow">
+                                <div style="font-weight:700; font-size:1rem; letter-spacing:0.03em;">${escapeHtml(c.code)}</div>
+                                <div style="font-size:0.8rem; color:var(--text-muted); margin-top:2px;">
+                                    ${discountText} · ${c.applies_to_item_id ? escapeHtml(c.shop_items?.name || 'товар') : 'на любой товар'} · использован ${c.uses_count}${c.max_uses !== null ? '/' + c.max_uses : ''} раз
+                                    ${c.expires_at ? ' · до ' + formatDate(c.expires_at, false) : ''}
+                                </div>
+                            </div>
+                            <span class="status-pill ${statusClass}">${statusText}</span>
+                            <button class="btn-mini danger" onclick="deletePromoCode('${c.id}')"><i data-lucide="trash-2" style="width:14px;height:14px;"></i></button>
+                        </div>
+                    </div>`;
+                });
+                container.innerHTML = html;
+                if (window.lucide) lucide.createIcons();
+            } catch (e) {
+                console.error(e);
+                container.innerHTML = `<div style="color:var(--accent-pink); padding:20px 0;">Не удалось загрузить промокоды. Проверьте, что таблица <b>promo_codes</b> создана.</div>`;
+            }
+        }
+
+        function openCreatePromoModal() {
+            const itemOptions = Object.values(adminShopItemsCache).map(i => `<option value="${i.id}">${escapeHtml(i.name)}</option>`).join('');
+            const html = `
+                <div style="display:flex; flex-direction:column; gap:12px; text-align:left;">
+                    <div><div class="admin-field-label">Код</div><input type="text" id="new-promo-code" class="admin-input" placeholder="KUROMI2026" style="text-transform:uppercase;"></div>
+                    <div style="display:flex; gap:10px;">
+                        <div style="flex:1;"><div class="admin-field-label">Тип скидки</div>
+                            <select id="new-promo-type" class="admin-select">
+                                <option value="percent">Процент, %</option>
+                                <option value="fixed">Фикс. сумма, ₽</option>
+                                <option value="free">Бесплатная выдача</option>
+                            </select>
+                        </div>
+                        <div style="flex:1;"><div class="admin-field-label">Значение</div><input type="number" id="new-promo-value" class="admin-input" placeholder="15"></div>
+                    </div>
+                    <div><div class="admin-field-label">Применяется к товару</div>
+                        <select id="new-promo-item" class="admin-select">
+                            <option value="">Любой товар в магазине</option>
+                            ${itemOptions}
+                        </select>
+                    </div>
+                    <div style="display:flex; gap:10px;">
+                        <div style="flex:1;"><div class="admin-field-label">Лимит использований</div><input type="number" id="new-promo-uses" class="admin-input" placeholder="Без ограничений"></div>
+                        <div style="flex:1;"><div class="admin-field-label">Истекает</div><input type="date" id="new-promo-expires" class="admin-input"></div>
+                    </div>
+                </div>`;
+            openCustomModal({
+                title: '🏷️ Новый промокод', text: html, showInput: false,
+                buttons: [
+                    { text: 'Отмена', className: 'btn-secondary', action: () => null },
+                    { text: 'Создать', className: 'btn-primary', action: () => 'confirmed' }
+                ]
+            }).then(async (result) => {
+                if (result !== 'confirmed') return;
+                const code = document.getElementById('new-promo-code').value.trim().toUpperCase();
+                const discountType = document.getElementById('new-promo-type').value;
+                const valueRaw = document.getElementById('new-promo-value').value;
+                const itemId = document.getElementById('new-promo-item').value || null;
+                const maxUsesRaw = document.getElementById('new-promo-uses').value;
+                const expiresRaw = document.getElementById('new-promo-expires').value;
+
+                if (!code) { customAlert('⚠️ Ошибка', 'Введите код промокода.'); return; }
+                const discountValue = discountType === 'free' ? null : parseFloat(valueRaw);
+                if (discountType !== 'free' && (isNaN(discountValue) || discountValue <= 0)) { customAlert('⚠️ Ошибка', 'Укажите корректное значение скидки.'); return; }
+
+                const { error } = await supabaseClient.from('promo_codes').insert({
+                    code, discount_type: discountType, discount_value: discountValue,
+                    applies_to_item_id: itemId, max_uses: maxUsesRaw ? parseInt(maxUsesRaw) : null,
+                    expires_at: expiresRaw ? new Date(expiresRaw).toISOString() : null, active: true
+                });
+                if (error) { console.error(error); customAlert('❌ Ошибка', 'Не удалось создать промокод (возможно, такой код уже существует).'); return; }
+
+                await logAdminAction({ action_type: 'promo_create', severity: 'medium', target_type: 'promo_code', target_label: code, details: { discount_type: discountType, discount_value: discountValue } });
+                await loadAdminPromoCodes();
+            });
+        }
+
+        async function deletePromoCode(id) {
+            const ok = await customConfirm('🗑️ Удалить промокод', 'Удалить этот промокод без возможности отмены?', 'Удалить');
+            if (!ok) return;
+            const { error } = await supabaseClient.from('promo_codes').delete().eq('id', id);
+            if (error) { console.error(error); customAlert('❌ Ошибка', 'Не удалось удалить промокод.'); return; }
+            await logAdminAction({ action_type: 'promo_delete', severity: 'medium', target_type: 'promo_code', target_label: id });
+            await loadAdminPromoCodes();
+        }
+
+        /* ================= ВИТРИНА МАГАЗИНА (для игроков) ================= */
+
+        async function renderShopFront() {
+            const container = document.getElementById('shop-front-container');
+            if (!container) return;
+            try {
+                const { data: items, error } = await supabaseClient.from('shop_items').select('*').neq('status', 'hidden').order('sort_order', { ascending: true });
+                if (error) throw error;
+                if (!items || items.length === 0) {
+                    renderShopFrontFallback();
+                    return;
+                }
+                let html = `<div style="grid-column: span 2; margin-bottom: 6px;">
+                    <input type="text" id="shop-promo-input" class="admin-input" style="max-width:280px;" placeholder="Промокод (необязательно)">
+                </div>`;
+                items.forEach(item => {
+                    const soon = item.status === 'soon';
+                    let finalPrice = item.base_price;
+                    let oldPriceHtml = '';
+                    if (item.discount_type === 'percent' && item.discount_value) {
+                        finalPrice = Math.max(0, Math.round(item.base_price * (1 - item.discount_value / 100)));
+                        oldPriceHtml = `<span style="text-decoration:line-through; color:var(--text-muted); font-size:0.85rem; margin-right:6px;">${item.base_price} ₽</span>`;
+                    } else if (item.discount_type === 'fixed' && item.discount_value) {
+                        finalPrice = Math.max(0, item.base_price - item.discount_value);
+                        oldPriceHtml = `<span style="text-decoration:line-through; color:var(--text-muted); font-size:0.85rem; margin-right:6px;">${item.base_price} ₽</span>`;
+                    }
+                    const isBig = item.category === 'pass_permanent';
+                    html += `
+                        <div class="ticket-card" style="padding: 20px 25px; border-radius: 20px; ${isBig ? 'grid-column: span 2;' : ''} position:relative;">
+                            ${soon ? '<div style="position:absolute; top:12px; right:12px; background:rgba(255,159,28,0.16); color:#ffb95c; font-size:0.68rem; font-weight:700; padding:4px 10px; border-radius:100px; text-transform:uppercase;">Скоро</div>' : ''}
+                            <div class="ticket-info">
+                                <h3>${escapeHtml(item.name)}</h3>
+                                <p>${escapeHtml(item.description || '')}</p>
+                            </div>
+                            <div>
+                                <div class="ticket-price" style="font-size: 1.15rem;">${oldPriceHtml}${finalPrice} ₽</div>
+                                <button class="btn-primary" style="padding: 8px 16px; font-size: 0.8rem; margin-top: 10px; width: 100%; ${soon ? 'opacity:0.5; cursor:not-allowed;' : ''}" ${soon ? 'disabled' : ''} onclick="buyShopItem('${item.id}')">${soon ? 'Скоро' : 'Купить'}</button>
+                            </div>
+                        </div>`;
+                });
+                container.innerHTML = html;
+            } catch (e) {
+                console.error('Не удалось загрузить магазин из shop_items, использую резервный список:', e);
+                renderShopFrontFallback();
+            }
+        }
+
+        function renderShopFrontFallback() {
+            const container = document.getElementById('shop-front-container');
+            if (!container) return;
+            container.innerHTML = `
+                <div class="ticket-card" style="padding: 20px 25px; border-radius: 20px; grid-column: span 2;">
+                    <div class="ticket-info"><h3>Пропуск «Навсегда»</h3><p>Полноценный вечный доступ на сервер без ограничений по сезонам.</p></div>
+                    <div><div class="ticket-price" style="font-size: 1.15rem;">349 ₽</div><button class="btn-primary" style="padding: 8px 16px; font-size: 0.8rem; margin-top: 10px; width: 100%;" onclick="buyServerPass(349)">Купить</button></div>
+                </div>
+                <div class="ticket-card" style="padding: 20px 25px; border-radius: 20px;">
+                    <div class="ticket-info"><h3>Инспектор (CoreProtect)</h3><p>Доступ к логированию действий /co i. Узнай, кто украл ресурсы или сломал постройку.</p></div>
+                    <div><div class="ticket-price" style="font-size: 1.15rem;">249 ₽</div><button class="btn-primary" style="padding: 8px 16px; font-size: 0.8rem; margin-top: 10px; width: 100%;" onclick="buyPrivilege('Инспектор (CoreProtect)', 249)">Купить</button></div>
+                </div>
+                <div class="ticket-card" style="padding: 20px 25px; border-radius: 20px;">
+                    <div class="ticket-info"><h3>Полицейский пропуск</h3><p>Разрешение на арест нарушителей. Веди преступников за собой на поводке.</p></div>
+                    <div><div class="ticket-price" style="font-size: 1.15rem;">199 ₽</div><button class="btn-primary" style="padding: 8px 16px; font-size: 0.8rem; margin-top: 10px; width: 100%;" onclick="buyPrivilege('Полицейский пропуск', 199)">Купить</button></div>
+                </div>
+                <div class="ticket-card" style="padding: 20px 25px; border-radius: 20px;">
+                    <div class="ticket-info"><h3>Маска Анонимуса</h3><p>Уникальный РП-предмет. Полностью скрывает твой оригинальный никнейм на сервере.</p></div>
+                    <div><div class="ticket-price" style="font-size: 1.15rem;">129 ₽</div><button class="btn-primary" style="padding: 8px 16px; font-size: 0.8rem; margin-top: 10px; width: 100%;" onclick="buyPrivilege('Маска Анонимуса', 129)">Купить</button></div>
+                </div>
+                <div class="ticket-card" style="padding: 20px 25px; border-radius: 20px;">
+                    <div class="ticket-info"><h3>Загробный кастом</h3><p>Уникальный звук, частицы дыма и замена текста о твоей смерти в глобальном чате.</p></div>
+                    <div><div class="ticket-price" style="font-size: 1.15rem;">99 ₽</div><button class="btn-primary" style="padding: 8px 16px; font-size: 0.8rem; margin-top: 10px; width: 100%;" onclick="buyPrivilege('Загробный кастом', 99)">Купить</button></div>
+                </div>
+            `;
+        }
+
+        async function buyShopItem(itemId) {
+            if (!currentUserSession) { customAlert("🔒 Авторизация", "Сначала авторизуйтесь через Discord!"); return; }
+            if (!currentUserLinkedData) { customAlert("🔗 Нужна привязка", "Сначала привяжите Minecraft-аккаунт во вкладке «Профиль»!"); return; }
+
+            try {
+                const { data: item, error } = await supabaseClient.from('shop_items').select('*').eq('id', itemId).maybeSingle();
+                if (error || !item) { customAlert("❌ Ошибка", "Товар не найден."); return; }
+                if (item.status !== 'active') { customAlert("⏳ Недоступно", "Этот товар сейчас недоступен к покупке."); return; }
+
+                let finalPrice = item.base_price;
+                if (item.discount_type === 'percent' && item.discount_value) finalPrice = Math.max(0, Math.round(item.base_price * (1 - item.discount_value / 100)));
+                else if (item.discount_type === 'fixed' && item.discount_value) finalPrice = Math.max(0, item.base_price - item.discount_value);
+
+                let appliedPromo = null;
+                const promoInput = document.getElementById('shop-promo-input');
+                const promoValue = promoInput ? promoInput.value.trim().toUpperCase() : '';
+                if (promoValue) {
+                    const { data: promo } = await supabaseClient.from('promo_codes').select('*').eq('code', promoValue).eq('active', true).maybeSingle();
+                    const now = new Date();
+                    const valid = promo && (!promo.expires_at || new Date(promo.expires_at) > now) && (promo.max_uses === null || promo.uses_count < promo.max_uses) && (!promo.applies_to_item_id || promo.applies_to_item_id === item.id);
+                    if (!valid) { customAlert("⚠️ Промокод", "Указанный промокод недействителен, истёк или не подходит для этого товара."); return; }
+                    appliedPromo = promo;
+                    if (promo.discount_type === 'percent') finalPrice = Math.max(0, Math.round(finalPrice * (1 - promo.discount_value / 100)));
+                    else if (promo.discount_type === 'fixed') finalPrice = Math.max(0, finalPrice - promo.discount_value);
+                    else if (promo.discount_type === 'free') finalPrice = 0;
+                }
+
+                if (item.category === 'pass_permanent' || item.category === 'pass_30d') {
+                    const { data: profile } = await supabaseClient.from('profiles').select('rub_balance, has_pass').eq('id', currentUserSession.user.id).maybeSingle();
+                    if (profile && profile.has_pass) { customAlert("👑 Информация", "У вас уже есть проходка на текущий сезон!"); return; }
+                    if (!profile || profile.rub_balance < finalPrice) { customLowBalance(finalPrice, profile?.rub_balance || 0); return; }
+                    await supabaseClient.from('profiles').update({ rub_balance: profile.rub_balance - finalPrice, has_pass: true }).eq('id', currentUserSession.user.id);
+                    await supabaseClient.from('whitelist_queue').insert({ minecraft_name: currentUserLinkedData.minecraft_name, action: item.category === 'pass_permanent' ? 'permanent' : 'add_30d' });
+                } else {
+                    const { data: profile } = await supabaseClient.from('profiles').select('rub_balance').eq('id', currentUserSession.user.id).maybeSingle();
+                    if (!profile || profile.rub_balance < finalPrice) { customLowBalance(finalPrice, profile?.rub_balance || 0); return; }
+                    await supabaseClient.from('profiles').update({ rub_balance: profile.rub_balance - finalPrice }).eq('id', currentUserSession.user.id);
+                }
+
+                await supabaseClient.from('shop_purchases').insert({
+                    discord_id: currentUserLinkedData.discord_id, minecraft_uuid: currentUserLinkedData.minecraft_uuid,
+                    minecraft_name: currentUserLinkedData.minecraft_name, item_id: item.id, item_name_snapshot: item.name,
+                    price_paid: finalPrice, promo_code: appliedPromo ? appliedPromo.code : null
+                });
+
+                if (appliedPromo) {
+                    await supabaseClient.from('promo_codes').update({ uses_count: appliedPromo.uses_count + 1 }).eq('code', appliedPromo.code);
+                }
+
+                customAlert("🎉 Поздравляем!", `Товар «${escapeHtml(item.name)}» успешно куплен за ${finalPrice} ₽!`);
+                loadProfileData();
+                renderShopFront();
+            } catch (e) {
+                console.error(e);
+                customAlert("❌ Ошибка", "Не удалось завершить покупку. Попробуйте позже.");
+            }
+        }
+
+        /* ================= ИГРОКИ (АДМИН) ================= */
+
+        async function renderAdminPlayersTab() {
+            const c = document.getElementById('admin-tab-content');
+            c.innerHTML = `
+                <div class="player-search-bar">
+                    <input type="text" id="admin-player-search" class="admin-input" placeholder="Никнейм или Discord ID игрока...">
+                    <button class="btn-mini save" onclick="adminSearchPlayer()"><i data-lucide="search" style="width:14px;height:14px;"></i> Найти</button>
+                </div>
+                <div id="admin-player-result"></div>
+
+                <details class="leaderboard-details">
+                    <summary><span class="icon-badge b-orange" style="width:30px;height:30px;"><i data-lucide="crown"></i></span> Топ игроков по балансу (Forbes) <i data-lucide="chevron-down" class="chev"></i></summary>
+                    <div class="leaderboard-body" id="admin-top-balance"></div>
+                </details>
+                <details class="leaderboard-details">
+                    <summary><span class="icon-badge b-red" style="width:30px;height:30px;"><i data-lucide="swords"></i></span> Топ игроков по киллам <i data-lucide="chevron-down" class="chev"></i></summary>
+                    <div class="leaderboard-body" id="admin-top-kills"></div>
+                </details>
+            `;
+            const searchInput = document.getElementById('admin-player-search');
+            if (searchInput) searchInput.addEventListener('keydown', e => { if (e.key === 'Enter') adminSearchPlayer(); });
+            if (window.lucide) lucide.createIcons();
+            loadTopLeaderboards();
+        }
+
+        async function loadTopLeaderboards() {
+            try {
+                const { data: linked } = await supabaseClient.from('linked_accounts').select('minecraft_uuid, minecraft_name, discord_id, user_id');
+                const nameMap = {};
+                (linked || []).forEach(l => nameMap[l.minecraft_uuid] = l);
+
+                const { data: byBalance } = await supabaseClient.from('player_stats').select('minecraft_uuid, currency_balance').order('currency_balance', { ascending: false }).limit(15);
+                const balanceBox = document.getElementById('admin-top-balance');
+                if (balanceBox) {
+                    const rows = (byBalance || []).filter(p => nameMap[p.minecraft_uuid]).slice(0, 10);
+                    balanceBox.innerHTML = rows.length ? rows.map((p, i) => `
+                        <div class="leaderboard-row">
+                            <div class="leaderboard-rank">${i + 1}</div>
+                            <img src="https://mc-heads.net/avatar/${nameMap[p.minecraft_uuid].minecraft_name}/28" style="width:28px;height:28px;border-radius:6px;image-rendering:pixelated;">
+                            <div style="flex:1; font-weight:600; font-size:0.88rem;">${escapeHtml(nameMap[p.minecraft_uuid].minecraft_name)}</div>
+                            <div style="font-weight:700; color:#ffb95c;">${p.currency_balance ?? 0}</div>
+                        </div>`).join('') : `<div style="color:var(--text-muted); padding:10px;">Нет данных</div>`;
+                }
+
+                const { data: byKills } = await supabaseClient.from('player_stats').select('minecraft_uuid, kills').order('kills', { ascending: false }).limit(15);
+                const killsBox = document.getElementById('admin-top-kills');
+                if (killsBox) {
+                    const rows = (byKills || []).filter(p => nameMap[p.minecraft_uuid]).slice(0, 10);
+                    killsBox.innerHTML = rows.length ? rows.map((p, i) => `
+                        <div class="leaderboard-row">
+                            <div class="leaderboard-rank">${i + 1}</div>
+                            <img src="https://mc-heads.net/avatar/${nameMap[p.minecraft_uuid].minecraft_name}/28" style="width:28px;height:28px;border-radius:6px;image-rendering:pixelated;">
+                            <div style="flex:1; font-weight:600; font-size:0.88rem;">${escapeHtml(nameMap[p.minecraft_uuid].minecraft_name)}</div>
+                            <div style="font-weight:700; color:#ff7b6e;">${p.kills ?? 0}</div>
+                        </div>`).join('') : `<div style="color:var(--text-muted); padding:10px;">Нет данных</div>`;
+                }
+            } catch (e) {
+                console.error('Ошибка загрузки топов игроков:', e);
+            }
+        }
+
+        async function adminSearchPlayer() {
+            const input = document.getElementById('admin-player-search');
+            const query = input ? input.value.trim() : '';
+            const resultBox = document.getElementById('admin-player-result');
+            if (!query || !resultBox) return;
+            resultBox.innerHTML = `<div style="color:var(--text-muted); padding:16px 0;">Поиск...</div>`;
+            try {
+                let linkedRow = null;
+                const { data: byName } = await supabaseClient.from('linked_accounts').select('*').ilike('minecraft_name', query).maybeSingle();
+                if (byName) linkedRow = byName;
+                if (!linkedRow) {
+                    const { data: byDiscord } = await supabaseClient.from('linked_accounts').select('*').eq('discord_id', query).maybeSingle();
+                    if (byDiscord) linkedRow = byDiscord;
+                }
+                if (!linkedRow) {
+                    resultBox.innerHTML = `<div style="color:var(--text-muted); padding:16px 0;">Игрок с таким никнеймом или Discord ID не найден среди привязанных аккаунтов.</div>`;
+                    return;
+                }
+                await renderPlayerAdminCard(linkedRow);
+            } catch (e) {
+                console.error(e);
+                resultBox.innerHTML = `<div style="color:var(--accent-pink); padding:16px 0;">Ошибка поиска игрока.</div>`;
+            }
+        }
+
+        async function renderPlayerAdminCard(player) {
+            currentAdminPlayerContext = player;
+            const resultBox = document.getElementById('admin-player-result');
+            if (!resultBox) return;
+            resultBox.innerHTML = `<div style="color:var(--text-muted); padding:16px 0;">Загрузка данных игрока...</div>`;
+
+            let profile = null;
+            if (player.user_id) {
+                const { data } = await supabaseClient.from('profiles').select('rub_balance, has_pass').eq('id', player.user_id).maybeSingle();
+                profile = data;
+            }
+            const { data: stat } = await supabaseClient.from('player_stats').select('currency_balance, kills, deaths, playtime_seconds, is_online').eq('minecraft_uuid', player.minecraft_uuid).maybeSingle();
+            const { data: wlRows } = await supabaseClient.from('whitelist_queue').select('*').eq('minecraft_name', player.minecraft_name).order('created_at', { ascending: false }).limit(1);
+            const wl = wlRows && wlRows[0];
+
+            let purchases = [];
+            try {
+                const { data } = await supabaseClient.from('shop_purchases').select('item_name_snapshot, price_paid, created_at').eq('discord_id', player.discord_id).order('created_at', { ascending: false }).limit(10);
+                purchases = data || [];
+            } catch (e) { /* таблица ещё не создана — пропускаем */ }
+
+            const { data: txs } = await supabaseClient.from('wallet_transactions').select('*').eq('minecraft_uuid', player.minecraft_uuid).order('created_at', { ascending: false }).limit(10);
+
+            const rub = profile ? (profile.rub_balance ?? 0) : null;
+            const game = stat?.currency_balance ?? 0;
+
+            resultBox.innerHTML = `
+                <div class="admin-card" style="margin-top:4px;">
+                    <div class="admin-row-head">
+                        <img src="https://mc-heads.net/avatar/${player.minecraft_name}/56" style="width:56px;height:56px;border-radius:12px;image-rendering:pixelated;">
+                        <div class="grow">
+                            <div style="font-size:1.15rem; font-weight:700;">${escapeHtml(player.minecraft_name)}</div>
+                            <div style="font-size:0.8rem; color:var(--text-muted);">Discord ID: ${escapeHtml(player.discord_id)} ${player.user_id ? '' : '· <span style="color:#ffb95c;">профиль сайта ещё не найден</span>'}</div>
+                        </div>
+                        <button class="btn-mini danger" onclick="resetPlayerLinking()"><i data-lucide="unlink" style="width:14px;height:14px;"></i> Сбросить привязку</button>
+                    </div>
+
+                    <div class="admin-card-grid">
+                        <div class="admin-stat-box">
+                            <div class="lbl"><i data-lucide="banknote" style="width:13px;height:13px;"></i> Баланс, ₽</div>
+                            <div class="val">${rub === null ? '—' : rub + ' ₽'}</div>
+                        </div>
+                        <div class="admin-stat-box">
+                            <div class="lbl"><i data-lucide="gem" style="width:13px;height:13px;"></i> Игровая валюта</div>
+                            <div class="val">${game}</div>
+                        </div>
+                        <div class="admin-stat-box">
+                            <div class="lbl"><i data-lucide="crown" style="width:13px;height:13px;"></i> Проходка</div>
+                            <div class="val">${profile?.has_pass ? 'Есть' : 'Нет'}</div>
+                        </div>
+                        <div class="admin-stat-box">
+                            <div class="lbl"><i data-lucide="list-checks" style="width:13px;height:13px;"></i> Вайтлист</div>
+                            <div class="val" style="font-size:0.85rem;">${wl ? (escapeHtml(wl.action) + ' · ' + formatDate(wl.created_at, false)) : 'Нет заявок'}</div>
+                        </div>
+                    </div>
+
+                    <div style="display:flex; gap:8px; flex-wrap:wrap; margin: 6px 0 18px;">
+                        <button class="btn-mini give" onclick="adjustPlayerBalance('rub','in')"><i data-lucide="plus" style="width:13px;height:13px;"></i> Выдать ₽</button>
+                        <button class="btn-mini danger" onclick="adjustPlayerBalance('rub','out')"><i data-lucide="minus" style="width:13px;height:13px;"></i> Списать ₽</button>
+                        <button class="btn-mini give" onclick="adjustPlayerBalance('game','in')"><i data-lucide="plus" style="width:13px;height:13px;"></i> Выдать валюту</button>
+                        <button class="btn-mini danger" onclick="adjustPlayerBalance('game','out')"><i data-lucide="minus" style="width:13px;height:13px;"></i> Списать валюту</button>
+                    </div>
+
+                    <div class="admin-field-label">История покупок</div>
+                    <div style="margin-bottom:16px;">
+                        ${purchases.length ? purchases.map(p => `<div style="display:flex; justify-content:space-between; font-size:0.82rem; padding:6px 0; border-bottom:1px solid rgba(255,255,255,0.04);"><span>${escapeHtml(p.item_name_snapshot)}</span><span style="color:var(--text-muted);">${p.price_paid} ₽ · ${formatDate(p.created_at, false)}</span></div>`).join('') : '<div style="color:var(--text-muted); font-size:0.85rem;">Покупок не найдено</div>'}
+                    </div>
+
+                    <div class="admin-field-label">История операций с балансом</div>
+                    <div>
+                        ${(txs || []).length ? txs.map(t => `<div style="display:flex; justify-content:space-between; font-size:0.82rem; padding:6px 0; border-bottom:1px solid rgba(255,255,255,0.04);"><span>${escapeHtml(t.description || 'Операция')}${t.admin_name ? ' · ' + escapeHtml(t.admin_name) : ''}</span><span style="color:${t.direction === 'in' ? '#2ecc71' : 'var(--accent-pink)'}; font-weight:700;">${t.direction === 'in' ? '+' : '-'}${t.amount}</span></div>`).join('') : '<div style="color:var(--text-muted); font-size:0.85rem;">История пуста</div>'}
+                    </div>
+                </div>
+            `;
+            if (window.lucide) lucide.createIcons();
+        }
+
+        function openAdjustBalanceModal(currencyType, direction) {
+            const label = currencyType === 'rub' ? 'рублей ₽' : 'игровой валюты';
+            const presets = ['Победа в ивенте', 'Компенсация за баг', 'Тестирование функционала', 'Коррекция ошибки', 'Другое'];
+            const html = `
+                <div style="display:flex; flex-direction:column; gap:12px; text-align:left;">
+                    <div><div class="admin-field-label">Сумма ${label}</div><input type="number" id="adj-amount" class="admin-input" placeholder="100"></div>
+                    <div><div class="admin-field-label">Причина (обязательно)</div>
+                        <select id="adj-reason-preset" class="admin-select" style="margin-bottom:8px;" onchange="document.getElementById('adj-reason-text').value = (this.value === 'Другое' ? '' : this.value);">
+                            <option value="">— выбрать частую причину —</option>
+                            ${presets.map(p => `<option value="${p}">${p}</option>`).join('')}
+                        </select>
+                        <textarea id="adj-reason-text" class="admin-textarea" placeholder="Опишите причину выдачи/списания..."></textarea>
+                    </div>
+                </div>`;
+            return openCustomModal({
+                title: (direction === 'in' ? '➕ Выдать ' : '➖ Списать ') + label,
+                text: html, showInput: false,
+                buttons: [
+                    { text: 'Отмена', className: 'btn-secondary', action: () => null },
+                    { text: direction === 'in' ? 'Выдать' : 'Списать', className: 'btn-primary', action: () => 'confirmed' }
+                ]
+            }).then((result) => {
+                if (result !== 'confirmed') return null;
+                const amount = parseFloat(document.getElementById('adj-amount').value);
+                const reason = document.getElementById('adj-reason-text').value.trim();
+                if (isNaN(amount) || amount <= 0) { customAlert('⚠️ Ошибка', 'Введите корректную положительную сумму.'); return null; }
+                if (!reason) { customAlert('⚠️ Ошибка', 'Укажите причину — это обязательное поле для журнала аудита.'); return null; }
+                return { amount, reason };
+            });
+        }
+
+        async function adjustPlayerBalance(currencyType, direction) {
+            const player = currentAdminPlayerContext;
+            if (!player) return;
+            const result = await openAdjustBalanceModal(currencyType, direction);
+            if (!result) return;
+            const { amount, reason } = result;
+            const admin = getAdminIdentity();
+
+            try {
+                if (currencyType === 'rub') {
+                    if (!player.user_id) { customAlert('⚠️ Невозможно', 'У этого игрока ещё нет записи профиля с рублёвым балансом (не найден user_id). Попросите его зайти на сайт и авторизоваться через Discord ещё раз — привязка обновится автоматически.'); return; }
+                    const { data: profile } = await supabaseClient.from('profiles').select('rub_balance').eq('id', player.user_id).maybeSingle();
+                    const before = profile?.rub_balance ?? 0;
+                    const after = direction === 'in' ? before + amount : before - amount;
+                    if (after < 0) { customAlert('⚠️ Ошибка', 'Баланс не может стать отрицательным.'); return; }
+                    const { error } = await supabaseClient.from('profiles').update({ rub_balance: after }).eq('id', player.user_id);
+                    if (error) throw error;
+                    await supabaseClient.from('wallet_transactions').insert({
+                        minecraft_uuid: player.minecraft_uuid, amount, direction, description: reason,
+                        currency_type: 'rub', reason, admin_discord_id: admin.discord_id, admin_name: admin.name
+                    });
+                } else {
+                    const { data: stat } = await supabaseClient.from('player_stats').select('currency_balance').eq('minecraft_uuid', player.minecraft_uuid).maybeSingle();
+                    const before = stat?.currency_balance ?? 0;
+                    const after = direction === 'in' ? before + amount : before - amount;
+                    if (after < 0) { customAlert('⚠️ Ошибка', 'Баланс не может стать отрицательным.'); return; }
+                    const { error } = await supabaseClient.from('player_stats').update({ currency_balance: after }).eq('minecraft_uuid', player.minecraft_uuid);
+                    if (error) throw error;
+                    await supabaseClient.from('wallet_transactions').insert({
+                        minecraft_uuid: player.minecraft_uuid, amount, direction, description: reason,
+                        currency_type: 'game', reason, admin_discord_id: admin.discord_id, admin_name: admin.name
+                    });
+                }
+
+                const severity = amount >= 1000 ? 'high' : (amount >= 200 ? 'medium' : 'low');
+                await logAdminAction({
+                    action_type: direction === 'in' ? 'balance_grant' : 'balance_deduct',
+                    severity, target_type: 'player', target_label: player.minecraft_name,
+                    reason, details: { currency: currencyType, amount: direction === 'in' ? amount : -amount }
+                });
+
+                customAlert('✅ Готово', `Баланс игрока ${player.minecraft_name} успешно обновлён.`);
+                renderPlayerAdminCard(player);
+            } catch (e) {
+                console.error(e);
+                customAlert('❌ Ошибка', 'Не удалось изменить баланс игрока.');
+            }
+        }
+
+        async function resetPlayerLinking() {
+            const player = currentAdminPlayerContext;
+            if (!player) return;
+            const ok = await customConfirm('⚠️ Сбросить привязку', `Удалить связь Discord ↔ Minecraft для игрока «${escapeHtml(player.minecraft_name)}»? Игрок сможет привязать аккаунт заново.`, 'Сбросить');
+            if (!ok) return;
+            const { error } = await supabaseClient.from('linked_accounts').delete().eq('minecraft_uuid', player.minecraft_uuid);
+            if (error) { console.error(error); customAlert('❌ Ошибка', 'Не удалось сбросить привязку.'); return; }
+            await logAdminAction({ action_type: 'link_reset', severity: 'high', target_type: 'player', target_label: player.minecraft_name, details: { discord_id: player.discord_id } });
+            customAlert('✅ Готово', 'Привязка аккаунта сброшена.');
+            const resultBox = document.getElementById('admin-player-result');
+            if (resultBox) resultBox.innerHTML = '';
+            const input = document.getElementById('admin-player-search');
+            if (input) input.value = '';
+            currentAdminPlayerContext = null;
+        }
+
+        /* ================= ЖУРНАЛ АУДИТА ================= */
+
+        const ADMIN_ACTION_LABELS = {
+            price_change: 'изменил цену товара',
+            item_edit: 'отредактировал товар',
+            item_status_change: 'изменил статус товара',
+            discount_change: 'изменил скидку товара',
+            item_create: 'создал товар',
+            item_delete: 'удалил товар',
+            promo_create: 'создал промокод',
+            promo_delete: 'удалил промокод',
+            balance_grant: 'выдал баланс игроку',
+            balance_deduct: 'списал баланс у игрока',
+            link_reset: 'сбросил привязку аккаунта игрока'
+        };
+
+        async function renderAdminLogsTab() {
+            const c = document.getElementById('admin-tab-content');
+            c.innerHTML = `
+                <div class="log-filters">
+                    <button class="log-filter-btn active" data-sev="all" onclick="setLogFilter('all')"><i data-lucide="list" style="width:13px;height:13px;"></i> Все</button>
+                    <button class="log-filter-btn" data-sev="low" onclick="setLogFilter('low')"><span class="log-dot sev-low"></span> Обычные</button>
+                    <button class="log-filter-btn" data-sev="medium" onclick="setLogFilter('medium')"><span class="log-dot sev-medium"></span> Чувствительные</button>
+                    <button class="log-filter-btn" data-sev="high" onclick="setLogFilter('high')"><span class="log-dot sev-high"></span> Критичные</button>
+                </div>
+                <div id="admin-logs-container"><div style="color:var(--text-muted); padding:20px 0;">Загрузка...</div></div>
+            `;
+            if (window.lucide) lucide.createIcons();
+            await loadAuditLogs();
+        }
+
+        function setLogFilter(sev) {
+            currentLogFilter = sev;
+            document.querySelectorAll('.log-filter-btn').forEach(b => b.classList.toggle('active', b.dataset.sev === sev));
+            loadAuditLogs();
+        }
+
+        function renderLogEntry(log) {
+            const label = ADMIN_ACTION_LABELS[log.action_type] || log.action_type;
+            let diffText = '';
+            const d = log.details || {};
+            if (log.action_type === 'price_change' && d.before !== undefined) {
+                diffText = `<div class="log-diff">Цена: <b>${d.before}</b> → <b>${d.after}</b> ₽</div>`;
+            } else if (log.action_type === 'item_status_change') {
+                diffText = `<div class="log-diff">Статус: <b>${d.before}</b> → <b>${d.after}</b></div>`;
+            } else if (log.action_type === 'discount_change') {
+                diffText = `<div class="log-diff">Скидка: <b>${d.before?.type || 'нет'} ${d.before?.value ?? ''}</b> → <b>${d.after?.type || 'нет'} ${d.after?.value ?? ''}</b></div>`;
+            } else if (log.action_type === 'balance_grant' || log.action_type === 'balance_deduct') {
+                diffText = `<div class="log-diff">Изменение: <b>${d.amount > 0 ? '+' : ''}${d.amount}</b> (${d.currency === 'rub' ? '₽' : 'валюта'})</div>`;
+            }
+            return `
+                <div class="log-entry sev-${log.severity}">
+                    <span class="log-dot sev-${log.severity}"></span>
+                    <div style="flex:1; min-width:0;">
+                        <div style="font-size:0.9rem;"><b>${escapeHtml(log.admin_name)}</b> ${label}${log.target_label ? ' «' + escapeHtml(log.target_label) + '»' : ''}</div>
+                        ${diffText}
+                        ${log.reason ? `<div class="log-reason">Причина: ${escapeHtml(log.reason)}</div>` : ''}
+                        <div class="log-meta">${formatDate(log.created_at, true)}</div>
+                    </div>
+                </div>`;
+        }
+
+        async function loadAuditLogs() {
+            const container = document.getElementById('admin-logs-container');
+            if (!container) return;
+            try {
+                let query = supabaseClient.from('admin_audit_logs').select('*').order('created_at', { ascending: false }).limit(100);
+                if (currentLogFilter !== 'all') query = query.eq('severity', currentLogFilter);
+                const { data: logs, error } = await query;
+                if (error) throw error;
+                if (!logs || logs.length === 0) {
+                    container.innerHTML = `<div style="color:var(--text-muted); padding:20px 0;">Записей журнала пока нет.</div>`;
+                    return;
+                }
+                container.innerHTML = logs.map(renderLogEntry).join('');
+            } catch (e) {
+                console.error(e);
+                container.innerHTML = `<div style="color:var(--accent-pink); padding:20px 0;">Не удалось загрузить журнал. Проверьте, что таблица <b>admin_audit_logs</b> создана.</div>`;
+            }
+        }
+
+        renderShopFront();
     </script>
 </body>
 </html>

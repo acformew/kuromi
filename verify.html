@@ -252,7 +252,7 @@
                 // Проверяем, нет ли уже линкованной записи для данного minecraft_uuid
                 const { data: existingLink, error: checkError } = await supabaseClient
                     .from('linked_accounts')
-                    .select('discord_id, minecraft_name')
+                    .select('discord_id, minecraft_name, user_id')
                     .eq('minecraft_uuid', minecraftUuid)
                     .maybeSingle();
 
@@ -260,6 +260,12 @@
 
                 if (existingLink) {
                     if (existingLink.discord_id === discordId) {
+                        if (!existingLink.user_id) {
+                            await supabaseClient
+                                .from('linked_accounts')
+                                .update({ user_id: user.id })
+                                .eq('minecraft_uuid', minecraftUuid);
+                        }
                         renderSuccessState(discordName, existingLink.minecraft_name || minecraftName);
                     } else {
                         renderErrorState(`Данный Minecraft-аккаунт уже жёстко привязан к другому пользователю Discord. Если это ошибка — обратитесь к Администрации Kuromi SMP.`);
@@ -287,7 +293,8 @@
                     .insert({
                         discord_id: discordId,
                         minecraft_uuid: minecraftUuid,
-                        minecraft_name: minecraftName
+                        minecraft_name: minecraftName,
+                        user_id: user.id
                     });
 
                 if (insertError) throw insertError;
