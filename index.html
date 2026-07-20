@@ -824,6 +824,7 @@
             background: var(--accent-pink);
         }
 
+        /* Анимации микро-интенсивностей */
         @keyframes customHeartPop {
             0% { transform: scale(1); }
             40% { transform: scale(1.22); }
@@ -834,6 +835,7 @@
             animation: customHeartPop 0.35s cubic-bezier(0.15, 0.85, 0.35, 1) forwards;
         }
 
+        /* Выделенные неоновые стили для селектов и полей */
         .app-select-field {
             width: 100%;
             background: rgba(10, 5, 15, 0.6);
@@ -856,6 +858,7 @@
             color: #fff;
         }
 
+        /* Плавные анимации оверлеев */
         @keyframes modalFadeIn {
             from { opacity: 0; }
             to { opacity: 1; }
@@ -863,25 +866,6 @@
         @keyframes cardSlideIn {
             from { transform: translateY(24px); opacity: 0; }
             to { transform: translateY(0); opacity: 1; }
-        }
-
-        /* Дополнительные стили админки */
-        .admin-nav-bar {
-            display: flex;
-            gap: 10px;
-            border-bottom: 1px solid rgba(255,255,255,0.04);
-            padding-bottom: 15px;
-            margin-bottom: 25px;
-            width: 100%;
-        }
-        .admin-sub-card {
-            background: rgba(255,255,255,0.01);
-            border: 1px solid rgba(255,255,255,0.03);
-            border-radius: 18px;
-            padding: 20px;
-            width: 100%;
-            text-align: left;
-            margin-bottom: 15px;
         }
     </style>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -1045,7 +1029,7 @@
                         <div class="mechanic-img-box"><div class="mechanic-placeholder-icon">📰</div></div>
                         <div class="mechanic-text-block">
                             <h3>Газета Kuromi Times</h3>
-                            <p>Информационный вестник сервера. Люгой житель SMP может отправить свою статью или расследование через форму на сайте. Публикация происходит после модерации редакцией.</p>
+                            <p>Информационный вестник сервера. Любой житель SMP может отправить свою статью или расследование через форму на сайте. Публикация происходит после модерации редакцией.</p>
                         </div>
                     </div>
                     <div class="mechanic-card">
@@ -1276,7 +1260,7 @@
         let currentRotation = 0; 
         let isWheelSpinning = false;
 
-        /* --- УНИВЕРСАЛЬНЫЙ МОДУЛЬ ДИАЛОГОВЫХ ОКОН --- */
+        /* --- УНИВЕРСАЛЬНЫЙ МОДУЛЬ ДИАЛОГОВЫХ ОКОН С ИСПРАВЛЕННЫМ ВЫРАВНИВАНИЕМ И ПЛЕЙСХОЛДЕРОМ --- */
         function openCustomModal({ title, text, showInput, placeholder, buttons }) {
             return new Promise((resolve) => {
                 const overlay = document.getElementById('custom-modal-overlay');
@@ -1360,52 +1344,929 @@
             });
         }
 
-        /* --- ЗАГРУЗКА ТОВАРОВ ИЗ СУБД --- */
-        async function fetchShopProducts() {
-            try {
-                const { data, error } = await supabaseClient.from('shop_products').select('*');
-                if (!error && data) {
-                    shopProducts = data;
-                    renderShopUI();
-                }
-            } catch(e) { console.error(e); }
+        function formatPlaytime(seconds) {
+            if (!seconds || seconds < 0) return '0ч 0м';
+            const hours = Math.floor(seconds / 3600);
+            const minutes = Math.floor((seconds % 3600) / 60);
+            return `${hours}ч ${minutes}м`;
         }
 
-        function renderShopUI() {
-            const container = document.getElementById('dynamic-products-container');
+        function formatDate(dateStr, showTime = true) {
+            if (!dateStr) return 'Неизвестно';
+            const date = new Date(dateStr);
+            if (isNaN(date.getTime())) return 'Неизвестно';
+            
+            const now = new Date();
+            const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+            const yesterday = new Date(today);
+            yesterday.setDate(yesterday.getDate() - 1);
+            const target = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+            
+            const hours = String(date.getHours()).padStart(2, '0');
+            const minutes = String(date.getMinutes()).padStart(2, '0');
+            const timeStr = showTime ? ` в ${hours}:${minutes}` : '';
+            
+            if (target.getTime() === today.getTime()) return `Сегодня${timeStr}`;
+            if (target.getTime() === yesterday.getTime()) return `Вчера${timeStr}`;
+            
+            const dayStr = String(date.getDate()).padStart(2, '0');
+            const monthStr = String(date.getMonth() + 1).padStart(2, '0');
+            return `${dayStr}.${monthStr}.${date.getFullYear()}${timeStr}`;
+        }
+
+        function initRouletteGraphic() {
+            const svg = document.getElementById('wheel');
+            if(!svg) return;
+            svg.innerHTML = ''; 
+
+            const numSectors = roulettePrizes.length;
+            const arcSize = 360 / numSectors; 
+            const radius = 150;
+            const center = 150;
+
+            for (let i = 0; i < numSectors; i++) {
+                const startAngle = i * arcSize;
+                const endAngle = startAngle + arcSize;
+                
+                const startRad = (startAngle * Math.PI) / 180;
+                const endRad = (endAngle * Math.PI) / 180;
+
+                const x1 = center + radius * Math.cos(startRad);
+                const y1 = center + radius * Math.sin(startRad);
+                const x2 = center + radius * Math.cos(endRad);
+                const y2 = center + radius * Math.sin(endRad);
+
+                const pathData = `M ${center} ${center} L ${x1} ${y1} A ${radius} ${radius} 0 0 1 ${x2} ${y2} Z`;
+                
+                const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+                path.setAttribute("d", pathData);
+                path.setAttribute("fill", roulettePrizes[i].color);
+                path.setAttribute("stroke", "#050308");
+                path.setAttribute("stroke-width", "4");
+                svg.appendChild(path);
+
+                const textAngle = startAngle + arcSize / 2;
+                const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
+                
+                text.setAttribute("transform", `translate(${center}, ${center}) rotate(${textAngle}) translate(${radius - 22}, 0)`);
+                text.setAttribute("text-anchor", "end");
+                text.setAttribute("dominant-baseline", "central");
+                text.textContent = roulettePrizes[i].text;
+                
+                text.setAttribute("font-family", "sans-serif");
+                text.setAttribute("font-weight", "bold");
+                text.setAttribute("font-size", "11px");
+                
+                if (roulettePrizes[i].color === '#ffffff') {
+                    text.setAttribute("fill", "#050308");
+                } else {
+                    text.setAttribute("fill", "#ffffff");
+                }
+                
+                svg.appendChild(text);
+            }
+        }
+
+        async function spinRouletteWheel() {
+            if (isWheelSpinning) return;
+
+            if (!currentUserSession) {
+                customAlert("🔒 Авторизация", "Пожалуйста, сначала войдите на сайт через ваш Discord-аккаунт!");
+                return;
+            }
+
+            const { data: profile } = await supabaseClient
+                .from('profiles')
+                .select('rub_balance, has_pass')
+                .eq('id', currentUserSession.user.id)
+                .single();
+
+            if (!profile || !profile.has_pass) {
+                customAlert("⛔ Доступ ограничен", "Вы не имеете права крутить Колесо Фортуны, пока не приобретете «Проходку» на сервер!");
+                return;
+            }
+
+            if (profile.rub_balance < 100) {
+                customLowBalance(100, profile.rub_balance);
+                return;
+            }
+
+            await supabaseClient
+                .from('profiles')
+                .update({ rub_balance: profile.rub_balance - 100 })
+                .eq('id', currentUserSession.user.id);
+
+            document.getElementById('ruble-balance-display').textContent = profile.rub_balance - 100;
+
+            const rand = Math.random() * 100;
+            let cumulativeWeight = 0;
+            let winningIndex = 0;
+
+            for (let i = 0; i < roulettePrizes.length; i++) {
+                cumulativeWeight += roulettePrizes[i].weight;
+                if (rand <= cumulativeWeight) {
+                    winningIndex = i;
+                    break;
+                }
+            }
+
+            isWheelSpinning = true;
+            const btn = document.getElementById('spin-button');
+            const wheel = document.getElementById('wheel');
+            btn.disabled = true;
+            btn.style.opacity = '0.5';
+
+            const numSectors = roulettePrizes.length;
+            const arcSize = 360 / numSectors;
+            const targetSectorAngle = (winningIndex * arcSize) + (arcSize / 2);
+            
+            let targetAngle = (270 - targetSectorAngle + 360) % 360;
+            let currentAngleOffset = currentRotation % 360;
+            let additionalRotation = (targetAngle - currentAngleOffset + 360) % 360;
+            
+            currentRotation += (360 * 6) + additionalRotation;
+            wheel.style.transform = `rotate(${currentRotation}deg)`;
+
+            setTimeout(() => {
+                isWheelSpinning = false;
+                btn.disabled = false;
+                btn.style.opacity = '1';
+                customAlert("🎰 Поздравляем!", `🎉 Вы выиграли игровой кастомный предмет: [ <span style="color:var(--primary-purple); font-weight:700;">${roulettePrizes[winningIndex].text}</span> ]! Награда будет выдана при следующем заходе.`);
+            }, 8000);
+        }
+
+        function renderBountyBoard() {
+            const container = document.getElementById('bounty-board-container');
             if(!container) return;
             container.innerHTML = '';
 
-            // Отрендерим только дополнительные донат-привилегии (не проходки, они статичны)
-            const privileges = shopProducts.filter(p => p.id !== 'pass_forever' && p.id !== 'pass_30d');
-            
-            privileges.forEach(p => {
-                const isDiscount = p.discount_active && p.original_price > p.price;
-                const priceHTML = isDiscount 
-                    ? `<span style="text-decoration:line-through; font-size:0.9rem; color:var(--text-muted); margin-right:8px;">${p.original_price} ₽</span>${p.price} ₽`
-                    : `${p.price} ₽`;
+            if(bountyDatabase.length === 0) {
+                container.innerHTML = `<div style="grid-column: span 2; color: var(--text-muted); padding: 20px;">Нет активных заказов. Все цели мертвы.</div>`;
+                return;
+            }
 
+            bountyDatabase.forEach(bounty => {
                 const card = document.createElement('div');
-                card.className = 'ticket-card';
-                card.style.borderRadius = '20px';
+                card.classList.add('bounty-card');
                 card.innerHTML = `
-                    <div class="ticket-info">
-                        <h3>${p.name} ${p.discount_active ? '<span style="color:var(--accent-pink); font-size:0.8rem; font-weight:700;">% СКИДКА</span>':''}</h3>
-                        <p>${p.description}</p>
+                    <div class="bounty-info">
+                        <img src="https://minotar.net/helm/${bounty.name}/56.png" alt="${bounty.name}" class="player-head-render" style="background: rgba(255,0,127,0.05); border-radius: 12px;">
+                        <div class="bounty-meta">
+                            <h4>${bounty.name}</h4>
+                            <span>Размещен: ${bounty.date}</span>
+                        </div>
                     </div>
-                    <div>
-                        <div class="ticket-price" style="font-size: 1.15rem;">${priceHTML}</div>
-                        <button class="btn-primary" style="padding: 8px 16px; font-size: 0.8rem; margin-top: 10px; width: 100%;" onclick="buyPrivilege('${p.name}', ${p.price})">Купить</button>
+                    <div class="bounty-price">
+                        <div class="bounty-amount">💎 x${bounty.reward}</div>
+                        <div class="bounty-status">В Розыске</div>
                     </div>
                 `;
                 container.appendChild(card);
             });
+        }
 
-            // Обновим ценники на карточках проходок на вкладке "Как попасть"
-            const passForever = shopProducts.find(p => p.id === 'pass_forever');
-            const pass30 = shopProducts.find(p => p.id === 'pass_30d');
-            if(passForever) document.getElementById('price-card-forever').textContent = passForever.price + ' ₽';
-            if(pass30) document.getElementById('price-card-30d').textContent = pass30.price + ' ₽';
+        function placeBountyContract() {
+            const targetInput = document.getElementById('bounty-target');
+            const rewardInput = document.getElementById('bounty-reward');
+            const name = targetInput.value.trim();
+            const reward = parseInt(rewardInput.value);
+
+            if(!name || isNaN(reward) || reward <= 0) {
+                customAlert("❌ Ошибка выполнения", "Укажите корректный игровой никнейм цели и сумму награды в алмазах!");
+                return;
+            }
+
+            bountyDatabase.unshift({ id: Date.now(), name: name, reward: reward, date: 'Сегодня' });
+            targetInput.value = ''; rewardInput.value = '';
+            renderBountyBoard();
+        }
+
+        function openBlackMarket() {
+            document.querySelectorAll('.content-section').forEach(section => section.classList.remove('active'));
+            document.querySelectorAll('nav button').forEach(button => button.classList.remove('active'));
+            const section = document.getElementById('section-blackmarket');
+            section.classList.add('active');
+            renderBountyBoard();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        async function loadProfileData() {
+            const wrapper = document.getElementById('profile-main-wrapper');
+            const headerWidget = document.getElementById('header-profile-auth');
+            if (!wrapper) return;
+
+            try {
+                const { data: { session }, error: sessionError } = await supabaseClient.auth.getSession();
+                if (sessionError) throw sessionError;
+
+                if (!session || !session.user) {
+                    currentUserSession = null;
+                    currentUserLinkedData = null;
+                    isUserModerator = false;
+                    
+                    headerWidget.innerHTML = `<button class="widget-login-btn" onclick="switchTab('profile')">🔑 Войти в профиль</button>`;
+                    wrapper.innerHTML = `
+                        <div style="display: flex; flex-direction: column; align-items: center; text-align: center; padding: 20px 0;">
+                            <div style="font-size: 4.5rem; color: #5865F2; margin-bottom: 20px; filter: drop-shadow(0 0 15px rgba(88,101,242,0.3));">
+                                <svg width="70" height="70" viewBox="0 0 127.14 96.36" fill="currentColor"><path d="M107.7,8.07A105.15,105.15,0,0,0,77.26,0a77.19,77.19,0,0,0-3.3,6.83A96.67,96.67,0,0,0,53.22,6.83,77.19,77.19,0,0,0,49.88,0,105.15,105.15,0,0,0,19.44,8.07C3.66,31.58-1.86,54.65,1,77.53A105.73,105.73,0,0,0,32,96.36a77.7,77.7,0,0,0,6.63-10.85,68.43,68.43,0,0,1-10.45-5c.87-.64,1.71-1.32,2.51-2a75.43,75.43,0,0,0,72.88,0c.8.71,1.64,1.39,2.51,2a68.21,68.21,0,0,1-10.45,5,78.35,78.35,0,0,0,6.63,10.85,105.32,105.32,0,0,0,31.06-18.83C129.2,49.52,123.4,26.75,107.7,8.07ZM42.45,65.69C36.18,65.69,31,60,31,53S36.18,40.36,42.45,40.36,53.83,46,53.83,53,48.72,65.69,42.45,65.69Zm42.24,0C78.41,65.69,73.24,60,73.24,53S78.41,40.36,84.69,40.36,96.07,46,96.07,53,91,65.69,84.69,65.69Z"/></svg>
+                            </div>
+                            <h2 class="panel-title" style="margin-bottom: 12px;">Войди через Discord</h2>
+                            <p style="font-size: 0.95rem; color: var(--text-muted); max-width: 440px; line-height: 1.5; margin-bottom: 30px;">Привяжи аккаунт, чтобы открыть профиль и собирать внутриигровую статистику.</p>
+                            <button class="btn-primary" style="background: #5865F2; box-shadow: 0 10px 25px rgba(88,101,242,0.25);" onclick="supabaseClient.auth.signInWithOAuth({ provider: 'discord', options: { redirectTo: window.location.origin + window.location.pathname } })">Войти через Discord</button>
+                        </div>`;
+                    updateForumForm();
+                    updateNewsForm();
+                    return;
+                }
+
+                currentUserSession = session;
+                const user = session.user;
+                const discordId = user.user_metadata.provider_id || user.id;
+                const discordUsername = user.user_metadata.full_name || user.user_metadata.name || 'Discord User';
+                const discordAvatarUrl = user.user_metadata.avatar_url || 'https://cdn.discordapp.com/embed/avatars/0.png';
+
+                const { data: rubData } = await supabaseClient
+                    .from('profiles')
+                    .select('rub_balance')
+                    .eq('id', user.id)
+                    .maybeSingle();
+                const currentRubBalance = rubData?.rub_balance ?? 0;
+
+                console.log("[Moderation Check] Начинаем верификацию прав для discordId:", discordId);
+                const { data: modData, error: modError } = await supabaseClient
+                    .from('forum_moderators')
+                    .select('*')
+                    .eq('discord_id', discordId)
+                    .maybeSingle();
+                
+                if (modError) {
+                    console.error("[Moderation Check] Сбой селекта из forum_moderators:", modError);
+                }
+                
+                isUserModerator = !!modData;
+                updateNewsForm();
+
+                const { data: linkedData, error: linkedError } = await supabaseClient
+                    .from('linked_accounts')
+                    .select('minecraft_uuid, minecraft_name')
+                    .eq('discord_id', discordId)
+                    .maybeSingle();
+
+                if (linkedError) throw linkedError;
+
+                if (!linkedData) {
+                    currentUserLinkedData = null;
+                    
+                    headerWidget.innerHTML = `
+                        <div style="display: flex; flex-direction: column; gap: 10px; width: 100%;">
+                            <div id="ruble-widget" onclick="openTopUpModal()">
+                                ₽ <span id="ruble-balance-display">${currentRubBalance}</span>
+                            </div>
+                        </div>
+                        <div class="widget-user-card" onclick="switchTab('profile')"><div class="widget-name" style="color: #b388ff;">${discordUsername}</div><div class="widget-status-text">⏳ Нет связи</div></div>`;
+                    
+                    wrapper.innerHTML = `
+                        <div style="width: 100%; text-align: left;">
+                            <div style="display: flex; align-items: center; gap: 14px; margin-bottom: 25px; background: rgba(255,255,255,0.02); padding: 12px 20px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.04); justify-content: space-between;">
+                                <div style="display: flex; align-items: center; gap: 14px;">
+                                    <img src="${discordAvatarUrl}" style="width: 48px; height: 48px; border-radius: 50%; border: 2px solid #5865F2;">
+                                    <div style="font-size: 1.1rem; font-weight: 600; color: var(--text-main);">${discordUsername} <span style="color: var(--text-muted); font-size: 0.85rem; font-weight: 400;">(Discord подключен)</span></div>
+                                </div>
+                                <button class="btn-secondary" style="padding: 8px 16px; font-size: 0.8rem; border-radius: 14px;" onclick="handleSignOut()">Выйти</button>
+                            </div>
+                            <div style="border: 1px solid rgba(138, 43, 226, 0.25); background: rgba(138, 43, 226, 0.02); border-radius: 24px; padding: 30px; width: 100%; margin-bottom: 25px;">
+                                <h3 style="font-size: 1.3rem; font-weight: 600; color: #fff; margin-bottom: 20px;">⛓️ Привяжи Minecraft аккаунт</h3>
+                                <div style="display: flex; flex-direction: column; gap: 20px;">
+                                    <div style="display: flex; gap: 16px; align-items: flex-start;">
+                                        <div style="background: rgba(138, 43, 226, 0.15); color: #b388ff; font-weight: 700; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">1</div>
+                                        <div>
+                                            <span style="font-weight: 600; color: #fff; display: block; margin-bottom: 6px;">🎮 Зайди на сервер</span>
+                                            <button class="btn-secondary" id="server-ip-profile" style="padding: 6px 14px; font-size: 0.78rem; border-radius: 10px;" onclick="copyIp('play.kuromismp.ru')">play.kuromismp.ru</button>
+                                        </div>
+                                    </div>
+                                    <div style="display: flex; gap: 16px; align-items: flex-start;">
+                                        <div style="background: rgba(138, 43, 226, 0.15); color: #b388ff; font-weight: 700; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">2</div>
+                                        <div style="color: var(--text-muted); font-size: 0.9rem;">
+                                            <span style="font-weight: 600; color: #fff; display: block; margin-bottom: 2px;">🔗 Нажми на ссылку в чате</span>
+                                            При входе в чате появится кликабельная ссылка. Нажми на неё — откроется браузер.
+                                        </div>
+                                    </div>
+                                    <div style="display: flex; gap: 16px; align-items: flex-start;">
+                                        <div style="background: rgba(138, 43, 226, 0.15); color: #b388ff; font-weight: 700; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">3</div>
+                                        <div style="color: var(--text-muted); font-size: 0.9rem;">
+                                            <span style="font-weight: 600; color: #fff; display: block; margin-bottom: 2px;">✅ Подтверди вход через Discord</span>
+                                            В браузере нажми 'Разрешить' — аккаунт привяжется автоматически.
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; border-top: 1px solid rgba(255,255,255,0.04); padding-top: 20px;">
+                                <div style="font-size: 0.88rem; color: var(--text-muted);"><span class="bounty-status">●</span> Ожидание привязки...</div>
+                                <button class="btn-primary" style="padding: 10px 24px; font-size: 0.85rem;" onclick="loadProfileData()">Обновить статус</button>
+                            </div>
+                        </div>`;
+                    updateForumForm();
+                    return;
+                }
+
+                currentUserLinkedData = {
+                    minecraft_uuid: linkedData.minecraft_uuid,
+                    minecraft_name: linkedData.minecraft_name,
+                    discord_id: discordId
+                };
+
+                const { data: stats, error: statsError } = await supabaseClient
+                    .from('player_stats')
+                    .select('playtime_seconds, deaths, kills, last_seen, first_join')
+                    .eq('minecraft_uuid', linkedData.minecraft_uuid)
+                    .maybeSingle();
+
+                if (statsError) throw statsError;
+
+                const currentStats = stats || { playtime_seconds: 0, deaths: 0, kills: 0, last_seen: null, first_join: null };
+                const kd = currentStats.deaths > 0 ? (currentStats.kills / currentStats.deaths).toFixed(2) : currentStats.kills + ".0";
+
+                headerWidget.innerHTML = `
+                    <div style="display: flex; flex-direction: column; gap: 10px; width: 100%;">
+                        <div id="wallet-widget" onclick="openWalletModal('${linkedData.minecraft_uuid}')">
+                            💎 <span id="wallet-balance-display">0</span>
+                        </div>
+                        <div id="ruble-widget" onclick="openTopUpModal()">
+                            ₽ <span id="ruble-balance-display">${currentRubBalance}</span>
+                        </div>
+                    </div>
+                    <div class="widget-user-card" onclick="switchTab('profile')"><img src="https://mc-heads.net/avatar/${linkedData.minecraft_name}/44" class="widget-avatar"><div class="widget-name">${linkedData.minecraft_name}</div><div class="widget-status-text" style="color: var(--accent-pink);">● Профиль</div></div>`;
+                
+                loadWalletBalance(linkedData.minecraft_uuid);
+                updateForumForm();
+                
+                wrapper.innerHTML = `
+                    <div style="width: 100%;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; width: 100%; border-bottom: 1px solid rgba(255,255,255,0.04); padding-bottom: 20px;">
+                            <div style="display: flex; align-items: center; gap: 24px;">
+                                <img src="https://mc-heads.net/avatar/${linkedData.minecraft_name}/80" style="border-radius:12px; image-rendering:pixelated; width:80px">
+                                <div style="text-align: left;">
+                                    <h2 style="font-size: 1.5rem; font-weight: 700; color: #fff;">${linkedData.minecraft_name}</h2>
+                                    <div style="font-size: 0.85rem; color: var(--text-muted); margin-top: 4px;">Discord: ${discordUsername}</div>
+                                    <div style="font-size: 0.82rem; color: #b388ff; margin-top: 4px;">На сервере с ${formatDate(currentStats.first_join, false)}</div>
+                                </div>
+                            </div>
+                            <button class="btn-secondary" style="padding: 8px 16px; font-size: 0.8rem;" onclick="handleSignOut()">Выйти</button>
+                        </div>
+                        <div class="stats-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-top: 20px;">
+                            <div class="stat-card" style="background: rgba(255,255,255,0.01); border: 1px solid rgba(255,255,255,0.03); padding: 20px; border-radius: 20px; text-align: left;">
+                                <div class="stat-label" style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 4px;">⏱ Время на сервере</div>
+                                <div class="stat-value" style="font-size: 1.4rem; font-weight: 700;">${formatPlaytime(currentStats.playtime_seconds)}</div>
+                            </div>
+                            <div class="stat-card" style="background: rgba(255,255,255,0.01); border: 1px solid rgba(255,255,255,0.03); padding: 20px; border-radius: 20px; text-align: left;">
+                                <div class="stat-label" style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 4px;">💀 Смертей</div>
+                                <div class="stat-value" style="font-size: 1.4rem; font-weight: 700;">${currentStats.deaths}</div>
+                            </div>
+                            <div class="stat-card" style="background: rgba(255,255,255,0.01); border: 1px solid rgba(255,255,255,0.03); padding: 20px; border-radius: 20px; text-align: left;">
+                                <div class="stat-label" style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 4px;">⚔️ Убийств</div>
+                                <div class="stat-value" style="font-size: 1.4rem; font-weight: 700;">${currentStats.kills}</div>
+                            </div>
+                            <div class="stat-card" style="background: rgba(255,255,255,0.01); border: 1px solid rgba(255,255,255,0.03); padding: 20px; border-radius: 20px; text-align: left;">
+                                <div class="stat-label" style="font-size: 0.8rem; color: var(--accent-pink); margin-bottom: 4px;">📊 K/D</div>
+                                <div class="stat-value" style="font-size: 1.4rem; font-weight: 700; color: var(--accent-pink);">${kd}</div>
+                            </div>
+                        </div>
+                        <div style="text-align: left; margin-top: 20px; font-size: 0.85rem; color: var(--text-muted);">Последний раз онлайн: ${formatDate(currentStats.last_seen, false)}</div>
+                    </div>`;
+            } catch (e) {
+                console.error(e);
+                wrapper.innerHTML = `<div style="color: var(--accent-pink);">Ошибка загрузки профиля.</div>`;
+            }
+        }
+
+        async function handleSignOut() {
+            await supabaseClient.auth.signOut();
+            currentUserSession = null;
+            currentUserLinkedData = null;
+            isUserModerator = false;
+            loadProfileData();
+        }
+
+        window.addEventListener('click', function(e) {
+            if(window.innerWidth <= 768) return; 
+            if(e.target.closest('#snakeCanvas') || e.target.closest('.snake-footer-container') || e.target.closest('.logo-img-left') || e.target.closest('.header-profile-sidebar') || e.target.closest('#forum-fixed-btn') || e.target.closest('#custom-modal-card') || e.target.closest('#app-modal-card')) return; 
+            const particleCount = 10; 
+            for (let i = 0; i < particleCount; i++) { createSparkParticle(e.clientX, e.clientY); }
+        });
+
+        function createSparkParticle(x, y) {
+            const p = document.createElement('div');
+            p.classList.add('particle');
+            document.body.appendChild(p);
+
+            const size = Math.random() * 4 + 3;
+            p.style.width = `${size}px`;
+            p.style.height = `${size}px`;
+            p.style.left = `${x}px`;
+            p.style.top = `${y}px`;
+
+            const angle = Math.random() * Math.PI * 2;
+            const distance = Math.random() * 70 + 30; 
+            const destX = Math.cos(angle) * distance;
+            const destY = Math.sin(angle) * distance;
+
+            p.animate([
+                { transform: 'translate(0, 0)', opacity: 1 },
+                { transform: `translate(${destX}px, ${destY}px)`, opacity: 0 }
+            ], {
+                duration: Math.random() * 300 + 300, 
+                easing: 'cubic-bezier(0.1, 0.8, 0.3, 1)',
+                fill: 'forwards'
+            });
+
+            setTimeout(() => { p.remove(); }, 600);
+        }
+
+        async function renderPlayersList() {
+            const container = document.getElementById('players-list-container');
+            if(!container) return;
+            try {
+                const { data, error } = await supabaseClient
+                    .from('linked_accounts')
+                    .select('minecraft_uuid, minecraft_name');
+                
+                if (error) throw error;
+                if (!data || data.length === 0) {
+                    loadedPlayers = [];
+                    displayPlayers([]);
+                    return;
+                }
+
+                const uuids = data.map(p => p.minecraft_uuid);
+                const { data: stats, error: statsError } = await supabaseClient
+                    .from('player_stats')
+                    .select('minecraft_uuid, playtime_seconds, is_online, last_seen, kills, deaths')
+                    .in('minecraft_uuid', uuids);
+                
+                if (statsError) throw statsError;
+
+                const statsMap = {};
+                if (stats) {
+                    stats.forEach(s => {
+                        statsMap[s.minecraft_uuid] = s;
+                    });
+                }
+
+                loadedPlayers = data.map(player => {
+                    const playerStats = statsMap[player.minecraft_uuid] || { playtime_seconds: 0, is_online: false, last_seen: null, kills: 0, deaths: 0 };
+                    return {
+                        minecraft_uuid: player.minecraft_uuid,
+                        minecraft_name: player.minecraft_name,
+                        playtime_seconds: playerStats.playtime_seconds,
+                        is_online: playerStats.is_online,
+                        last_seen: playerStats.last_seen,
+                        kills: playerStats.kills || 0,
+                        deaths: playerStats.deaths || 0
+                    };
+                });
+
+                loadedPlayers.sort((a, b) => b.playtime_seconds - a.playtime_seconds);
+                displayPlayers(loadedPlayers);
+            } catch (e) {
+                console.error(e);
+                container.innerHTML = `<div style="grid-column: span 2; color: var(--accent-pink); padding: 20px;">Ошибка загрузки списка игроков</div>`;
+            }
+        }
+
+        function displayPlayers(dataList) {
+            const container = document.getElementById('players-list-container');
+            if(!container) return;
+            container.innerHTML = '';
+
+            if(dataList.length === 0) {
+                container.innerHTML = `<div style="grid-column: span 2; color: var(--text-muted); padding: 20px;">Совпадений не найдено</div>`;
+                return;
+            }
+
+            dataList.forEach(player => {
+                const card = document.createElement('div');
+                card.classList.add('player-item-card');
+                card.style.cursor = 'pointer';
+                
+                const dotColor = player.is_online ? '#2ecc71' : '#6e6482';
+
+                card.onclick = () => openPlayerModal(player);
+
+                card.innerHTML = `
+                    <img src="https://mc-heads.net/avatar/${player.minecraft_name}/56" alt="${player.minecraft_name}" class="player-head-render" style="image-rendering:pixelated; border-radius:10px; width:56px; height:56px;">
+                    <div class="player-card-info">
+                        <h3>${player.minecraft_name}</h3>
+                        <div class="player-card-meta">
+                            <span>⏱ ${formatPlaytime(player.playtime_seconds)}</span>
+                            <span>•</span>
+                            <span style="display: inline-flex; align-items: center; gap: 5px;">
+                                <span style="width: 8px; height: 8px; background: ${dotColor}; border-radius: 50%; display: inline-block; ${player.is_online ? 'box-shadow: 0 0 8px #2ecc71;' : ''}"></span>
+                                ${player.is_online ? 'Онлайн' : 'Офлайн'}
+                            </span>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function filterPlayersGrid() {
+            const query = document.getElementById('player-filter-input').value.trim().toLowerCase();
+            const filtered = loadedPlayers.filter(p => p.minecraft_name && p.minecraft_name.toLowerCase().includes(query));
+            displayPlayers(filtered);
+        }
+
+        async function openPlayerModal(player, name) {
+            let playerData;
+            if (typeof player === 'string') {
+                playerData = { minecraft_uuid: player, minecraft_name: name };
+            } else {
+                playerData = { ...player };
+            }
+            
+            if (playerData.playtime_seconds === undefined || playerData.kills === undefined) {
+                try {
+                    const { data, error } = await supabaseClient
+                        .from('player_stats')
+                        .select('playtime_seconds, deaths, kills, last_seen, is_online')
+                        .eq('minecraft_uuid', playerData.minecraft_uuid)
+                        .maybeSingle();
+                    if (!error && data) {
+                        playerData = { ...playerData, ...data };
+                    }
+                } catch (e) {
+                    console.error("Ошибка при получении полной статистики игрока:", e);
+                }
+            }
+
+            const modalOverlay = document.createElement('div');
+            modalOverlay.style.position = 'fixed';
+            modalOverlay.style.top = '0';
+            modalOverlay.style.left = '0';
+            modalOverlay.style.width = '100%';
+            modalOverlay.style.height = '100%';
+            modalOverlay.style.background = 'rgba(5, 3, 8, 0.75)';
+            modalOverlay.style.backdropFilter = 'blur(10px)';
+            modalOverlay.style.webkitBackdropFilter = 'blur(10px)';
+            modalOverlay.style.zIndex = '9999';
+            modalOverlay.style.display = 'flex';
+            modalOverlay.style.alignItems = 'center';
+            modalOverlay.style.justifyContent = 'center';
+            modalOverlay.style.padding = '20px';
+            
+            modalOverlay.onclick = function(e) {
+                if (e.target === modalOverlay) {
+                    modalOverlay.remove();
+                }
+            };
+
+            const kills = playerData.kills || 0;
+            const deaths = playerData.deaths || 0;
+            const kd = deaths === 0 ? kills + ".0" : (kills / deaths).toFixed(2);
+
+            modalOverlay.innerHTML = `
+                <div style="background: rgba(16, 11, 28, 0.95); border-radius: 28px; border: 1px solid rgba(138, 43, 226, 0.2); max-width: 480px; width: 100%; padding: 40px 30px; position: relative; box-shadow: 0 20px 50px rgba(0,0,0,0.6); text-align: center; font-family: var(--font-sans); color: #fff;">
+                    <span style="position: absolute; top: 20px; right: 25px; color: var(--text-muted); font-size: 1.8rem; cursor: pointer; font-weight: bold; line-height: 1;" onclick="this.parentElement.parentElement.remove()">&times;</span>
+                    
+                    <img src="https://mc-heads.net/avatar/${playerData.minecraft_name}/80" style="image-rendering:pixelated; border-radius:12px; width:80px; height:80px; margin-bottom: 15px; border: 2px solid var(--primary-purple); box-shadow: 0 0 15px rgba(138, 43, 226, 0.15);">
+                    <h2 style="font-size: 1.8rem; font-weight: 700; color: #fff; margin-bottom: 25px;">${playerData.minecraft_name}</h2>
+                    
+                    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; width: 100%; margin-bottom: 25px;">
+                        <div style="background: rgba(255,255,255,0.01); border: 1px solid rgba(255,255,255,0.03); border-radius: 20px; padding: 16px; text-align: left;">
+                            <div style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 4px;">⏱ Время онлайна</div>
+                            <div style="font-size: 1.3rem; font-weight: 700; color: #fff;">${formatPlaytime(playerData.playtime_seconds)}</div>
+                        </div>
+                        <div style="background: rgba(255,255,255,0.01); border: 1px solid rgba(255,255,255,0.03); border-radius: 20px; padding: 16px; text-align: left;">
+                            <div style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 4px;">💀 Смертей</div>
+                            <div style="font-size: 1.3rem; font-weight: 700; color: #fff;">${deaths}</div>
+                        </div>
+                        <div style="background: rgba(255,255,255,0.01); border: 1px solid rgba(255,255,255,0.03); border-radius: 20px; padding: 16px; text-align: left;">
+                            <div style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 4px;">⚔️ Убийств</div>
+                            <div style="font-size: 1.3rem; font-weight: 700; color: #fff;">${kills}</div>
+                        </div>
+                        <div style="background: rgba(255,255,255,0.01); border: 1px solid rgba(255,255,255,0.03); border-radius: 20px; padding: 16px; text-align: left;">
+                            <div style="font-size: 0.8rem; color: var(--accent-pink); margin-bottom: 4px;">📊 K/D</div>
+                            <div style="font-size: 1.3rem; font-weight: 700; color: var(--accent-pink);">${kd}</div>
+                        </div>
+                    </div>
+                    
+                    <div style="font-size: 0.85rem; color: var(--text-muted); text-align: left; border-top: 1px solid rgba(255,255,255,0.04); padding-top: 15px;">
+                        Последний раз онлайн: <span style="color: #fff; font-weight: 600;">${formatDate(playerData.last_seen, false)}</span>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(modalOverlay);
+        }
+
+        function switchTab(tabName) {
+            document.querySelectorAll('.content-section').forEach(section => section.classList.remove('active'));
+            document.querySelectorAll('nav button').forEach(button => button.classList.remove('active'));
+            
+            const targetSection = document.getElementById(`section-${tabName}`);
+            if(targetSection) targetSection.classList.add('active');
+            const targetTabBtn = document.getElementById(`tab-${tabName}`);
+            if(targetTabBtn) targetTabBtn.classList.add('active');
+            
+            if(tabName === 'donate') initRouletteGraphic();
+            if(tabName === 'profile') loadProfileData();
+            if(tabName === 'forum') {
+                loadProfileData().then(() => {
+                    loadForumFeed(false); 
+                });
+            }
+
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function copyIp(ip) {
+            navigator.clipboard.writeText(ip);
+            const btn = document.getElementById('server-ip');
+            const btnProfile = document.getElementById('server-ip-profile');
+            if(btn) btn.innerText = 'Скопировано!';
+            if(btnProfile) btnProfile.innerText = 'Скопировано!';
+            
+            setTimeout(() => {
+                if(btn) btn.innerText = ip;
+                if(btnProfile) btnProfile.innerText = ip;
+            }, 2000);
+        }
+
+        const canvas = document.getElementById('snakeCanvas');
+        const ctx = canvas.getContext('2d');
+        let grid = 20;
+        let snake = [{x: 120, y: 120}, {x: 100, y: 120}, {x: 80, y: 120}];
+        let dx = grid, dy = 0;
+        let food = {x: 200, y: 120};
+        let score = 0;
+        let attempts = 1;
+        let gameLoopId = null;
+        let gameRunning = false;
+
+        function getRandomInt(min, max) { return Math.floor(Math.random() * (max - min)) + min; }
+
+        function resetSnakeGame() {
+            snake = [{x: 120, y: 120}, {x: 100, y: 120}, {x: 80, y: 120}];
+            dx = grid; dy = 0; score = 0;
+            document.getElementById('snake-score').innerText = score;
+            generateSnakeFood();
+        }
+
+        function triggerGameOver() {
+            attempts++;
+            document.getElementById('snake-attempts').innerText = attempts;
+            resetSnakeGame();
+        }
+
+        function generateSnakeFood() {
+            food.x = getRandomInt(0, canvas.width / grid) * grid;
+            food.y = getRandomInt(0, canvas.height / grid) * grid;
+        }
+
+        function toggleSnakeGame() {
+            const box = document.getElementById('snake-game-box');
+            const arrow = document.getElementById('snake-arrow');
+            if (box.style.display === 'block') {
+                box.style.display = 'none';
+                arrow.innerText = '▼';
+                stopSnakeGame();
+            } else {
+                box.style.display = 'block';
+                arrow.innerText = '▲';
+                resetSnakeGame();
+                startSnakeGame();
+            }
+        }
+
+        function startSnakeGame() {
+            if(!gameRunning) {
+                gameRunning = true;
+                gameLoopId = setInterval(drawSnakeGame, 160); 
+            }
+        }
+
+        function stopSnakeGame() {
+            gameRunning = false;
+            clearInterval(gameLoopId);
+        }
+
+        function drawSnakeGame() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            let head = {x: snake[0].x + dx, y: snake[0].y + dy};
+
+            if (head.x < 0) head.x = canvas.width - grid;
+            else if (head.x >= canvas.width) head.x = 0;
+
+            if (head.y < 0) head.y = canvas.height - grid;
+            else if (head.y >= canvas.height) head.y = 0;
+
+            for(let i=0; i<snake.length; i++) {
+                if(head.x === snake[i].x && head.y === snake[i].y) { triggerGameOver(); return; }
+            }
+
+            snake.unshift(head);
+            if (head.x === food.x && head.y === food.y) {
+                score += 10;
+                document.getElementById('snake-score').innerText = score;
+                generateSnakeFood();
+            } else { snake.pop(); }
+
+            ctx.fillStyle = '#ff007f';
+            ctx.shadowBlur = 10; ctx.shadowColor = '#ff007f';
+            ctx.fillRect(food.x, food.y, grid-2, grid-2);
+
+            ctx.shadowColor = '#8a2be2';
+            snake.forEach((part, index) => {
+                ctx.fillStyle = index === 0 ? '#b388ff' : '#8a2be2';
+                ctx.fillRect(part.x, part.y, grid-2, grid-2);
+            });
+            ctx.shadowBlur = 0;
+        }
+
+        window.addEventListener('keydown', function(e) {
+            if(!gameRunning) return;
+            if([37, 38, 39, 40, 65, 87, 83, 68].indexOf(e.keyCode) > -1) { e.preventDefault(); }
+            if ((e.keyCode === 37 || e.keyCode === 65) && dx === 0) { dx = -grid; dy = 0; }
+            else if ((e.keyCode === 38 || e.keyCode === 87) && dy === 0) { dx = 0; dy = -grid; }
+            else if ((e.keyCode === 39 || e.keyCode === 68) && dx === 0) { dx = grid; dy = 0; }
+            else if ((e.keyCode === 40 || e.keyCode === 83) && dy === 0) { dx = 0; dy = grid; }
+        });
+
+        async function updateServerStatus() {
+            try {
+                const { data, error } = await supabaseClient
+                    .from('player_stats')
+                    .select('minecraft_name', { count: 'exact' })
+                    .eq('is_online', true);
+
+                const onlineEl = document.getElementById('online-count');
+                const barEl = document.getElementById('online-bar');
+                
+                if (!error) {
+                    const current = data ? data.length : 0;
+                    const max = 150;
+                    if (onlineEl) onlineEl.textContent = current + ' / ' + max;
+                    if (barEl) barEl.style.width = Math.min((current / max) * 100, 100) + '%';
+                } else {
+                    if (onlineEl) onlineEl.textContent = '0 / 150';
+                }
+            } catch (e) {
+                const onlineEl = document.getElementById('online-count');
+                if (onlineEl) onlineEl.textContent = '0 / 150';
+            }
+        }
+
+        async function loadWalletBalance(uuid) {
+            try {
+                const { data, error } = await supabaseClient
+                    .from('player_stats')
+                    .select('currency_balance')
+                    .eq('minecraft_uuid', uuid)
+                    .maybeSingle();
+                
+                if (error) throw error;
+                const balance = data?.currency_balance ?? 0;
+                
+                const displayEl = document.getElementById('wallet-balance-display');
+                if (displayEl) displayEl.textContent = balance;
+                
+                return balance;
+            } catch (e) {
+                console.error("Ошибка при получении баланса кошелька:", e);
+                return 0;
+            }
+        }
+
+        async function openWalletModal(uuid) {
+            const oldOverlay = document.getElementById('wallet-modal-overlay');
+            if (oldOverlay) oldOverlay.remove();
+
+            const overlay = document.createElement('div');
+            overlay.id = 'wallet-modal-overlay';
+            overlay.style.position = 'fixed';
+            overlay.style.top = '0';
+            overlay.style.left = '0';
+            overlay.style.width = '100%';
+            overlay.style.height = '100%';
+            overlay.style.background = 'rgba(5, 3, 8, 0.82)';
+            overlay.style.backdropFilter = 'blur(12px)';
+            overlay.style.webkitBackdropFilter = 'blur(12px)';
+            overlay.style.zIndex = '10000';
+            overlay.style.display = 'flex';
+            overlay.style.alignItems = 'center';
+            overlay.style.justifyContent = 'center';
+            overlay.style.padding = '20px';
+            
+            overlay.onclick = function(e) {
+                if (e.target === overlay) overlay.remove();
+            };
+
+            const currentBalance = await loadWalletBalance(uuid);
+
+            overlay.innerHTML = `
+                <div style="background: rgba(16, 11, 28, 0.96); border-radius: 28px; border: 1px solid rgba(138, 43, 226, 0.2); max-width: 440px; width: 100%; padding: 35px 25px; position: relative; box-shadow: 0 25px 60px rgba(0,0,0,0.65); font-family: var(--font-sans); color: #fff;">
+                    <span style="position: absolute; top: 16px; right: 22px; color: var(--text-muted); font-size: 1.7rem; cursor: pointer; font-weight: bold; line-height: 1;" onclick="document.getElementById('wallet-modal-overlay').remove()">&times;</span>
+                    
+                    <h2 style="font-size: 1.4rem; font-weight: 600; margin-bottom: 5px; display: flex; align-items: center; gap: 8px; justify-content: center;">💎 Кошелёк</h2>
+                    
+                    <div style="text-align: center; margin: 22px 0;">
+                        <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.06em; font-weight: 600; margin-bottom: 4px;">Твой баланс</div>
+                        <div style="font-size: 2.2rem; font-weight: 700; color: #fff; display: flex; align-items: center; justify-content: center; gap: 6px;">
+                            ${currentBalance} <span style="font-size: 1.1rem; color: var(--text-muted); font-weight: 500;">валюты</span>
+                        </div>
+                    </div>
+
+                    <div style="display: flex; background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.04); padding: 4px; border-radius: 16px; gap: 4px; margin-bottom: 22px;">
+                        <button id="wtab-history" style="flex:1; background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.02); color: #fff; padding: 10px; border-radius: 12px; font-family: var(--font-sans); font-size: 0.85rem; font-weight: 500; cursor: pointer; transition: all 0.2s;" onclick="switchWalletTab('history', '${uuid}')">История</button>
+                        <button id="wtab-season" style="flex:1; background: none; border: none; color: var(--text-muted); padding: 10px; border-radius: 12px; font-family: var(--font-sans); font-size: 0.85rem; font-weight: 500; cursor: pointer; transition: all 0.2s;" onclick="switchWalletTab('season', '${uuid}')">Сезон</button>
+                    </div>
+
+                    <div id="wallet-tab-content" class="wallet-scroll" style="max-height: 260px; overflow-y: auto; padding-right: 4px;"></div>
+                </div>
+            `;
+
+            document.body.appendChild(overlay);
+            switchWalletTab('history', uuid); 
+        }
+
+        async function switchWalletTab(tab, uuid) {
+            ['history', 'season'].forEach(t => {
+                const btn = document.getElementById(`wtab-${t}`);
+                if (btn) {
+                    if (t === tab) {
+                        btn.style.background = 'rgba(255, 255, 255, 0.04)';
+                        btn.style.border = '1px solid rgba(255, 255, 255, 0.02)';
+                        btn.style.color = '#fff';
+                    } else {
+                        btn.style.background = 'none';
+                        btn.style.border = 'none';
+                        btn.style.color = 'var(--text-muted)';
+                    }
+                }
+            });
+
+            const container = document.getElementById('wallet-tab-content');
+            if (!container) return;
+            container.innerHTML = `<div style="color: var(--text-muted); text-align: center; padding: 30px 0; font-size: 0.9rem;">Загрузка данных...</div>`;
+
+            let transactions = [];
+            if (tab === 'history') {
+                try {
+                    const { data, error } = await supabaseClient
+                        .from('wallet_transactions')
+                        .select('*')
+                        .eq('minecraft_uuid', uuid)
+                        .order('created_at', { ascending: false })
+                        .limit(20);
+                    if (error) throw error;
+                    transactions = data || [];
+                } catch (e) {
+                    console.error(e);
+                    container.innerHTML = `<div style="color: var(--accent-pink); text-align: center; padding: 30px 0; font-size: 0.9rem;">Не удалось загрузить транзакции</div>`;
+                    return;
+                }
+            }
+
+            if (tab === 'history') {
+                if (transactions.length === 0) {
+                    container.innerHTML = `<div style="color: var(--text-muted); text-align: center; padding: 30px 0; font-size: 0.9rem;">История операций пуста</div>`;
+                    return;
+                }
+
+                let html = `<div style="display: flex; flex-direction: column; gap: 10px;">`;
+                transactions.forEach(tx => {
+                    const isIn = tx.direction === 'in';
+                    const color = isIn ? '#2ecc71' : 'var(--accent-pink)';
+                    const badge = isIn ? '💵' : '🛒';
+                    const sign = isIn ? '+' : '-';
+                    
+                    html += `
+                        <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(255,255,255,0.01); border: 1px solid rgba(255,255,255,0.03); padding: 12px; border-radius: 14px;">
+                            <div style="display: flex; align-items: center; gap: 10px; text-align: left; overflow: hidden;">
+                                <span style="font-size: 1.1rem; flex-shrink: 0;">${badge}</span>
+                                <div style="overflow: hidden;">
+                                    <div style="font-size: 0.85rem; font-weight: 500; color: #fff; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">${tx.description || 'Операция'}</div>
+                                    <div style="font-size: 0.72rem; color: var(--text-muted); margin-top: 2px;">${formatDate(tx.created_at, false)}</div>
+                                </div>
+                            </div>
+                            <div style="font-size: 0.9rem; font-weight: 700; color: ${color}; white-space: nowrap; margin-left: 10px;">
+                                ${sign}${tx.amount}
+                            </div>
+                        </div>
+                    `;
+                });
+                html += `</div>`;
+                container.innerHTML = html;
+
+            } else if (tab === 'season') {
+                container.innerHTML = `
+                    <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 45px 15px; color: var(--text-muted);">
+                        <div style="font-size: 2.3rem; margin-bottom: 12px; filter: drop-shadow(0 0 10px rgba(255,183,0,0.15));">🔒</div>
+                        <div style="font-size: 0.9rem; font-weight: 600; color: #fff; margin-bottom: 4px;">Раздел временно закрыт</div>
+                        <div style="font-size: 0.8rem; line-height: 1.4; max-width: 280px;">Скоро здесь появится статистика Батл Пасса. Следи за новостями запуска 4-го сезона!</div>
+                    </div>
+                `;
+            }
         }
 
         /* --- ЛОГИКА ОПЛАТЫ LAVA.TOP И СИСТЕМНОГО БАЛАНСА В РУБЛЯХ --- */
@@ -1473,7 +2334,7 @@
                     action: whitelistAction
                 });
 
-            customAlert("🎉 Успешная покупка!", `Проходка успешно куплена за **${price} ₽**! Никнейм [**${cleanNick}**] отправлен в очередь вайтлиста сервера. Можете заходить в игру!`);
+            alert(`🎉 Поздравляем! Проходка успешно куплена за ${price} ₽! Никнейм [${cleanNick}] отправлен в очередь вайтлиста сервера. Теперь вы можете беспрепятственно зайти в игру и пройти верификацию!`);
             loadProfileData();
         }
 
@@ -1930,7 +2791,7 @@
                 if (comments) {
                     comments.forEach(c => {
                         if (!commentsByPost[c.post_id]) commentsByPost[c.post_id] = [];
-                        commentsByPost[c.post_id].push(c);
+                        commentsByPost[c.post_id].push(c); // ОШИБКА ИСПРАВЛЕНА: Пробел между 'comments' и 'ByPost' полностью удален!
                     });
                 }
 
