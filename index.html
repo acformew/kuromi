@@ -290,6 +290,8 @@
             white-space: nowrap; 
         }
         .features-line span { color: var(--text-main); }
+        .features-line > div { display: inline-flex; align-items: center; gap: 7px; }
+        .features-line [data-lucide] { color: #b985f4; }
 
         .cta-group {
             display: flex;
@@ -488,7 +490,8 @@
             justify-content: center;
             position: relative;
         }
-        .mechanic-placeholder-icon { font-size: 2.5rem; filter: drop-shadow(0 0 12px var(--primary-purple)); z-index: 1; }
+        .mechanic-placeholder-icon { filter: drop-shadow(0 0 12px var(--primary-purple)); z-index: 1; display: flex; align-items: center; justify-content: center; }
+        .mechanic-placeholder-icon svg { width: 42px; height: 42px; stroke-width: 1.6; color: #fff; }
         .mechanic-text-block h3 { font-size: 1.15rem; font-weight: 600; color: #fff; margin-bottom: 6px; }
         .mechanic-text-block p { font-size: 0.88rem; color: var(--text-muted); line-height: 1.4; }
 
@@ -591,7 +594,8 @@
             border: 1px solid rgba(255, 255, 255, 0.02);
             font-size: 0.88rem;
         }
-        .chance-row span:first-child { font-weight: 500; color: var(--text-main); }
+        .chance-row span:first-child { font-weight: 500; color: var(--text-main); display: flex; align-items: center; gap: 8px; }
+        .chance-row [data-lucide] { color: #b985f4; flex-shrink: 0; }
         .chance-value { font-weight: 700; color: #ffb700; font-family: monospace; }
 
         .spin-btn-box { width: 100%; display: flex; justify-content: center; margin-top: 35px; }
@@ -905,12 +909,48 @@
         .admin-textarea { resize: vertical; min-height: 46px; }
 
         .status-pill {
-            font-size: 0.72rem; font-weight: 700; padding: 5px 11px; border-radius: 100px;
+            font-size: 0.72rem; font-weight: 700; padding: 5px 12px; border-radius: 100px;
             border: 1px solid transparent; cursor: pointer; text-transform: uppercase; letter-spacing: 0.03em;
+            display: inline-flex; align-items: center; gap: 5px; white-space: nowrap;
         }
+        .status-pill [data-lucide] { width: 12px; height: 12px; }
         .status-pill.active { background: rgba(46, 204, 113, 0.14); color: #4fdc8e; border-color: rgba(46,204,113,0.25); }
         .status-pill.hidden { background: rgba(110, 100, 130, 0.18); color: #a49cc0; border-color: rgba(110,100,130,0.3); }
         .status-pill.soon   { background: rgba(255, 159, 28, 0.14); color: #ffb95c; border-color: rgba(255,159,28,0.25); }
+
+        /* --- Группы и карточки товаров (редизайн для наглядности) --- */
+        .shop-category-group { margin-bottom: 26px; }
+        .shop-category-heading {
+            display: flex; align-items: center; gap: 10px; margin-bottom: 12px; padding: 4px 2px;
+            border-bottom: 1px solid rgba(255,255,255,0.06); padding-bottom: 10px;
+        }
+        .shop-category-heading .name { font-weight: 700; font-size: 0.95rem; color: #fff; }
+        .shop-category-heading .count {
+            margin-left: auto; font-size: 0.72rem; color: var(--text-muted); background: rgba(255,255,255,0.04);
+            padding: 3px 10px; border-radius: 100px; font-weight: 600;
+        }
+        .shop-item-card {
+            background: rgba(255,255,255,0.018); border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 22px; padding: 20px 22px; margin-bottom: 14px; transition: border-color 0.2s;
+        }
+        .shop-item-card:hover { border-color: rgba(138,43,226,0.22); }
+        .shop-item-top { display: flex; align-items: flex-start; gap: 14px; margin-bottom: 14px; }
+        .shop-item-index {
+            width: 30px; height: 30px; border-radius: 9px; background: rgba(138,43,226,0.12); color: #b985f4;
+            display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 800;
+            flex-shrink: 0; margin-top: 2px;
+        }
+        .shop-item-name-input {
+            width: 100%; background: transparent; border: none; border-bottom: 1px solid transparent;
+            color: #fff; font-family: var(--font-sans); font-size: 1.05rem; font-weight: 700;
+            padding: 4px 2px; outline: none; transition: border-color 0.2s;
+        }
+        .shop-item-name-input:focus { border-bottom-color: var(--primary-purple); }
+        .shop-item-divider { height: 1px; background: rgba(255,255,255,0.05); margin: 14px 0; }
+        .shop-item-footer {
+            display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 14px; flex-wrap: wrap;
+        }
+        .shop-item-footer .shop-item-actions { display: flex; gap: 8px; margin-left: auto; }
 
         .btn-mini {
             background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.08); color: #fff;
@@ -1021,7 +1061,8 @@
     <div class="content-container">
         <div class="header-profile-sidebar">
             <div id="header-profile-auth" style="display: flex; flex-direction: column; gap: 10px; width: 100%;"></div>
-            <button id="forum-fixed-btn" class="widget-login-btn" onclick="switchTab('forum')">💬 Форум</button>
+            <button id="admin-fixed-btn" class="widget-login-btn" onclick="switchTab('admin')" style="display:none; background: rgba(138, 43, 226, 0.12); border-color: rgba(138, 43, 226, 0.3);"><i data-lucide="shield-check" style="width:16px;height:16px;"></i> Админ</button>
+            <button id="forum-fixed-btn" class="widget-login-btn" onclick="switchTab('forum')"><i data-lucide="messages-square" style="width:16px;height:16px;"></i> Форум</button>
         </div>
         
         <main id="section-home" class="content-section active">
@@ -1030,9 +1071,9 @@
                 <h1>Закрытый ванильный<br>Майнкрафт сервер</h1>
                 
                 <div class="features-line">
-                    <div>🔒 <span>WhiteList</span> доступ</div>
-                    <div>💎 Без <span>креатива</span> и доната</div>
-                    <div>🌸 <span>Взаимодействие</span> с игроками</div>
+                    <div><i data-lucide="lock" style="width:16px;height:16px;"></i> <span>WhiteList</span> доступ</div>
+                    <div><i data-lucide="gem" style="width:16px;height:16px;"></i> Без <span>креатива</span> и доната</div>
+                    <div><i data-lucide="flower-2" style="width:16px;height:16px;"></i> <span>Взаимодействие</span> с игроками</div>
                 </div>
 
                 <div class="cta-group">
@@ -1050,7 +1091,7 @@
             </div>
 
             <div class="ux-panel">
-                <div class="panel-title" style="margin-bottom: 24px; text-align: left; width: 100%;">📰 Последние новости</div>
+                <div class="panel-title" style="margin-bottom: 24px; text-align: left; width: 100%; display:flex; align-items:center; gap:10px;"><span class="icon-badge b-blue" style="width:32px;height:32px;"><i data-lucide="newspaper"></i></span> Последние новости</div>
                 <div id="news-admin-container" style="width: 100%;"></div>
                 <div class="news-list" id="news-list-container" style="width: 100%; display: flex; flex-direction: column; gap: 16px;"></div>
             </div>
@@ -1062,23 +1103,23 @@
                 <div class="join-row">
                     <div class="ticket-card">
                         <div class="ticket-info">
-                            <h3>Постоянный безлимит «Навсегда»</h3>
-                            <p>Твой ультимативный билет в вечное выживание! Абсолютная свобода от любых продлений, взносов и вайпов на все будущие сезоны проекта. Залетай в WhiteList один раз и забудь о суете навсегда.</p>
+                            <h3 id="join-name-permanent">Постоянный безлимит «Навсегда»</h3>
+                            <p id="join-desc-permanent">Твой ультимативный билет в вечное выживание! Абсолютная свобода от любых продлений, взносов и вайпов на все будущие сезоны проекта. Залетай в WhiteList один раз и забудь о суете навсегда.</p>
                         </div>
                         <div>
-                            <div class="ticket-price">349 ₽</div>
-                            <button class="btn-primary" style="padding: 10px 20px; font-size: 0.8rem; margin-top: 10px; width: 100%;" onclick="buyServerPass(349)">Купить доступ</button>
+                            <div class="ticket-price" id="join-price-permanent">349 ₽</div>
+                            <button class="btn-primary" id="join-btn-permanent" style="padding: 10px 20px; font-size: 0.8rem; margin-top: 10px; width: 100%;" onclick="buyServerPass(349)">Купить доступ</button>
                         </div>
                     </div>
 
                     <div class="ticket-card">
                         <div class="ticket-info">
-                            <h3>Экспресс-пропуск «На 30 дней»</h3>
-                            <p>Максимальный комфорт для быстрого старта! Мгновенная автоматическая регистрация в WhiteList без томительного ожидания, скучных анкет и долгих проверок. Залетай в игру в один клик прямо сейчас на целый месяц.</p>
+                            <h3 id="join-name-30d">Экспресс-пропуск «На 30 дней»</h3>
+                            <p id="join-desc-30d">Максимальный комфорт для быстрого старта! Мгновенная автоматическая регистрация в WhiteList без томительного ожидания, скучных анкет и долгих проверок. Залетай в игру в один клик прямо сейчас на целый месяц.</p>
                         </div>
                         <div>
-                            <div class="ticket-price">149 ₽</div>
-                            <button class="btn-primary" style="padding: 10px 20px; font-size: 0.8rem; margin-top: 10px; width: 100%;" onclick="buyServerPass(149)">В один клик</button>
+                            <div class="ticket-price" id="join-price-30d">149 ₽</div>
+                            <button class="btn-primary" id="join-btn-30d" style="padding: 10px 20px; font-size: 0.8rem; margin-top: 10px; width: 100%;" onclick="buyServerPass(149)">В один клик</button>
                         </div>
                     </div>
 
@@ -1094,7 +1135,7 @@
                     </div>
                 </div>
                 <div class="info-notice-box">
-                    <h4>🛡️ Информация о верификации</h4>
+                    <h4><i data-lucide="shield-check" style="width:16px;height:16px;"></i> Информация о верификации</h4>
                     <p>Для игроков с официальной Лицензией Майнкрафт доступ предоставляется бесплатно после подтверждения подлинности аккаунта. Для пользователей пиратских лаунчеров обязательно приобретение проходки. Это ограничение введено для обеспечения жесткой безопасности игрового процесса и полной защиты серверов от повторных заходов забаненных нарушителей.</p>
                 </div>
             </div>
@@ -1121,6 +1162,18 @@
         <div id="section-players" class="content-section">
             <div class="ux-panel">
                 <div class="panel-title">Участники проекта</div>
+
+                <div style="width:100%; margin-bottom: 24px;">
+                    <details class="leaderboard-details" style="margin-bottom:12px;">
+                        <summary><span class="icon-badge b-orange" style="width:30px;height:30px;"><i data-lucide="crown"></i></span> Топ игроков по балансу (Forbes) <i data-lucide="chevron-down" class="chev"></i></summary>
+                        <div class="leaderboard-body" id="public-top-balance"></div>
+                    </details>
+                    <details class="leaderboard-details">
+                        <summary><span class="icon-badge b-red" style="width:30px;height:30px;"><i data-lucide="swords"></i></span> Топ игроков по киллам <i data-lucide="chevron-down" class="chev"></i></summary>
+                        <div class="leaderboard-body" id="public-top-kills"></div>
+                    </details>
+                </div>
+
                 <div class="search-container">
                     <input type="text" id="player-filter-input" class="search-input" placeholder="Поиск игрока по никнейму..." oninput="filterPlayersGrid()">
                 </div>
@@ -1133,35 +1186,35 @@
                 <div class="panel-title">Игровые механики сервера</div>
                 <div class="mechanics-grid">
                     <div class="mechanic-card">
-                        <div class="mechanic-img-box"><div class="mechanic-placeholder-icon">⛓️</div></div>
+                        <div class="mechanic-img-box"><div class="mechanic-placeholder-icon"><i data-lucide="link-2"></i></div></div>
                         <div class="mechanic-text-block">
                             <h3>Арест и Конвоирование</h3>
                             <p>Ролевая система задержания нарушителей. Позволяет временно заковать игрока в наручники и конвоировать его за собой на РП-поводке до выяснения обстоятельства администрацией.</p>
                         </div>
                     </div>
                     <div class="mechanic-card">
-                        <div class="mechanic-img-box"><div class="mechanic-placeholder-icon">🦹</div></div>
+                        <div class="mechanic-img-box"><div class="mechanic-placeholder-icon"><i data-lucide="eye-off"></i></div></div>
                         <div class="mechanic-text-block">
                             <h3>Черный рынок контрабанды</h3>
                             <p>Скрытый даркнет-раздел. Доска объявлений, где за игровую валюту можно анонимно объявить награду за голову любого игрока. Тот, кто ликвидирует цель первым, мгновенно забирает банк.</p>
                         </div>
                     </div>
                     <div class="mechanic-card">
-                        <div class="mechanic-img-box"><div class="mechanic-placeholder-icon">👺</div></div>
+                        <div class="mechanic-img-box"><div class="mechanic-placeholder-icon"><i data-lucide="venetian-mask"></i></div></div>
                         <div class="mechanic-text-block">
                             <h3>Анонимные маски</h3>
                             <p>Маскировка личности на базе текстурированных тыкв. При экипировке предмета игровой никнейм в табе и над головой полностью подменяется, обеспечивая безопасность тайных сделок.</p>
                         </div>
                     </div>
                     <div class="mechanic-card">
-                        <div class="mechanic-img-box"><div class="mechanic-placeholder-icon">📰</div></div>
+                        <div class="mechanic-img-box"><div class="mechanic-placeholder-icon"><i data-lucide="newspaper"></i></div></div>
                         <div class="mechanic-text-block">
                             <h3>Газета Kuromi Times</h3>
                             <p>Информационный вестник сервера. Люгой житель SMP может отправить свою статью или расследование через форму на сайте. Публикация происходит после модерации редакцией.</p>
                         </div>
                     </div>
                     <div class="mechanic-card">
-                        <div class="mechanic-img-box"><div class="mechanic-placeholder-icon">💀</div></div>
+                        <div class="mechanic-img-box"><div class="mechanic-placeholder-icon"><i data-lucide="skull"></i></div></div>
                         <div class="mechanic-text-block">
                             <h3>Кастомная смерть</h3>
                             <p>Косметическая кастомизация логов убийств. Генерирует в чате уникальные текстовые маркеры и спавнит густые ведьминские частицы дыма в точке вашей гибели.</p>
@@ -1199,11 +1252,11 @@
 
                     <div class="chances-panel">
                         <h3>Вероятности секторов рулетки:</h3>
-                        <div class="chance-row"><span>💀 Кастомная смерть (Частый x3)</span><span class="chance-value">47.5%</span></div>
-                        <div class="chance-row"><span>👺 Маска Анонимуса (x2)</span><span class="chance-value">34.0%</span></div>
-                        <div class="chance-row"><span>⛓️ Лицензия на Арест /команду</span><span class="chance-value">10.0%</span></div>
-                        <div class="chance-row"><span>🔍 Логи CoreProtect</span><span class="chance-value">8.0%</span></div>
-                        <div class="chance-row"><span>👑 Проходка НАВСЕГДА (Легендарный)</span><span class="chance-value">0.5%</span></div>
+                        <div class="chance-row"><span><i data-lucide="skull" style="width:15px;height:15px;"></i> Кастомная смерть (Частый x3)</span><span class="chance-value">47.5%</span></div>
+                        <div class="chance-row"><span><i data-lucide="venetian-mask" style="width:15px;height:15px;"></i> Маска Анонимуса (x2)</span><span class="chance-value">34.0%</span></div>
+                        <div class="chance-row"><span><i data-lucide="link-2" style="width:15px;height:15px;"></i> Лицензия на Арест /команду</span><span class="chance-value">10.0%</span></div>
+                        <div class="chance-row"><span><i data-lucide="search" style="width:15px;height:15px;"></i> Логи CoreProtect</span><span class="chance-value">8.0%</span></div>
+                        <div class="chance-row"><span><i data-lucide="crown" style="width:15px;height:15px;"></i> Проходка НАВСЕГДА (Легендарный)</span><span class="chance-value">0.5%</span></div>
                     </div>
                 </div>
 
@@ -1228,8 +1281,8 @@
                     <button class="btn-primary" style="background: var(--accent-pink); box-shadow: 0 4px 15px rgba(255, 0, 127, 0.3);" onclick="placeBountyContract()">Объявить охоту</button>
                 </div>
 
-                <div class="panel-title" style="font-size: 1.3rem; text-align: left; width: 100%; color: #fff; border-bottom: 1px solid rgba(255,0,127,0.1); padding-bottom: 10px; margin-bottom: 20px;">
-                    🎯 Активные контракты в розыске
+                <div class="panel-title" style="font-size: 1.3rem; text-align: left; width: 100%; color: #fff; border-bottom: 1px solid rgba(255,0,127,0.1); padding-bottom: 10px; margin-bottom: 20px; display:flex; align-items:center; gap:10px;">
+                    <span class="icon-badge b-red" style="width:28px;height:28px;"><i data-lucide="target"></i></span> Активные контракты в розыске
                 </div>
 
                 <div class="bounty-grid" id="bounty-board-container"></div>
@@ -1298,7 +1351,7 @@
     <!-- Красивое интерактивное окно подачи Заявки/Анкеты -->
     <div id="app-modal-overlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(5, 3, 8, 0.85); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); z-index: 20001; align-items: center; justify-content: center; padding: 20px;">
         <div id="app-modal-card" style="background: rgba(16, 11, 28, 0.98); border: 1px solid var(--accent-pink); border-radius: 32px; max-width: 500px; width: 100%; padding: 40px 35px; box-shadow: 0 0 40px rgba(255, 0, 127, 0.2); text-align: left; font-family: var(--font-sans); color: #fff; transform: translateY(30px) scale(0.95); opacity: 0; transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);">
-            <h3 style="font-size: 1.45rem; font-weight: 700; margin-bottom: 6px; color: #fff; display: flex; align-items: center; gap: 8px;">🌸 Бесплатный доступ</h3>
+            <h3 style="font-size: 1.45rem; font-weight: 700; margin-bottom: 6px; color: #fff; display: flex; align-items: center; gap: 8px;"><i data-lucide="flower-2" style="width:20px;height:20px;"></i> Бесплатный доступ</h3>
             <p style="font-size: 0.86rem; color: var(--text-muted); margin-bottom: 24px;">Анкета верификации для владельцев официальной Лицензии Minecraft.</p>
             
             <div style="display: flex; flex-direction: column; gap: 20px; width: 100%; margin-bottom: 28px;">
@@ -1367,6 +1420,53 @@
         let isWheelSpinning = false;
 
         /* --- УНИВЕРСАЛЬНЫЙ МОДУЛЬ ДИАЛОГОВЫХ ОКОН С ИСПРАВЛЕННЫМ ВЫРАВНИВАНИЕМ И ПЛЕЙСХОЛДЕРОМ --- */
+        const EMOJI_ICON_MAP = {
+            '⚠️': { icon: 'triangle-alert', color: 'orange' },
+            '❌': { icon: 'x-circle', color: 'red' },
+            '🔒': { icon: 'lock', color: 'purple' },
+            '👑': { icon: 'crown', color: 'orange' },
+            '💀': { icon: 'skull', color: 'red' },
+            '🎉': { icon: 'party-popper', color: 'pink' },
+            '⛓️': { icon: 'link-2', color: 'blue' },
+            '👺': { icon: 'venetian-mask', color: 'purple' },
+            '✅': { icon: 'check-circle-2', color: 'green' },
+            '💎': { icon: 'gem', color: 'purple' },
+            '⛔': { icon: 'ban', color: 'red' },
+            '💬': { icon: 'messages-square', color: 'blue' },
+            '🌸': { icon: 'flower-2', color: 'pink' },
+            '📰': { icon: 'newspaper', color: 'blue' },
+            '🔍': { icon: 'search', color: 'blue' },
+            '🎮': { icon: 'gamepad-2', color: 'purple' },
+            '🔗': { icon: 'link', color: 'blue' },
+            '🛒': { icon: 'shopping-cart', color: 'purple' },
+            '🗑️': { icon: 'trash-2', color: 'red' },
+            '🛡️': { icon: 'shield-check', color: 'green' },
+            '🦹': { icon: 'eye-off', color: 'red' },
+            '🎯': { icon: 'target', color: 'pink' },
+            '🛑': { icon: 'wallet', color: 'red' },
+            '🎰': { icon: 'disc-3', color: 'pink' },
+            '🔑': { icon: 'key', color: 'orange' },
+            '💵': { icon: 'banknote', color: 'green' },
+            '💳': { icon: 'credit-card', color: 'blue' },
+            '❤️': { icon: 'heart', color: 'pink' },
+            '✨': { icon: 'sparkles', color: 'purple' },
+            '🏷️': { icon: 'tag', color: 'orange' },
+            '➕': { icon: 'plus', color: 'green' },
+            '➖': { icon: 'minus', color: 'red' }
+        };
+
+        function formatModalTitle(title) {
+            if (!title) return '';
+            for (const emoji in EMOJI_ICON_MAP) {
+                if (title.indexOf(emoji) === 0) {
+                    const cfg = EMOJI_ICON_MAP[emoji];
+                    const rest = title.slice(emoji.length).trim();
+                    return '<span class="icon-badge b-' + cfg.color + '" style="width:34px;height:34px;flex-shrink:0;"><i data-lucide="' + cfg.icon + '"></i></span><span>' + rest + '</span>';
+                }
+            }
+            return title;
+        }
+
         function openCustomModal({ title, text, showInput, placeholder, buttons }) {
             return new Promise((resolve) => {
                 const overlay = document.getElementById('custom-modal-overlay');
@@ -1377,7 +1477,7 @@
                 const inputEl = document.getElementById('custom-modal-input');
                 const buttonsContainer = document.getElementById('custom-modal-buttons');
 
-                titleEl.innerHTML = title || '';
+                titleEl.innerHTML = formatModalTitle(title);
                 textEl.innerHTML = text || '';
                 inputContainer.style.display = showInput ? 'block' : 'none';
                 
@@ -1410,6 +1510,7 @@
                 overlay.offsetHeight; 
                 card.style.transform = 'translateY(0)';
                 card.style.opacity = '1';
+                if (window.lucide) lucide.createIcons();
             });
         }
 
@@ -1704,12 +1805,13 @@
                         </div>
                     </div>
                     <div class="bounty-price">
-                        <div class="bounty-amount">💎 x${bounty.reward}</div>
+                        <div class="bounty-amount"><i data-lucide="gem" style="width:14px;height:14px;vertical-align:-2px;"></i> x${bounty.reward}</div>
                         <div class="bounty-status">В Розыске</div>
                     </div>
                 `;
                 container.appendChild(card);
             });
+            if (window.lucide) lucide.createIcons();
         }
 
         function placeBountyContract() {
@@ -1751,7 +1853,7 @@
                     currentUserLinkedData = null;
                     isUserModerator = false;
                     
-                    headerWidget.innerHTML = `<button class="widget-login-btn" onclick="switchTab('profile')">🔑 Войти в профиль</button>`;
+                    headerWidget.innerHTML = `<button class="widget-login-btn" onclick="switchTab('profile')"><i data-lucide="key" style="width:16px;height:16px;"></i> Войти в профиль</button>`;
                     wrapper.innerHTML = `
                         <div style="display: flex; flex-direction: column; align-items: center; text-align: center; padding: 20px 0;">
                             <div style="font-size: 4.5rem; color: #5865F2; margin-bottom: 20px; filter: drop-shadow(0 0 15px rgba(88,101,242,0.3));">
@@ -1763,6 +1865,7 @@
                         </div>`;
                     updateForumForm();
                     updateNewsForm();
+                    if (window.lucide) lucide.createIcons();
                     return;
                 }
 
@@ -1822,26 +1925,26 @@
                                 <button class="btn-secondary" style="padding: 8px 16px; font-size: 0.8rem; border-radius: 14px;" onclick="handleSignOut()">Выйти</button>
                             </div>
                             <div style="border: 1px solid rgba(138, 43, 226, 0.25); background: rgba(138, 43, 226, 0.02); border-radius: 24px; padding: 30px; width: 100%; margin-bottom: 25px;">
-                                <h3 style="font-size: 1.3rem; font-weight: 600; color: #fff; margin-bottom: 20px;">⛓️ Привяжи Minecraft аккаунт</h3>
+                                <h3 style="font-size: 1.3rem; font-weight: 600; color: #fff; margin-bottom: 20px; display:flex; align-items:center; gap:10px;"><i data-lucide="link-2" style="width:20px;height:20px;"></i> Привяжи Minecraft аккаунт</h3>
                                 <div style="display: flex; flex-direction: column; gap: 20px;">
                                     <div style="display: flex; gap: 16px; align-items: flex-start;">
                                         <div style="background: rgba(138, 43, 226, 0.15); color: #b388ff; font-weight: 700; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">1</div>
                                         <div>
-                                            <span style="font-weight: 600; color: #fff; display: block; margin-bottom: 6px;">🎮 Зайди на сервер</span>
+                                            <span style="font-weight: 600; color: #fff; display: block; margin-bottom: 6px;"><i data-lucide="gamepad-2" style="width:14px;height:14px;vertical-align:-2px;"></i> Зайди на сервер</span>
                                             <button class="btn-secondary" id="server-ip-profile" style="padding: 6px 14px; font-size: 0.78rem; border-radius: 10px;" onclick="copyIp('play.kuromismp.ru')">play.kuromismp.ru</button>
                                         </div>
                                     </div>
                                     <div style="display: flex; gap: 16px; align-items: flex-start;">
                                         <div style="background: rgba(138, 43, 226, 0.15); color: #b388ff; font-weight: 700; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">2</div>
                                         <div style="color: var(--text-muted); font-size: 0.9rem;">
-                                            <span style="font-weight: 600; color: #fff; display: block; margin-bottom: 2px;">🔗 Нажми на ссылку в чате</span>
+                                            <span style="font-weight: 600; color: #fff; display: block; margin-bottom: 2px;"><i data-lucide="link" style="width:14px;height:14px;vertical-align:-2px;"></i> Нажми на ссылку в чате</span>
                                             При входе в чате появится кликабельная ссылка. Нажми на неё — откроется браузер.
                                         </div>
                                     </div>
                                     <div style="display: flex; gap: 16px; align-items: flex-start;">
                                         <div style="background: rgba(138, 43, 226, 0.15); color: #b388ff; font-weight: 700; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">3</div>
                                         <div style="color: var(--text-muted); font-size: 0.9rem;">
-                                            <span style="font-weight: 600; color: #fff; display: block; margin-bottom: 2px;">✅ Подтверди вход через Discord</span>
+                                            <span style="font-weight: 600; color: #fff; display: block; margin-bottom: 2px;"><i data-lucide="check-circle-2" style="width:14px;height:14px;vertical-align:-2px;"></i> Подтверди вход через Discord</span>
                                             В браузере нажми 'Разрешить' — аккаунт привяжется автоматически.
                                         </div>
                                     </div>
@@ -1876,7 +1979,7 @@
                 headerWidget.innerHTML = `
                     <div style="display: flex; flex-direction: column; gap: 10px; width: 100%;">
                         <div id="wallet-widget" onclick="openWalletModal('${linkedData.minecraft_uuid}')">
-                            💎 <span id="wallet-balance-display">0</span>
+                            <i data-lucide="gem" style="width:15px;height:15px;vertical-align:-2px;"></i> <span id="wallet-balance-display">0</span>
                         </div>
                         <div id="ruble-widget" onclick="openTopUpModal()">
                             ₽ <span id="ruble-balance-display">${currentRubBalance}</span>
@@ -1902,7 +2005,7 @@
                         </div>
                         <div class="stats-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-top: 20px;">
                             <div class="stat-card" style="background: rgba(255,255,255,0.01); border: 1px solid rgba(255,255,255,0.03); padding: 20px; border-radius: 20px; text-align: left;">
-                                <div class="stat-label" style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 4px;">⏱ Время на сервере</div>
+                                <div class="stat-label" style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 4px;"><i data-lucide="clock" style="width:13px;height:13px;display:inline;vertical-align:-2px;"></i> Время на сервере</div>
                                 <div class="stat-value" style="font-size: 1.4rem; font-weight: 700;">${formatPlaytime(currentStats.playtime_seconds)}</div>
                             </div>
                             <div class="stat-card" style="background: rgba(255,255,255,0.01); border: 1px solid rgba(255,255,255,0.03); padding: 20px; border-radius: 20px; text-align: left;">
@@ -1924,6 +2027,7 @@
                 console.error(e);
                 wrapper.innerHTML = `<div style="color: var(--accent-pink);">Ошибка загрузки профиля.</div>`;
             }
+            if (window.lucide) lucide.createIcons();
         }
 
         async function handleSignOut() {
@@ -2044,7 +2148,7 @@
                     <div class="player-card-info">
                         <h3>${player.minecraft_name}</h3>
                         <div class="player-card-meta">
-                            <span>⏱ ${formatPlaytime(player.playtime_seconds)}</span>
+                            <span><i data-lucide="clock" style="width:12px;height:12px;vertical-align:-2px;"></i> ${formatPlaytime(player.playtime_seconds)}</span>
                             <span>•</span>
                             <span style="display: inline-flex; align-items: center; gap: 5px;">
                                 <span style="width: 8px; height: 8px; background: ${dotColor}; border-radius: 50%; display: inline-block; ${player.is_online ? 'box-shadow: 0 0 8px #2ecc71;' : ''}"></span>
@@ -2055,6 +2159,7 @@
                 `;
                 container.appendChild(card);
             });
+            if (window.lucide) lucide.createIcons();
         }
 
         function filterPlayersGrid() {
@@ -2157,6 +2262,8 @@
             if(targetTabBtn) targetTabBtn.classList.add('active');
             
             if(tabName === 'donate') { initRouletteGraphic(); renderShopFront(); }
+            if(tabName === 'join') renderJoinPrices();
+            if(tabName === 'players') { if (window.lucide) lucide.createIcons(); loadTopLeaderboards('public'); }
             if(tabName === 'profile') loadProfileData();
             if(tabName === 'forum') {
                 loadProfileData().then(() => {
@@ -2434,7 +2541,7 @@
                 transactions.forEach(tx => {
                     const isIn = tx.direction === 'in';
                     const color = isIn ? '#2ecc71' : 'var(--accent-pink)';
-                    const badge = isIn ? '💵' : '🛒';
+                    const badge = isIn ? '<i data-lucide="banknote" style="width:14px;height:14px;"></i>' : '<i data-lucide="shopping-cart" style="width:14px;height:14px;"></i>';
                     const sign = isIn ? '+' : '-';
                     
                     html += `
@@ -2458,7 +2565,7 @@
             } else if (tab === 'season') {
                 container.innerHTML = `
                     <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 45px 15px; color: var(--text-muted);">
-                        <div style="font-size: 2.3rem; margin-bottom: 12px; filter: drop-shadow(0 0 10px rgba(255,183,0,0.15));">🔒</div>
+                        <div style="margin-bottom: 12px; filter: drop-shadow(0 0 10px rgba(255,183,0,0.15));"><i data-lucide="lock" style="width:38px;height:38px;color:#ffb95c;"></i></div>
                         <div style="font-size: 0.9rem; font-weight: 600; color: #fff; margin-bottom: 4px;">Раздел временно закрыт</div>
                         <div style="font-size: 0.8rem; line-height: 1.4; max-width: 280px;">Скоро здесь появится статистика Батл Пасса. Следи за новостями запуска 4-го сезона!</div>
                     </div>
@@ -2531,7 +2638,7 @@
                     action: whitelistAction
                 });
 
-            alert(`🎉 Поздравляем! Проходка успешно куплена за ${price} ₽! Никнейм [${cleanNick}] отправлен в очередь вайтлиста сервера. Теперь вы можете беспрепятственно зайти в игру и пройти верификацию!`);
+            customAlert("🎉 Поздравляем!", `Проходка успешно куплена за ${price} ₽! Никнейм [${cleanNick}] отправлен в очередь вайтлиста сервера. Теперь вы можете беспрепятственно зайти в игру и пройти верификацию!`);
             loadProfileData();
         }
 
@@ -2667,7 +2774,7 @@
             } else {
                 container.innerHTML = `
                     <div style="width: 100%; background: rgba(138, 43, 226, 0.02); border: 1px solid rgba(138, 43, 226, 0.15); padding: 20px; border-radius: 20px; text-align: center; color: var(--text-muted); font-size: 0.95rem; font-weight: 500;">
-                        🔒 Войди и привяжи Minecraft, чтобы публиковать посты.
+                        <i data-lucide="lock" style="width:15px;height:15px;vertical-align:-2px;"></i> Войди и привяжи Minecraft, чтобы публиковать посты.
                     </div>
                 `;
             }
@@ -2843,10 +2950,10 @@
                         
                         <div style="display: flex; gap: 12px; align-items: center;">
                             <button id="like-btn-${post.id}" style="display: flex; align-items: center; gap: 8px; background: ${activeLikeBg}; border: 1px solid rgba(255,255,255,0.03); color: ${activeLikeColor}; padding: 8px 16px; border-radius: 14px; font-family: var(--font-sans); font-size: 0.85rem; font-weight: 600; cursor: pointer; transition: all 0.2s;" onclick="toggleLike('${post.id}', event)">
-                                ❤️ <span>${post.likes_count ?? 0}</span>
+                                <i data-lucide="heart" style="width:14px;height:14px;vertical-align:-2px;"></i> <span>${post.likes_count ?? 0}</span>
                             </button>
                             <button style="display: flex; align-items: center; gap: 8px; background: rgba(255,255,255,0.01); border: 1px solid rgba(255,255,255,0.03); color: var(--text-muted); padding: 8px 16px; border-radius: 14px; font-family: var(--font-sans); font-size: 0.85rem; font-weight: 500; cursor: pointer; transition: all 0.2s;" onclick="toggleCommentsDisplay('${post.id}')">
-                                Ответы 💬 (<span>${postComments.length}</span>)
+                                Ответы <i data-lucide="messages-square" style="width:13px;height:13px;vertical-align:-2px;"></i> (<span>${postComments.length}</span>)
                             </button>
                         </div>
 
@@ -2862,6 +2969,7 @@
 
                 feedContainer.innerHTML = '';
                 feedContainer.appendChild(fragment);
+                if (window.lucide) lucide.createIcons();
             } catch (e) {
                 console.error("Ошибка при генерации ленты форума:", e);
                 feedContainer.innerHTML = `<div style="color: var(--accent-pink); text-align: center; padding: 20px;">Не удалось подгрузить посты форума.</div>`;
@@ -3064,6 +3172,11 @@
         function updateNewsForm() {
             const adminTabBtn = document.getElementById('tab-admin');
             if (adminTabBtn) adminTabBtn.style.display = isUserModerator ? 'inline-block' : 'none';
+            const adminFixedBtn = document.getElementById('admin-fixed-btn');
+            if (adminFixedBtn) {
+                adminFixedBtn.style.display = isUserModerator ? 'flex' : 'none';
+                if (isUserModerator && window.lucide) lucide.createIcons();
+            }
             if (!isUserModerator) {
                 const activeSection = document.getElementById('section-admin');
                 if (activeSection && activeSection.classList.contains('active')) switchTab('home');
@@ -3304,23 +3417,28 @@
             await loadAdminPromoCodes();
         }
 
-        function renderShopItemRow(item, stats) {
+        const STATUS_ICONS = { active: 'check-circle-2', hidden: 'eye-off', soon: 'clock' };
+
+        function renderShopItemRow(item, stats, index) {
             const categoryLabels = { privilege: 'Привилегия', pass_permanent: 'Проходка навсегда', pass_30d: 'Проходка 30 дней' };
             const statusLabels = { active: 'В продаже', hidden: 'Скрыт', soon: 'Скоро' };
+            const num = String(index + 1).padStart(2, '0');
             return `
-            <div class="admin-card">
-                <div class="admin-row-head">
+            <div class="shop-item-card">
+                <div class="shop-item-top">
+                    <div class="shop-item-index">${num}</div>
                     <div class="grow">
-                        <div class="admin-field-label">Название</div>
-                        <input type="text" class="admin-input" id="si-name-${item.id}" value="${escapeHtml(item.name)}">
+                        <input type="text" class="shop-item-name-input" id="si-name-${item.id}" value="${escapeHtml(item.name)}">
                     </div>
-                    <div>
-                        <div class="admin-field-label">Статус</div>
-                        <span class="status-pill ${item.status}" onclick="toggleItemStatus('${item.id}')" title="Нажмите, чтобы переключить">${statusLabels[item.status] || item.status}</span>
-                    </div>
+                    <span class="status-pill ${item.status}" onclick="toggleItemStatus('${item.id}')" title="Нажмите, чтобы переключить статус">
+                        <i data-lucide="${STATUS_ICONS[item.status] || 'circle'}"></i>${statusLabels[item.status] || item.status}
+                    </span>
                 </div>
+
                 <div class="admin-field-label">Описание</div>
-                <textarea class="admin-textarea" id="si-desc-${item.id}" style="margin-bottom:12px;">${escapeHtml(item.description || '')}</textarea>
+                <textarea class="admin-textarea" id="si-desc-${item.id}">${escapeHtml(item.description || '')}</textarea>
+
+                <div class="shop-item-divider"></div>
 
                 <div class="discount-row">
                     <div style="min-width:110px;">
@@ -3339,20 +3457,16 @@
                         <div class="admin-field-label">Значение</div>
                         <input type="number" class="admin-input" id="si-disc-val-${item.id}" value="${item.discount_value !== null && item.discount_value !== undefined ? item.discount_value : ''}" placeholder="—">
                     </div>
-                    <div style="margin-left:auto; display:flex; gap:8px; align-items:flex-end; padding-top: 18px;">
-                        <button class="btn-mini save" onclick="saveShopItemRow('${item.id}')"><i data-lucide="check" style="width:14px;height:14px;"></i> Сохранить</button>
-                        <button class="btn-mini danger" onclick="deleteShopItem('${item.id}')"><i data-lucide="trash-2" style="width:14px;height:14px;"></i></button>
-                    </div>
                 </div>
 
-                <div class="admin-card-grid" style="margin-top:14px; margin-bottom:0;">
-                    <div class="admin-stat-box">
-                        <div class="lbl"><i data-lucide="shopping-cart" style="width:13px;height:13px;"></i> Категория</div>
-                        <div class="val" style="font-size:0.9rem;">${categoryLabels[item.category] || item.category}</div>
+                <div class="shop-item-footer">
+                    <div class="admin-stat-box" style="padding:8px 14px;">
+                        <div class="lbl"><i data-lucide="trending-up" style="width:12px;height:12px;"></i> Продано / выручка</div>
+                        <div class="val" style="font-size:0.92rem;">${stats.count} шт · ${stats.revenue.toFixed(0)} ₽</div>
                     </div>
-                    <div class="admin-stat-box">
-                        <div class="lbl"><i data-lucide="trending-up" style="width:13px;height:13px;"></i> Продано / выручка</div>
-                        <div class="val">${stats.count} шт · ${stats.revenue.toFixed(0)} ₽</div>
+                    <div class="shop-item-actions">
+                        <button class="btn-mini save" onclick="saveShopItemRow('${item.id}')"><i data-lucide="check" style="width:14px;height:14px;"></i> Сохранить</button>
+                        <button class="btn-mini danger" onclick="deleteShopItem('${item.id}')"><i data-lucide="trash-2" style="width:14px;height:14px;"></i></button>
                     </div>
                 </div>
             </div>`;
@@ -3381,10 +3495,35 @@
                 });
 
                 let html = '';
+                const groups = { pass_permanent: [], pass_30d: [], privilege: [] };
                 items.forEach(item => {
                     adminShopItemsCache[item.id] = item;
-                    const stats = statsMap[item.id] || { count: 0, revenue: 0 };
-                    html += renderShopItemRow(item, stats);
+                    if (!groups[item.category]) groups[item.category] = [];
+                    groups[item.category].push(item);
+                });
+
+                const groupMeta = {
+                    pass_permanent: { label: 'Проходки навсегда', icon: 'crown', color: 'orange' },
+                    pass_30d: { label: 'Проходки на 30 дней', icon: 'calendar-clock', color: 'blue' },
+                    privilege: { label: 'Привилегии и кастомизация', icon: 'sparkles', color: 'purple' }
+                };
+
+                Object.keys(groups).forEach(catKey => {
+                    const groupItems = groups[catKey];
+                    if (!groupItems || groupItems.length === 0) return;
+                    const meta = groupMeta[catKey] || { label: catKey, icon: 'package', color: 'purple' };
+                    html += `
+                        <div class="shop-category-group">
+                            <div class="shop-category-heading">
+                                <span class="icon-badge b-${meta.color}" style="width:30px;height:30px;"><i data-lucide="${meta.icon}"></i></span>
+                                <span class="name">${escapeHtml(meta.label)}</span>
+                                <span class="count">${groupItems.length}</span>
+                            </div>`;
+                    groupItems.forEach((item, idx) => {
+                        const stats = statsMap[item.id] || { count: 0, revenue: 0 };
+                        html += renderShopItemRow(item, stats, idx);
+                    });
+                    html += `</div>`;
                 });
                 container.innerHTML = html;
                 if (window.lucide) lucide.createIcons();
@@ -3453,6 +3592,7 @@
             customAlert('✅ Сохранено', 'Изменения товара успешно сохранены и записаны в журнал.');
             await loadAdminShopItems();
             renderShopFront();
+            renderJoinPrices();
         }
 
         async function toggleItemStatus(itemId) {
@@ -3468,6 +3608,7 @@
             });
             await loadAdminShopItems();
             renderShopFront();
+            renderJoinPrices();
         }
 
         async function deleteShopItem(itemId) {
@@ -3480,6 +3621,7 @@
             await logAdminAction({ action_type: 'item_delete', severity: 'high', target_type: 'shop_item', target_label: original.name, details: { deleted_price: original.base_price } });
             await loadAdminShopItems();
             renderShopFront();
+            renderJoinPrices();
         }
 
         function openCreateShopItemModal() {
@@ -3521,6 +3663,7 @@
                 await logAdminAction({ action_type: 'item_create', severity: 'medium', target_type: 'shop_item', target_label: name, details: { price } });
                 await loadAdminShopItems();
                 renderShopFront();
+                renderJoinPrices();
             });
         }
 
@@ -3632,6 +3775,44 @@
             await loadAdminPromoCodes();
         }
 
+        async function renderJoinPrices() {
+            try {
+                const { data: items, error } = await supabaseClient.from('shop_items').select('*').in('key', ['pass_permanent', 'pass_30d']);
+                if (error) throw error;
+                (items || []).forEach(item => {
+                    const suffix = item.key === 'pass_permanent' ? 'permanent' : '30d';
+                    let finalPrice = item.base_price;
+                    if (item.discount_type === 'percent' && item.discount_value) finalPrice = Math.max(0, Math.round(item.base_price * (1 - item.discount_value / 100)));
+                    else if (item.discount_type === 'fixed' && item.discount_value) finalPrice = Math.max(0, item.base_price - item.discount_value);
+
+                    const nameEl = document.getElementById(`join-name-${suffix}`);
+                    const descEl = document.getElementById(`join-desc-${suffix}`);
+                    const priceEl = document.getElementById(`join-price-${suffix}`);
+                    const btnEl = document.getElementById(`join-btn-${suffix}`);
+                    if (nameEl) nameEl.textContent = item.name;
+                    if (descEl) descEl.textContent = item.description || '';
+                    if (priceEl) {
+                        priceEl.innerHTML = item.discount_type && item.discount_value
+                            ? `<span style="text-decoration:line-through; color:var(--text-muted); font-size:0.8rem; margin-right:6px;">${item.base_price} ₽</span>${finalPrice} ₽`
+                            : `${finalPrice} ₽`;
+                    }
+                    if (btnEl) {
+                        if (item.status === 'soon') {
+                            btnEl.disabled = true;
+                            btnEl.style.opacity = '0.5';
+                            btnEl.textContent = 'Скоро';
+                        } else {
+                            btnEl.disabled = false;
+                            btnEl.style.opacity = '1';
+                            btnEl.onclick = () => buyShopItem(item.id);
+                        }
+                    }
+                });
+            } catch (e) {
+                console.error('Не удалось подгрузить актуальные цены проходок (используются значения по умолчанию):', e);
+            }
+        }
+
         /* ================= ВИТРИНА МАГАЗИНА (для игроков) ================= */
 
         async function renderShopFront() {
@@ -3659,11 +3840,11 @@
                         oldPriceHtml = `<span style="text-decoration:line-through; color:var(--text-muted); font-size:0.85rem; margin-right:6px;">${item.base_price} ₽</span>`;
                     }
                     const isBig = item.category === 'pass_permanent';
+                    const soonChip = soon ? '<span class="status-pill soon" style="margin-left:8px; cursor:default;"><i data-lucide="clock"></i>Скоро</span>' : '';
                     html += `
-                        <div class="ticket-card" style="padding: 20px 25px; border-radius: 20px; ${isBig ? 'grid-column: span 2;' : ''} position:relative;">
-                            ${soon ? '<div style="position:absolute; top:12px; right:12px; background:rgba(255,159,28,0.16); color:#ffb95c; font-size:0.68rem; font-weight:700; padding:4px 10px; border-radius:100px; text-transform:uppercase;">Скоро</div>' : ''}
+                        <div class="ticket-card" style="padding: 20px 25px; border-radius: 20px; ${isBig ? 'grid-column: span 2;' : ''}">
                             <div class="ticket-info">
-                                <h3>${escapeHtml(item.name)}</h3>
+                                <h3 style="display:flex; align-items:center; flex-wrap:wrap;">${escapeHtml(item.name)}${soonChip}</h3>
                                 <p>${escapeHtml(item.description || '')}</p>
                             </div>
                             <div>
@@ -3673,6 +3854,7 @@
                         </div>`;
                 });
                 container.innerHTML = html;
+                if (window.lucide) lucide.createIcons();
             } catch (e) {
                 console.error('Не удалось загрузить магазин из shop_items, использую резервный список:', e);
                 renderShopFrontFallback();
@@ -3758,6 +3940,7 @@
                 customAlert("🎉 Поздравляем!", `Товар «${escapeHtml(item.name)}» успешно куплен за ${finalPrice} ₽!`);
                 loadProfileData();
                 renderShopFront();
+                renderJoinPrices();
             } catch (e) {
                 console.error(e);
                 customAlert("❌ Ошибка", "Не удалось завершить покупку. Попробуйте позже.");
@@ -3790,14 +3973,15 @@
             loadTopLeaderboards();
         }
 
-        async function loadTopLeaderboards() {
+        async function loadTopLeaderboards(prefix) {
+            prefix = prefix || 'admin';
             try {
                 const { data: linked } = await supabaseClient.from('linked_accounts').select('minecraft_uuid, minecraft_name, discord_id, user_id');
                 const nameMap = {};
                 (linked || []).forEach(l => nameMap[l.minecraft_uuid] = l);
 
                 const { data: byBalance } = await supabaseClient.from('player_stats').select('minecraft_uuid, currency_balance').order('currency_balance', { ascending: false }).limit(15);
-                const balanceBox = document.getElementById('admin-top-balance');
+                const balanceBox = document.getElementById(`${prefix}-top-balance`);
                 if (balanceBox) {
                     const rows = (byBalance || []).filter(p => nameMap[p.minecraft_uuid]).slice(0, 10);
                     balanceBox.innerHTML = rows.length ? rows.map((p, i) => `
@@ -3810,7 +3994,7 @@
                 }
 
                 const { data: byKills } = await supabaseClient.from('player_stats').select('minecraft_uuid, kills').order('kills', { ascending: false }).limit(15);
-                const killsBox = document.getElementById('admin-top-kills');
+                const killsBox = document.getElementById(`${prefix}-top-kills`);
                 if (killsBox) {
                     const rows = (byKills || []).filter(p => nameMap[p.minecraft_uuid]).slice(0, 10);
                     killsBox.innerHTML = rows.length ? rows.map((p, i) => `
@@ -3821,6 +4005,7 @@
                             <div style="font-weight:700; color:#ff7b6e;">${p.kills ?? 0}</div>
                         </div>`).join('') : `<div style="color:var(--text-muted); padding:10px;">Нет данных</div>`;
                 }
+                if (window.lucide) lucide.createIcons();
             } catch (e) {
                 console.error('Ошибка загрузки топов игроков:', e);
             }
@@ -4106,6 +4291,8 @@
         }
 
         renderShopFront();
+        renderJoinPrices();
+        loadTopLeaderboards('public');
     </script>
 </body>
 </html>
