@@ -616,6 +616,80 @@
             transition: all 0.3s ease;
         }
         .mechanic-card:hover { border-color: rgba(138, 43, 226, 0.25); background: rgba(255, 255, 255, 0.02); transform: translateY(-2px); }
+        .mechanic-card { cursor: pointer; }
+        .mechanic-more {
+            display: flex; align-items: center; gap: 6px;
+            font-size: 0.78rem; font-weight: 600; color: #b985f4;
+            margin-top: auto; padding-top: 4px;
+        }
+        .mechanic-more [data-lucide] { width: 14px; height: 14px; transition: transform 0.2s ease; }
+        .mechanic-card:hover .mechanic-more [data-lucide] { transform: translateX(3px); }
+
+        #wiki-modal-overlay {
+            display: none; position: fixed; inset: 0;
+            background: rgba(5, 3, 8, 0.85);
+            backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+            z-index: 20001; align-items: center; justify-content: center; padding: 20px;
+        }
+        #wiki-modal-card {
+            background: rgba(16, 11, 28, 0.98);
+            border: 1px solid rgba(138, 43, 226, 0.4);
+            border-radius: 32px;
+            max-width: 620px; width: 100%; max-height: 84vh;
+            display: flex; flex-direction: column;
+            box-shadow: 0 0 50px rgba(138, 43, 226, 0.2);
+            transform: translateY(30px) scale(0.95); opacity: 0;
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        .wiki-modal-header {
+            display: flex; align-items: center; gap: 14px;
+            padding: 28px 32px 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            flex-shrink: 0;
+        }
+        .wiki-modal-header h3 { font-family: var(--font-display); font-size: 1.25rem; font-weight: 600; color: #fff; flex: 1; }
+        .wiki-modal-close {
+            width: 34px; height: 34px; border-radius: 10px; flex-shrink: 0;
+            background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.06);
+            display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--text-muted);
+            transition: all 0.2s ease;
+        }
+        .wiki-modal-close:hover { background: rgba(255, 0, 127, 0.12); color: #fff; }
+        .wiki-modal-close [data-lucide] { width: 16px; height: 16px; }
+
+        .wiki-modal-body {
+            padding: 24px 32px 32px;
+            overflow-y: auto;
+            color: rgba(255, 255, 255, 0.85);
+            font-size: 0.92rem;
+            line-height: 1.65;
+        }
+        .wiki-modal-body::-webkit-scrollbar { width: 5px; }
+        .wiki-modal-body::-webkit-scrollbar-thumb { background: rgba(138, 43, 226, 0.35); border-radius: 4px; }
+        .wiki-modal-body h4 {
+            font-size: 0.95rem; font-weight: 700; color: #fff; margin: 22px 0 10px;
+            display: flex; align-items: center; gap: 8px;
+        }
+        .wiki-modal-body h4:first-child { margin-top: 0; }
+        .wiki-modal-body h4 [data-lucide] { width: 15px; height: 15px; color: #b985f4; }
+        .wiki-modal-body ul { list-style: none; display: flex; flex-direction: column; gap: 8px; margin: 4px 0; }
+        .wiki-modal-body ul li { display: flex; align-items: flex-start; gap: 9px; }
+        .wiki-modal-body ul li::before {
+            content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--primary-purple);
+            flex-shrink: 0; margin-top: 8px;
+        }
+        .wiki-modal-body code {
+            background: rgba(255, 255, 255, 0.06); padding: 2px 8px; border-radius: 6px;
+            font-family: monospace; font-size: 0.85em; color: #d9b3ff;
+        }
+        .wiki-tip {
+            display: flex; gap: 12px; align-items: flex-start;
+            background: rgba(138, 43, 226, 0.08); border: 1px solid rgba(138, 43, 226, 0.2);
+            border-radius: 16px; padding: 16px 18px; margin-top: 18px;
+            font-size: 0.85rem; color: var(--text-muted);
+        }
+        .wiki-tip [data-lucide] { width: 17px; height: 17px; color: #b985f4; flex-shrink: 0; margin-top: 1px; }
+        .wiki-tip b { color: #fff; }
         .mechanic-img-box {
             width: 100%;
             height: 160px;
@@ -988,8 +1062,8 @@
             transition: all 0.3s ease;
         }
         .app-input-glow:focus {
-            border-color: var(--accent-pink) !important;
-            box-shadow: 0 0 15px rgba(255, 0, 127, 0.25);
+            border-color: #2ecc71 !important;
+            box-shadow: 0 0 15px rgba(46, 204, 113, 0.25);
             background: rgba(16, 11, 28, 0.9) !important;
         }
         /* ================= АДМИН-ПАНЕЛЬ ================= */
@@ -1189,7 +1263,7 @@
             <button id="tab-join" onclick="switchTab('join')">Как попасть</button>
             <button id="tab-rules" onclick="switchTab('rules')">Правила</button>
             <button id="tab-players" onclick="switchTab('players')">Игроки</button>
-            <button id="tab-mechanics" onclick="switchTab('mechanics')">Механики</button>
+            <button id="tab-mechanics" onclick="switchTab('mechanics')">Вики</button>
             <button id="tab-donate" onclick="switchTab('donate')">Донат</button>
         </nav>
     </header>
@@ -1341,42 +1415,50 @@
 
         <div id="section-mechanics" class="content-section">
             <div class="ux-panel">
-                <div class="panel-title">Игровые механики сервера</div>
+                <div class="panel-title" style="text-align: left; width: 100%; display:flex; align-items:center; gap:10px;">
+                    <span class="icon-badge b-purple" style="width:32px;height:32px;"><i data-lucide="book-open"></i></span> Вики сервера
+                </div>
+                <div class="eyebrow" style="margin-bottom: 30px; text-align: left; width: 100%;">Разбираем все механики, системы и фишки KuromiSMP</div>
                 <div class="mechanics-grid">
-                    <div class="mechanic-card">
+                    <div class="mechanic-card" onclick="openWikiArticle('arrest')">
                         <div class="mechanic-img-box"><div class="mechanic-placeholder-icon"><i data-lucide="link-2"></i></div></div>
                         <div class="mechanic-text-block">
                             <h3>Арест и Конвоирование</h3>
                             <p>Ролевая система задержания нарушителей. Позволяет временно заковать игрока в наручники и конвоировать его за собой на РП-поводке до выяснения обстоятельства администрацией.</p>
                         </div>
+                        <div class="mechanic-more">Подробнее <i data-lucide="arrow-right"></i></div>
                     </div>
-                    <div class="mechanic-card">
+                    <div class="mechanic-card" onclick="openWikiArticle('blackmarket')">
                         <div class="mechanic-img-box"><div class="mechanic-placeholder-icon"><i data-lucide="eye-off"></i></div></div>
                         <div class="mechanic-text-block">
                             <h3>Черный рынок контрабанды</h3>
                             <p>Скрытый даркнет-раздел. Доска объявлений, где за игровую валюту можно анонимно объявить награду за голову любого игрока. Тот, кто ликвидирует цель первым, мгновенно забирает банк.</p>
                         </div>
+                        <div class="mechanic-more">Подробнее <i data-lucide="arrow-right"></i></div>
                     </div>
-                    <div class="mechanic-card">
+                    <div class="mechanic-card" onclick="openWikiArticle('mask')">
                         <div class="mechanic-img-box"><div class="mechanic-placeholder-icon"><i data-lucide="venetian-mask"></i></div></div>
                         <div class="mechanic-text-block">
                             <h3>Анонимные маски</h3>
                             <p>Маскировка личности на базе текстурированных тыкв. При экипировке предмета игровой никнейм в табе и над головой полностью подменяется, обеспечивая безопасность тайных сделок.</p>
                         </div>
+                        <div class="mechanic-more">Подробнее <i data-lucide="arrow-right"></i></div>
                     </div>
-                    <div class="mechanic-card">
+                    <div class="mechanic-card" onclick="openWikiArticle('newspaper')">
                         <div class="mechanic-img-box"><div class="mechanic-placeholder-icon"><i data-lucide="newspaper"></i></div></div>
                         <div class="mechanic-text-block">
                             <h3>Газета Kuromi Times</h3>
                             <p>Информационный вестник сервера. Люгой житель SMP может отправить свою статью или расследование через форму на сайте. Публикация происходит после модерации редакцией.</p>
                         </div>
+                        <div class="mechanic-more">Подробнее <i data-lucide="arrow-right"></i></div>
                     </div>
-                    <div class="mechanic-card">
+                    <div class="mechanic-card" onclick="openWikiArticle('death')">
                         <div class="mechanic-img-box"><div class="mechanic-placeholder-icon"><i data-lucide="skull"></i></div></div>
                         <div class="mechanic-text-block">
                             <h3>Кастомная смерть</h3>
                             <p>Косметическая кастомизация логов убийств. Генерирует в чате уникальные текстовые маркеры и спавнит густые ведьминские частицы дыма в точке вашей гибели.</p>
                         </div>
+                        <div class="mechanic-more">Подробнее <i data-lucide="arrow-right"></i></div>
                     </div>
                 </div>
             </div>
@@ -1508,8 +1590,8 @@
 
     <!-- Красивое интерактивное окно подачи Заявки/Анкеты -->
     <div id="app-modal-overlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(5, 3, 8, 0.85); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); z-index: 20001; align-items: center; justify-content: center; padding: 20px;">
-        <div id="app-modal-card" style="background: rgba(16, 11, 28, 0.98); border: 1px solid var(--accent-pink); border-radius: 32px; max-width: 500px; width: 100%; padding: 40px 35px; box-shadow: 0 0 40px rgba(255, 0, 127, 0.2); text-align: left; font-family: var(--font-sans); color: #fff; transform: translateY(30px) scale(0.95); opacity: 0; transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);">
-            <h3 style="font-size: 1.45rem; font-weight: 700; margin-bottom: 6px; color: #fff; display: flex; align-items: center; gap: 8px;"><i data-lucide="flower-2" style="width:20px;height:20px;"></i> Бесплатный доступ</h3>
+        <div id="app-modal-card" style="background: rgba(16, 11, 28, 0.98); border: 1px solid #2ecc71; border-radius: 32px; max-width: 500px; width: 100%; padding: 40px 35px; box-shadow: 0 0 40px rgba(46, 204, 113, 0.2); text-align: left; font-family: var(--font-sans); color: #fff; transform: translateY(30px) scale(0.95); opacity: 0; transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);">
+            <h3 style="font-size: 1.45rem; font-weight: 700; margin-bottom: 6px; color: #fff; display: flex; align-items: center; gap: 8px;"><i data-lucide="flower-2" style="width:20px;height:20px;color:#7be8a4;"></i> Бесплатный доступ</h3>
             <p style="font-size: 0.86rem; color: var(--text-muted); margin-bottom: 24px;">Анкета верификации для владельцев официальной Лицензии Minecraft.</p>
             
             <div style="display: flex; flex-direction: column; gap: 20px; width: 100%; margin-bottom: 28px;">
@@ -1539,8 +1621,19 @@
 
             <div style="display: flex; gap: 12px; justify-content: flex-end; width: 100%;">
                 <button class="btn-secondary" style="padding: 12px 26px; border-radius: 20px; font-weight: 600;" onclick="closeApplicationModal()">Отмена</button>
-                <button id="app-submit-btn" class="btn-primary" style="padding: 12px 28px; border-radius: 20px; background:var(--accent-pink); box-shadow: 0 4px 15px rgba(255,0,127,0.2); font-weight: 700; transition: all 0.2s;" onclick="submitServerApplication()">Отправить анкету</button>
+                <button id="app-submit-btn" class="btn-primary" style="padding: 12px 28px; border-radius: 20px; background:#2ecc71; box-shadow: 0 4px 15px rgba(46,204,113,0.25); font-weight: 700; transition: all 0.2s;" onclick="submitServerApplication()">Отправить анкету</button>
             </div>
+        </div>
+    </div>
+
+    <div id="wiki-modal-overlay">
+        <div id="wiki-modal-card">
+            <div class="wiki-modal-header">
+                <span class="icon-badge b-purple" id="wiki-modal-icon" style="width:40px;height:40px;"><i data-lucide="book-open"></i></span>
+                <h3 id="wiki-modal-title">Заголовок статьи</h3>
+                <div class="wiki-modal-close" onclick="closeWikiArticle()"><i data-lucide="x"></i></div>
+            </div>
+            <div class="wiki-modal-body" id="wiki-modal-body"></div>
         </div>
     </div>
 
@@ -1731,6 +1824,116 @@
         function closeApplicationModal() {
             const overlay = document.getElementById('app-modal-overlay');
             const card = document.getElementById('app-modal-card');
+            card.style.transform = 'translateY(30px) scale(0.95)';
+            card.style.opacity = '0';
+            setTimeout(() => { overlay.style.display = 'none'; }, 250);
+        }
+
+        /* --- ВИКИ СЕРВЕРА: ПОЛНЫЕ СТАТЬИ ПО МЕХАНИКАМ --- */
+        const WIKI_ARTICLES = {
+            arrest: {
+                icon: 'link-2', color: 'blue',
+                title: 'Арест и Конвоирование',
+                body: `
+                    <h4><i data-lucide="info"></i> Что это такое</h4>
+                    <p>Ролевая механика задержания нарушителей без банов и киков «в лоб». Она нужна для отыгрыша полицейских и охранных РП-фракций: вместо того чтобы жаловаться администрации, конвоир сам временно обездвиживает нарушителя и ведёт его на разбирательство.</p>
+                    <h4><i data-lucide="list-ordered"></i> Как это работает</h4>
+                    <ul>
+                        <li>Игрок с лицензией на арест использует наручники командой <code>/cuf</code> на нарушителе.</li>
+                        <li>Скованный игрок теряет возможность свободно передвигаться и следует за конвоиром на невидимом РП-поводке.</li>
+                        <li>Конвоир решает дальнейшую судьбу: довести до администрации для разбирательства или отпустить (<code>/cuf revoke</code>).</li>
+                    </ul>
+                    <div class="wiki-tip"><i data-lucide="lightbulb"></i><div><b>Совет:</b> лицензия на арест выпадает в Колесе Фортуны или приобретается отдельно — без неё команда <code>/cuf</code> не сработает.</div></div>
+                `
+            },
+            blackmarket: {
+                icon: 'eye-off', color: 'red',
+                title: 'Чёрный рынок контрабанды',
+                body: `
+                    <h4><i data-lucide="info"></i> Что это такое</h4>
+                    <p>Анонимный раздел доски объявлений на сайте, где любой игрок может назначить награду за голову другого игрока — за реальные конфликты, ролевую вражду или просто ради азарта.</p>
+                    <h4><i data-lucide="list-ordered"></i> Как это работает</h4>
+                    <ul>
+                        <li>Заказчик анонимно указывает ник цели и сумму награды в игровой валюте.</li>
+                        <li>Контракт появляется в общей доске «Активные контракты в розыске» на вкладке «Донат».</li>
+                        <li>Игрок, который ликвидирует цель первым, мгновенно получает всю сумму на баланс.</li>
+                    </ul>
+                    <div class="wiki-tip"><i data-lucide="lightbulb"></i><div><b>Важно:</b> система полностью анонимна — ни цель, ни другие игроки не видят, кто именно назначил награду.</div></div>
+                `
+            },
+            mask: {
+                icon: 'venetian-mask', color: 'purple',
+                title: 'Анонимные маски',
+                body: `
+                    <h4><i data-lucide="info"></i> Что это такое</h4>
+                    <p>Косметический предмет для тех, кто хочет скрыть свою личность на сервере — например, во время тайных сделок на чёрном рынке или ролевых интриг.</p>
+                    <h4><i data-lucide="list-ordered"></i> Как это работает</h4>
+                    <ul>
+                        <li>Маска приобретается в магазине привилегий или выпадает в Колесе Фортуны.</li>
+                        <li>При экипировке ваш игровой никнейм в табе и над головой полностью подменяется анонимным именем.</li>
+                        <li>Снять маску и вернуть настоящий ник можно в любой момент.</li>
+                    </ul>
+                    <div class="wiki-tip"><i data-lucide="lightbulb"></i><div><b>Совет:</b> маска не защищает от логов CoreProtect — администрация всегда может установить, кто скрывался под ней.</div></div>
+                `
+            },
+            newspaper: {
+                icon: 'newspaper', color: 'blue',
+                title: 'Газета Kuromi Times',
+                body: `
+                    <h4><i data-lucide="info"></i> Что это такое</h4>
+                    <p>Информационный вестник сервера — истории, расследования и репортажи о происходящем на KuromiSMP, которые пишут сами игроки.</p>
+                    <h4><i data-lucide="list-ordered"></i> Как опубликовать статью</h4>
+                    <ul>
+                        <li>Подготовьте текст статьи или расследования по событиям на сервере.</li>
+                        <li>Отправьте материал редакции через Discord или Telegram сервера для рассмотрения.</li>
+                        <li>После модерации редакцией статья публикуется в разделе новостей на сайте.</li>
+                    </ul>
+                    <div class="wiki-tip"><i data-lucide="lightbulb"></i><div><b>Совет:</b> редакция охотнее берёт материалы с конкретными деталями — никами участников, датами и итогом истории.</div></div>
+                `
+            },
+            death: {
+                icon: 'skull', color: 'purple',
+                title: 'Кастомная смерть',
+                body: `
+                    <h4><i data-lucide="info"></i> Что это такое</h4>
+                    <p>Чисто косметическая привилегия, которая делает вашу гибель более запоминающейся — без влияния на игровой баланс.</p>
+                    <h4><i data-lucide="list-ordered"></i> Как это работает</h4>
+                    <ul>
+                        <li>При активной привилегии сообщение о вашей смерти в общем чате заменяется на уникальный авторский текст.</li>
+                        <li>В точке гибели спавнятся густые ведьминские частицы дыма.</li>
+                        <li>Эффект срабатывает при любой смерти — от игрока, моба или окружения.</li>
+                    </ul>
+                    <div class="wiki-tip"><i data-lucide="lightbulb"></i><div><b>Совет:</b> привилегию можно приобрести в магазине или выбить в Колесе Фортуны со скидкой.</div></div>
+                `
+            }
+        };
+
+        function openWikiArticle(key) {
+            const article = WIKI_ARTICLES[key];
+            if (!article) return;
+
+            document.getElementById('wiki-modal-title').textContent = article.title;
+            document.getElementById('wiki-modal-body').innerHTML = article.body;
+
+            const iconBadge = document.getElementById('wiki-modal-icon');
+            iconBadge.className = 'icon-badge b-' + article.color;
+            iconBadge.style.width = '40px';
+            iconBadge.style.height = '40px';
+            iconBadge.innerHTML = `<i data-lucide="${article.icon}"></i>`;
+
+            const overlay = document.getElementById('wiki-modal-overlay');
+            const card = document.getElementById('wiki-modal-card');
+            overlay.style.display = 'flex';
+            overlay.offsetHeight;
+            card.style.transform = 'translateY(0) scale(1)';
+            card.style.opacity = '1';
+
+            if (window.lucide) lucide.createIcons();
+        }
+
+        function closeWikiArticle() {
+            const overlay = document.getElementById('wiki-modal-overlay');
+            const card = document.getElementById('wiki-modal-card');
             card.style.transform = 'translateY(30px) scale(0.95)';
             card.style.opacity = '0';
             setTimeout(() => { overlay.style.display = 'none'; }, 250);
@@ -2198,7 +2401,7 @@
 
         window.addEventListener('click', function(e) {
             if(window.innerWidth <= 768) return; 
-            if(e.target.closest('#snakeCanvas') || e.target.closest('.snake-footer-container') || e.target.closest('.logo-img-left') || e.target.closest('.header-profile-sidebar') || e.target.closest('#forum-fixed-btn') || e.target.closest('#custom-modal-card') || e.target.closest('#app-modal-card')) return; 
+            if(e.target.closest('#snakeCanvas') || e.target.closest('.snake-footer-container') || e.target.closest('.logo-img-left') || e.target.closest('.header-profile-sidebar') || e.target.closest('#forum-fixed-btn') || e.target.closest('#custom-modal-card') || e.target.closest('#app-modal-card') || e.target.closest('#wiki-modal-card')) return; 
             const particleCount = 10; 
             for (let i = 0; i < particleCount; i++) { createSparkParticle(e.clientX, e.clientY); }
         });
