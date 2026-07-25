@@ -598,6 +598,41 @@
         }
         .player-item-card:hover { border-color: rgba(138, 43, 226, 0.25); background: rgba(255, 255, 255, 0.02); }
 
+        .profile-avatar-ring {
+            padding: 3px;
+            border-radius: 14px;
+            border: 2px solid var(--pf-accent, rgba(138, 43, 226, 0.5));
+            flex-shrink: 0;
+            display: inline-flex;
+        }
+        .profile-avatar-ring img { display: block; border-radius: 10px; image-rendering: pixelated; }
+
+        .profile-banner-card {
+            position: relative;
+            overflow: hidden;
+            width: 100%;
+            border-radius: 26px;
+            border: 1px solid rgba(255, 255, 255, 0.07);
+            padding: 28px 30px;
+            background: var(--pf-gradient, linear-gradient(135deg, rgba(138,43,226,0.22), rgba(255,0,127,0.10)));
+        }
+        .profile-banner-watermark {
+            position: absolute; right: -14px; bottom: -14px; z-index: 0;
+            opacity: 0.07; transform: rotate(-12deg); pointer-events: none;
+        }
+        .profile-banner-watermark [data-lucide] { width: 150px; height: 150px; stroke-width: 1; }
+        .profile-banner-card > *:not(.profile-banner-watermark) { position: relative; z-index: 1; }
+
+        .profile-color-picker { display: flex; align-items: center; gap: 10px; margin-top: 22px; flex-wrap: wrap; }
+        .profile-color-picker .label { font-size: 0.8rem; color: var(--text-muted); margin-right: 4px; }
+        .profile-color-swatch {
+            width: 26px; height: 26px; border-radius: 50%;
+            border: 2px solid rgba(255,255,255,0.15); cursor: pointer;
+            transition: transform 0.15s ease, border-color 0.15s ease;
+        }
+        .profile-color-swatch:hover { transform: scale(1.12); }
+        .profile-color-swatch.active { border-color: #fff; transform: scale(1.12); }
+
         .player-head-render { width: 56px; height: 56px; border-radius: 8px; image-rendering: pixelated; background: rgba(255,255,255,0.02); flex-shrink: 0; }
         .player-card-info { text-align: left; overflow: hidden; width: 100%; }
         .player-card-info h3 { font-size: 1.05rem; font-weight: 600; margin-bottom: 4px; }
@@ -1285,7 +1320,7 @@
                 
                 <div class="features-line">
                     <div><i data-lucide="lock" style="width:16px;height:16px;"></i> <span>WhiteList</span> доступ</div>
-                    <div><i data-lucide="gem" style="width:16px;height:16px;"></i> Без <span>креатива</span> и доната</div>
+                    <div><i data-lucide="gem" style="width:16px;height:16px;"></i> Никакого <span>Pay-to-Win</span></div>
                     <div><i data-lucide="flower-2" style="width:16px;height:16px;"></i> <span>Взаимодействие</span> с игроками</div>
                 </div>
 
@@ -2328,13 +2363,13 @@
 
                 const { data: stats, error: statsError } = await supabaseClient
                     .from('player_stats')
-                    .select('playtime_seconds, deaths, kills, last_seen, first_join')
+                    .select('playtime_seconds, deaths, kills, last_seen, first_join, profile_gradient')
                     .eq('minecraft_uuid', linkedData.minecraft_uuid)
                     .maybeSingle();
 
                 if (statsError) throw statsError;
 
-                const currentStats = stats || { playtime_seconds: 0, deaths: 0, kills: 0, last_seen: null, first_join: null };
+                const currentStats = stats || { playtime_seconds: 0, deaths: 0, kills: 0, last_seen: null, first_join: null, profile_gradient: 'default' };
                 const kd = currentStats.deaths > 0 ? (currentStats.kills / currentStats.deaths).toFixed(2) : currentStats.kills + ".0";
 
                 headerWidget.innerHTML = `
@@ -2352,37 +2387,41 @@
                 updateForumForm();
                 
                 wrapper.innerHTML = `
-                    <div style="width: 100%;">
-                        <div style="display: flex; justify-content: space-between; align-items: center; width: 100%; border-bottom: 1px solid rgba(255,255,255,0.04); padding-bottom: 20px;">
+                    <div class="profile-banner-card" style="--pf-gradient: ${getGradientPreset(currentStats.profile_gradient).css};">
+                        <div class="profile-banner-watermark"><i data-lucide="cat"></i></div>
+
+                        <div style="display: flex; justify-content: space-between; align-items: center; width: 100%; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 20px; flex-wrap: wrap; gap: 14px;">
                             <div style="display: flex; align-items: center; gap: 24px;">
-                                <img src="https://mc-heads.net/avatar/${linkedData.minecraft_name}/80" style="border-radius:12px; image-rendering:pixelated; width:80px">
+                                <img src="https://mc-heads.net/avatar/${linkedData.minecraft_name}/80" style="border-radius:12px; image-rendering:pixelated; width:80px; border: 2px solid rgba(255,255,255,0.2);">
                                 <div style="text-align: left;">
-                                    <h2 style="font-size: 1.5rem; font-weight: 700; color: #fff;">${linkedData.minecraft_name}</h2>
-                                    <div style="font-size: 0.85rem; color: var(--text-muted); margin-top: 4px;">Discord: ${discordUsername}</div>
-                                    <div style="font-size: 0.82rem; color: #b388ff; margin-top: 4px;">На сервере с ${formatDate(currentStats.first_join, false)}</div>
+                                    <h2 style="font-family: var(--font-display); font-size: 1.4rem; font-weight: 600; color: #fff;">${linkedData.minecraft_name}</h2>
+                                    <div style="font-size: 0.85rem; color: rgba(255,255,255,0.65); margin-top: 4px;">Discord: ${discordUsername}</div>
+                                    <div style="font-size: 0.82rem; color: #fff; opacity: 0.85; margin-top: 4px;">На сервере с ${formatDate(currentStats.first_join, false)}</div>
                                 </div>
                             </div>
                             <button class="btn-secondary" style="padding: 8px 16px; font-size: 0.8rem;" onclick="handleSignOut()">Выйти</button>
                         </div>
                         <div class="stats-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-top: 20px;">
-                            <div class="stat-card" style="background: rgba(255,255,255,0.01); border: 1px solid rgba(255,255,255,0.03); padding: 20px; border-radius: 20px; text-align: left;">
-                                <div class="stat-label" style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 4px;"><i data-lucide="clock" style="width:13px;height:13px;display:inline;vertical-align:-2px;"></i> Время на сервере</div>
-                                <div class="stat-value" style="font-size: 1.4rem; font-weight: 700;">${formatPlaytime(currentStats.playtime_seconds)}</div>
+                            <div class="stat-card" style="background: rgba(0,0,0,0.18); border: 1px solid rgba(255,255,255,0.06); padding: 20px; border-radius: 20px; text-align: left;">
+                                <div class="stat-label" style="font-size: 0.8rem; color: rgba(255,255,255,0.6); margin-bottom: 4px;"><i data-lucide="clock" style="width:13px;height:13px;display:inline;vertical-align:-2px;"></i> Время на сервере</div>
+                                <div class="stat-value" style="font-size: 1.4rem; font-weight: 700; color:#fff;">${formatPlaytime(currentStats.playtime_seconds)}</div>
                             </div>
-                            <div class="stat-card" style="background: rgba(255,255,255,0.01); border: 1px solid rgba(255,255,255,0.03); padding: 20px; border-radius: 20px; text-align: left;">
-                                <div class="stat-label" style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 4px;"><i data-lucide="skull" style="width:13px;height:13px;display:inline;vertical-align:-2px;"></i> Смертей</div>
-                                <div class="stat-value" style="font-size: 1.4rem; font-weight: 700;">${currentStats.deaths}</div>
+                            <div class="stat-card" style="background: rgba(0,0,0,0.18); border: 1px solid rgba(255,255,255,0.06); padding: 20px; border-radius: 20px; text-align: left;">
+                                <div class="stat-label" style="font-size: 0.8rem; color: rgba(255,255,255,0.6); margin-bottom: 4px;"><i data-lucide="skull" style="width:13px;height:13px;display:inline;vertical-align:-2px;"></i> Смертей</div>
+                                <div class="stat-value" style="font-size: 1.4rem; font-weight: 700; color:#fff;">${currentStats.deaths}</div>
                             </div>
-                            <div class="stat-card" style="background: rgba(255,255,255,0.01); border: 1px solid rgba(255,255,255,0.03); padding: 20px; border-radius: 20px; text-align: left;">
-                                <div class="stat-label" style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 4px;"><i data-lucide="swords" style="width:13px;height:13px;display:inline;vertical-align:-2px;"></i> Убийств</div>
-                                <div class="stat-value" style="font-size: 1.4rem; font-weight: 700;">${currentStats.kills}</div>
+                            <div class="stat-card" style="background: rgba(0,0,0,0.18); border: 1px solid rgba(255,255,255,0.06); padding: 20px; border-radius: 20px; text-align: left;">
+                                <div class="stat-label" style="font-size: 0.8rem; color: rgba(255,255,255,0.6); margin-bottom: 4px;"><i data-lucide="swords" style="width:13px;height:13px;display:inline;vertical-align:-2px;"></i> Убийств</div>
+                                <div class="stat-value" style="font-size: 1.4rem; font-weight: 700; color:#fff;">${currentStats.kills}</div>
                             </div>
-                            <div class="stat-card" style="background: rgba(255,255,255,0.01); border: 1px solid rgba(255,255,255,0.03); padding: 20px; border-radius: 20px; text-align: left;">
-                                <div class="stat-label" style="font-size: 0.8rem; color: var(--accent-pink); margin-bottom: 4px;"><i data-lucide="bar-chart-2" style="width:13px;height:13px;display:inline;vertical-align:-2px;"></i> K/D</div>
-                                <div class="stat-value" style="font-size: 1.4rem; font-weight: 700; color: var(--accent-pink);">${kd}</div>
+                            <div class="stat-card" style="background: rgba(0,0,0,0.18); border: 1px solid rgba(255,255,255,0.06); padding: 20px; border-radius: 20px; text-align: left;">
+                                <div class="stat-label" style="font-size: 0.8rem; color: #ffb0d9; margin-bottom: 4px;"><i data-lucide="bar-chart-2" style="width:13px;height:13px;display:inline;vertical-align:-2px;"></i> K/D</div>
+                                <div class="stat-value" style="font-size: 1.4rem; font-weight: 700; color: #ffb0d9;">${kd}</div>
                             </div>
                         </div>
-                        <div style="text-align: left; margin-top: 20px; font-size: 0.85rem; color: var(--text-muted);">Последний раз онлайн: ${formatDate(currentStats.last_seen, false)}</div>
+                        <div style="text-align: left; margin-top: 20px; font-size: 0.85rem; color: rgba(255,255,255,0.6);">Последний раз онлайн: ${formatDate(currentStats.last_seen, false)}</div>
+
+                        ${renderColorPickerRow(currentStats.profile_gradient)}
                     </div>`;
             } catch (e) {
                 console.error(e);
@@ -2434,6 +2473,46 @@
             setTimeout(() => { p.remove(); }, 600);
         }
 
+        const GRADIENT_PRESETS = {
+            default: { css: 'linear-gradient(135deg, rgba(138,43,226,0.22), rgba(255,0,127,0.10))', accent: 'rgba(138,43,226,0.6)', swatch: 'linear-gradient(135deg, #8a2be2, #ff007f)' },
+            blue:    { css: 'linear-gradient(135deg, rgba(64,156,255,0.22), rgba(64,156,255,0.04))', accent: 'rgba(64,156,255,0.6)', swatch: '#409cff' },
+            green:   { css: 'linear-gradient(135deg, rgba(46,204,113,0.22), rgba(46,204,113,0.04))', accent: 'rgba(46,204,113,0.6)', swatch: '#2ecc71' },
+            orange:  { css: 'linear-gradient(135deg, rgba(255,159,28,0.22), rgba(255,159,28,0.04))', accent: 'rgba(255,159,28,0.6)', swatch: '#ff9f1c' },
+            red:     { css: 'linear-gradient(135deg, rgba(231,76,60,0.22), rgba(231,76,60,0.04))', accent: 'rgba(231,76,60,0.6)', swatch: '#e74c3c' },
+            mono:    { css: 'linear-gradient(135deg, rgba(255,255,255,0.10), rgba(255,255,255,0.01))', accent: 'rgba(255,255,255,0.35)', swatch: '#ffffff' }
+        };
+
+        function getGradientPreset(key) {
+            return GRADIENT_PRESETS[key] || GRADIENT_PRESETS.default;
+        }
+
+        function renderProfileBannerOpen(gradientKey, watermarkIcon) {
+            const preset = getGradientPreset(gradientKey);
+            return `<div class="profile-banner-card" style="--pf-gradient: ${preset.css};">
+                <div class="profile-banner-watermark"><i data-lucide="${watermarkIcon}"></i></div>`;
+        }
+
+        function renderColorPickerRow(activeKey) {
+            const swatches = Object.keys(GRADIENT_PRESETS).map(key => {
+                const preset = GRADIENT_PRESETS[key];
+                const isActive = key === (activeKey || 'default');
+                return `<div class="profile-color-swatch ${isActive ? 'active' : ''}" style="background: ${preset.swatch};" onclick="setProfileGradient('${key}')" title="${key}"></div>`;
+            }).join('');
+            return `<div class="profile-color-picker"><span class="label"><i data-lucide="palette" style="width:14px;height:14px;vertical-align:-2px;"></i> Цвет профиля:</span>${swatches}</div>`;
+        }
+
+        async function setProfileGradient(key) {
+            if (!currentUserLinkedData) return;
+            try {
+                const { error } = await supabaseClient.from('player_stats').update({ profile_gradient: key }).eq('minecraft_uuid', currentUserLinkedData.minecraft_uuid);
+                if (error) throw error;
+                loadProfileData();
+            } catch (e) {
+                console.error('Не удалось сохранить цвет профиля:', e);
+                customAlert('❌ Ошибка', 'Не удалось сохранить цвет профиля.');
+            }
+        }
+
         async function renderPlayersList() {
             const container = document.getElementById('players-list-container');
             if(!container) return;
@@ -2452,7 +2531,7 @@
                 const uuids = data.map(p => p.minecraft_uuid);
                 const { data: stats, error: statsError } = await supabaseClient
                     .from('player_stats')
-                    .select('minecraft_uuid, playtime_seconds, is_online, last_seen, kills, deaths')
+                    .select('minecraft_uuid, playtime_seconds, is_online, last_seen, kills, deaths, profile_gradient')
                     .in('minecraft_uuid', uuids);
                 
                 if (statsError) throw statsError;
@@ -2465,7 +2544,7 @@
                 }
 
                 loadedPlayers = data.map(player => {
-                    const playerStats = statsMap[player.minecraft_uuid] || { playtime_seconds: 0, is_online: false, last_seen: null, kills: 0, deaths: 0 };
+                    const playerStats = statsMap[player.minecraft_uuid] || { playtime_seconds: 0, is_online: false, last_seen: null, kills: 0, deaths: 0, profile_gradient: 'default' };
                     return {
                         minecraft_uuid: player.minecraft_uuid,
                         minecraft_name: player.minecraft_name,
@@ -2473,7 +2552,8 @@
                         is_online: playerStats.is_online,
                         last_seen: playerStats.last_seen,
                         kills: playerStats.kills || 0,
-                        deaths: playerStats.deaths || 0
+                        deaths: playerStats.deaths || 0,
+                        profile_gradient: playerStats.profile_gradient || 'default'
                     };
                 });
 
@@ -2499,20 +2579,22 @@
                 const card = document.createElement('div');
                 card.classList.add('player-item-card');
                 card.style.cursor = 'pointer';
-                
-                const dotColor = player.is_online ? '#2ecc71' : '#6e6482';
+
+                const preset = getGradientPreset(player.profile_gradient);
+                const statusColor = player.is_online ? '#2ecc71' : '#6e6482';
 
                 card.onclick = () => openPlayerModal(player);
 
                 card.innerHTML = `
-                    <img src="https://mc-heads.net/avatar/${player.minecraft_name}/56" alt="${player.minecraft_name}" class="player-head-render" style="image-rendering:pixelated; border-radius:10px; width:56px; height:56px;">
-                    <div class="player-card-info">
-                        <h3>${player.minecraft_name}</h3>
-                        <div class="player-card-meta">
-                            <span><i data-lucide="clock" style="width:12px;height:12px;vertical-align:-2px;"></i> ${formatPlaytime(player.playtime_seconds)}</span>
-                            <span>•</span>
-                            <span style="display: inline-flex; align-items: center; gap: 5px;">
-                                <span style="width: 8px; height: 8px; background: ${dotColor}; border-radius: 50%; display: inline-block; ${player.is_online ? 'box-shadow: 0 0 8px #2ecc71;' : ''}"></span>
+                    <div class="profile-avatar-ring" style="--pf-accent: ${preset.accent};">
+                        <img src="https://mc-heads.net/avatar/${player.minecraft_name}/50" alt="${player.minecraft_name}" width="50" height="50">
+                    </div>
+                    <div class="player-card-info" style="flex:1; min-width:0;">
+                        <h3 style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${player.minecraft_name}</h3>
+                        <div class="player-card-meta" style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+                            <span style="display:inline-flex; align-items:center; gap:5px;"><i data-lucide="clock" style="width:12px;height:12px;"></i> ${formatPlaytime(player.playtime_seconds)}</span>
+                            <span style="display:inline-flex; align-items:center; gap:6px; font-size:0.78rem; font-weight:600; padding:3px 10px; border-radius:100px; background:${player.is_online ? 'rgba(46,204,113,0.14)' : 'rgba(110,100,130,0.14)'}; color:${statusColor};">
+                                <span style="width:6px; height:6px; border-radius:50%; background:${statusColor}; ${player.is_online ? 'box-shadow: 0 0 6px #2ecc71;' : ''}"></span>
                                 ${player.is_online ? 'Онлайн' : 'Офлайн'}
                             </span>
                         </div>
@@ -2541,7 +2623,7 @@
                 try {
                     const { data, error } = await supabaseClient
                         .from('player_stats')
-                        .select('playtime_seconds, deaths, kills, last_seen, is_online')
+                        .select('playtime_seconds, deaths, kills, last_seen, is_online, profile_gradient')
                         .eq('minecraft_uuid', playerData.minecraft_uuid)
                         .maybeSingle();
                     if (!error && data) {
@@ -2576,35 +2658,40 @@
             const kills = playerData.kills || 0;
             const deaths = playerData.deaths || 0;
             const kd = deaths === 0 ? kills + ".0" : (kills / deaths).toFixed(2);
+            const preset = getGradientPreset(playerData.profile_gradient);
 
             modalOverlay.innerHTML = `
-                <div style="background: rgba(16, 11, 28, 0.95); border-radius: 28px; border: 1px solid rgba(138, 43, 226, 0.2); max-width: 480px; width: 100%; padding: 40px 30px; position: relative; box-shadow: 0 20px 50px rgba(0,0,0,0.6); text-align: center; font-family: var(--font-sans); color: #fff;">
-                    <span style="position: absolute; top: 20px; right: 25px; color: var(--text-muted); font-size: 1.8rem; cursor: pointer; font-weight: bold; line-height: 1;" onclick="this.parentElement.parentElement.remove()">&times;</span>
-                    
-                    <img src="https://mc-heads.net/avatar/${playerData.minecraft_name}/80" style="image-rendering:pixelated; border-radius:12px; width:80px; height:80px; margin-bottom: 15px; border: 2px solid var(--primary-purple); box-shadow: 0 0 15px rgba(138, 43, 226, 0.15);">
-                    <h2 style="font-size: 1.8rem; font-weight: 700; color: #fff; margin-bottom: 25px;">${playerData.minecraft_name}</h2>
-                    
-                    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; width: 100%; margin-bottom: 25px;">
-                        <div style="background: rgba(255,255,255,0.01); border: 1px solid rgba(255,255,255,0.03); border-radius: 20px; padding: 16px; text-align: left;">
-                            <div style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 4px;"><i data-lucide="clock" style="width:13px;height:13px;display:inline;vertical-align:-2px;"></i> Время онлайна</div>
-                            <div style="font-size: 1.3rem; font-weight: 700; color: #fff;">${formatPlaytime(playerData.playtime_seconds)}</div>
+                <div style="background: rgba(16, 11, 28, 0.95); border-radius: 28px; border: 1px solid rgba(138, 43, 226, 0.2); max-width: 480px; width: 100%; padding: 22px; position: relative; box-shadow: 0 20px 50px rgba(0,0,0,0.6); font-family: var(--font-sans); color: #fff;">
+                    <span style="position: absolute; top: 30px; right: 35px; color: #fff; opacity: 0.6; font-size: 1.8rem; cursor: pointer; font-weight: bold; line-height: 1; z-index: 2;" onclick="this.parentElement.parentElement.remove()">&times;</span>
+
+                    <div class="profile-banner-card" style="--pf-gradient: ${preset.css}; text-align: center;">
+                        <div class="profile-banner-watermark"><i data-lucide="cat"></i></div>
+
+                        <img src="https://mc-heads.net/avatar/${playerData.minecraft_name}/80" style="image-rendering:pixelated; border-radius:12px; width:80px; height:80px; margin-bottom: 15px; border: 2px solid rgba(255,255,255,0.25); box-shadow: 0 0 15px rgba(0,0,0,0.2);">
+                        <h2 style="font-family: var(--font-display); font-size: 1.6rem; font-weight: 600; color: #fff; margin-bottom: 22px;">${playerData.minecraft_name}</h2>
+
+                        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; width: 100%; margin-bottom: 20px;">
+                            <div style="background: rgba(0,0,0,0.18); border: 1px solid rgba(255,255,255,0.06); border-radius: 20px; padding: 16px; text-align: left;">
+                                <div style="font-size: 0.8rem; color: rgba(255,255,255,0.6); margin-bottom: 4px;"><i data-lucide="clock" style="width:13px;height:13px;display:inline;vertical-align:-2px;"></i> Время онлайна</div>
+                                <div style="font-size: 1.3rem; font-weight: 700; color: #fff;">${formatPlaytime(playerData.playtime_seconds)}</div>
+                            </div>
+                            <div style="background: rgba(0,0,0,0.18); border: 1px solid rgba(255,255,255,0.06); border-radius: 20px; padding: 16px; text-align: left;">
+                                <div style="font-size: 0.8rem; color: rgba(255,255,255,0.6); margin-bottom: 4px;"><i data-lucide="skull" style="width:13px;height:13px;display:inline;vertical-align:-2px;"></i> Смертей</div>
+                                <div style="font-size: 1.3rem; font-weight: 700; color: #fff;">${deaths}</div>
+                            </div>
+                            <div style="background: rgba(0,0,0,0.18); border: 1px solid rgba(255,255,255,0.06); border-radius: 20px; padding: 16px; text-align: left;">
+                                <div style="font-size: 0.8rem; color: rgba(255,255,255,0.6); margin-bottom: 4px;"><i data-lucide="swords" style="width:13px;height:13px;display:inline;vertical-align:-2px;"></i> Убийств</div>
+                                <div style="font-size: 1.3rem; font-weight: 700; color: #fff;">${kills}</div>
+                            </div>
+                            <div style="background: rgba(0,0,0,0.18); border: 1px solid rgba(255,255,255,0.06); border-radius: 20px; padding: 16px; text-align: left;">
+                                <div style="font-size: 0.8rem; color: #ffb0d9; margin-bottom: 4px;"><i data-lucide="bar-chart-2" style="width:13px;height:13px;display:inline;vertical-align:-2px;"></i> K/D</div>
+                                <div style="font-size: 1.3rem; font-weight: 700; color: #ffb0d9;">${kd}</div>
+                            </div>
                         </div>
-                        <div style="background: rgba(255,255,255,0.01); border: 1px solid rgba(255,255,255,0.03); border-radius: 20px; padding: 16px; text-align: left;">
-                            <div style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 4px;"><i data-lucide="skull" style="width:13px;height:13px;display:inline;vertical-align:-2px;"></i> Смертей</div>
-                            <div style="font-size: 1.3rem; font-weight: 700; color: #fff;">${deaths}</div>
+
+                        <div style="font-size: 0.85rem; color: rgba(255,255,255,0.6); text-align: left; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 15px;">
+                            Последний раз онлайн: <span style="color: #fff; font-weight: 600;">${formatDate(playerData.last_seen, false)}</span>
                         </div>
-                        <div style="background: rgba(255,255,255,0.01); border: 1px solid rgba(255,255,255,0.03); border-radius: 20px; padding: 16px; text-align: left;">
-                            <div style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 4px;"><i data-lucide="swords" style="width:13px;height:13px;display:inline;vertical-align:-2px;"></i> Убийств</div>
-                            <div style="font-size: 1.3rem; font-weight: 700; color: #fff;">${kills}</div>
-                        </div>
-                        <div style="background: rgba(255,255,255,0.01); border: 1px solid rgba(255,255,255,0.03); border-radius: 20px; padding: 16px; text-align: left;">
-                            <div style="font-size: 0.8rem; color: var(--accent-pink); margin-bottom: 4px;"><i data-lucide="bar-chart-2" style="width:13px;height:13px;display:inline;vertical-align:-2px;"></i> K/D</div>
-                            <div style="font-size: 1.3rem; font-weight: 700; color: var(--accent-pink);">${kd}</div>
-                        </div>
-                    </div>
-                    
-                    <div style="font-size: 0.85rem; color: var(--text-muted); text-align: left; border-top: 1px solid rgba(255,255,255,0.04); padding-top: 15px;">
-                        Последний раз онлайн: <span style="color: #fff; font-weight: 600;">${formatDate(playerData.last_seen, false)}</span>
                     </div>
                 </div>
             `;
