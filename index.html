@@ -2028,6 +2028,11 @@
             }
         }
 
+        function escapeHtml(str) {
+            if (str === null || str === undefined) return '';
+            return String(str).replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m]));
+        }
+
         function formatPlaytime(seconds) {
             if (!seconds || seconds < 0) return '0ч 0м';
             const hours = Math.floor(seconds / 3600);
@@ -2363,14 +2368,26 @@
 
                 const { data: stats, error: statsError } = await supabaseClient
                     .from('player_stats')
-                    .select('playtime_seconds, deaths, kills, last_seen, first_join, profile_gradient')
+                    .select('playtime_seconds, deaths, kills, last_seen, first_join')
                     .eq('minecraft_uuid', linkedData.minecraft_uuid)
                     .maybeSingle();
 
                 if (statsError) throw statsError;
 
-                const currentStats = stats || { playtime_seconds: 0, deaths: 0, kills: 0, last_seen: null, first_join: null, profile_gradient: 'default' };
+                const currentStats = stats || { playtime_seconds: 0, deaths: 0, kills: 0, last_seen: null, first_join: null };
                 const kd = currentStats.deaths > 0 ? (currentStats.kills / currentStats.deaths).toFixed(2) : currentStats.kills + ".0";
+
+                let currentCustom = { profile_gradient: 'default', bio: null };
+                try {
+                    const { data: custom } = await supabaseClient
+                        .from('player_profile_customization')
+                        .select('profile_gradient, bio')
+                        .eq('minecraft_uuid', linkedData.minecraft_uuid)
+                        .maybeSingle();
+                    if (custom) currentCustom = custom;
+                } catch (e) {
+                    console.error('Не удалось загрузить кастомизацию профиля (таблица player_profile_customization создана?):', e);
+                }
 
                 headerWidget.innerHTML = `
                     <div style="display: flex; flex-direction: column; gap: 10px; width: 100%;">
@@ -2387,7 +2404,7 @@
                 updateForumForm();
                 
                 wrapper.innerHTML = `
-                    <div class="profile-banner-card" style="--pf-gradient: ${getGradientPreset(currentStats.profile_gradient).css};">
+                    <div class="profile-banner-card" style="--pf-gradient: ${getGradientPreset(currentCustom.profile_gradient).css};">
                         <div class="profile-banner-watermark"><i data-lucide="cat"></i></div>
 
                         <div style="display: flex; justify-content: space-between; align-items: center; width: 100%; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 20px; flex-wrap: wrap; gap: 14px;">
@@ -2421,7 +2438,15 @@
                         </div>
                         <div style="text-align: left; margin-top: 20px; font-size: 0.85rem; color: rgba(255,255,255,0.6);">Последний раз онлайн: ${formatDate(currentStats.last_seen, false)}</div>
 
-                        ${renderColorPickerRow(currentStats.profile_gradient)}
+                        <div style="margin-top: 22px; text-align: left;">
+                            <div style="font-size: 0.8rem; color: rgba(255,255,255,0.6); margin-bottom: 8px;"><i data-lucide="pen-line" style="width:13px;height:13px;vertical-align:-2px;"></i> Описание профиля <span id="profile-bio-counter" style="color: rgba(255,255,255,0.4);">(${(currentCustom.bio || '').length}/40)</span></div>
+                            <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                                <input type="text" id="profile-bio-input" maxlength="40" value="${escapeHtml(currentCustom.bio || '')}" placeholder="Например: топлю за красный террикон" oninput="document.getElementById('profile-bio-counter').textContent = '(' + this.value.length + '/40)'" style="flex:1; min-width:200px; background: rgba(0,0,0,0.25); border: 1px solid rgba(255,255,255,0.12); border-radius: 12px; padding: 9px 14px; color:#fff; font-family: var(--font-sans); font-size: 0.85rem; outline:none;">
+                                <button class="btn-mini save" style="padding: 9px 18px;" onclick="saveProfileBio()"><i data-lucide="check" style="width:14px;height:14px;"></i> Сохранить</button>
+                            </div>
+                        </div>
+
+                        ${renderColorPickerRow(currentCustom.profile_gradient)}
                     </div>`;
             } catch (e) {
                 console.error(e);
@@ -2504,18 +2529,51 @@
         async function setProfileGradient(key) {
             if (!currentUserLinkedData) return;
             try {
-                const { error } = await supabaseClient.from('player_stats').update({ profile_gradient: key }).eq('minecraft_uuid', currentUserLinkedData.minecraft_uuid);
+                const { data, error } = await supabaseClient
+                    .from('player_profile_customization')
+                    .upsert({ minecraft_uuid: currentUserLinkedData.minecraft_uuid, profile_gradient: key, updated_at: new Date().toISOString() }, { onConflict: 'minecraft_uuid' })
+                    .select();
                 if (error) throw error;
+                if (!data || data.length === 0) {
+                    customAlert('⚠️ Не сохранилось', 'Supabase не подтвердил изменение — вероятно, RLS-политика в таблице player_profile_customization блокирует запись. Проверьте настройки доступа.');
+                    return;
+                }
                 loadProfileData();
             } catch (e) {
                 console.error('Не удалось сохранить цвет профиля:', e);
-                customAlert('❌ Ошибка', 'Не удалось сохранить цвет профиля.');
+                customAlert('❌ Ошибка', 'Не удалось сохранить цвет профиля. Проверьте, что таблица player_profile_customization создана в Supabase.');
             }
         }
 
-        async function renderPlayersList() {
+        async function saveProfileBio() {
+            if (!currentUserLinkedData) return;
+            const input = document.getElementById('profile-bio-input');
+            if (!input) return;
+            const bio = input.value.trim().slice(0, 40);
+            try {
+                const { data, error } = await supabaseClient
+                    .from('player_profile_customization')
+                    .upsert({ minecraft_uuid: currentUserLinkedData.minecraft_uuid, bio: bio || null, updated_at: new Date().toISOString() }, { onConflict: 'minecraft_uuid' })
+                    .select();
+                if (error) throw error;
+                if (!data || data.length === 0) {
+                    customAlert('⚠️ Не сохранилось', 'Supabase не подтвердил изменение — вероятно, RLS-политика в таблице player_profile_customization блокирует запись.');
+                    return;
+                }
+                customAlert('✅ Сохранено', 'Описание профиля обновлено.');
+                loadProfileData();
+            } catch (e) {
+                console.error('Не удалось сохранить описание профиля:', e);
+                customAlert('❌ Ошибка', 'Не удалось сохранить описание профиля.');
+            }
+        }
+
+        async function renderPlayersList(isSilent = false) {
             const container = document.getElementById('players-list-container');
             if(!container) return;
+            if (!isSilent) {
+                container.innerHTML = `<div style="grid-column: 1 / -1; color: var(--text-muted); text-align: center; padding: 30px 0; font-size: 0.95rem;">Синхронизация списка игроков...</div>`;
+            }
             try {
                 const { data, error } = await supabaseClient
                     .from('linked_accounts')
@@ -2531,7 +2589,7 @@
                 const uuids = data.map(p => p.minecraft_uuid);
                 const { data: stats, error: statsError } = await supabaseClient
                     .from('player_stats')
-                    .select('minecraft_uuid, playtime_seconds, is_online, last_seen, kills, deaths, profile_gradient')
+                    .select('minecraft_uuid, playtime_seconds, is_online, last_seen, kills, deaths')
                     .in('minecraft_uuid', uuids);
                 
                 if (statsError) throw statsError;
@@ -2543,8 +2601,20 @@
                     });
                 }
 
+                const customMap = {};
+                try {
+                    const { data: customization } = await supabaseClient
+                        .from('player_profile_customization')
+                        .select('minecraft_uuid, profile_gradient, bio')
+                        .in('minecraft_uuid', uuids);
+                    (customization || []).forEach(c => { customMap[c.minecraft_uuid] = c; });
+                } catch (e) {
+                    console.error('Не удалось загрузить кастомизацию профилей (таблица player_profile_customization создана?):', e);
+                }
+
                 loadedPlayers = data.map(player => {
-                    const playerStats = statsMap[player.minecraft_uuid] || { playtime_seconds: 0, is_online: false, last_seen: null, kills: 0, deaths: 0, profile_gradient: 'default' };
+                    const playerStats = statsMap[player.minecraft_uuid] || { playtime_seconds: 0, is_online: false, last_seen: null, kills: 0, deaths: 0 };
+                    const custom = customMap[player.minecraft_uuid] || { profile_gradient: 'default', bio: null };
                     return {
                         minecraft_uuid: player.minecraft_uuid,
                         minecraft_name: player.minecraft_name,
@@ -2553,7 +2623,8 @@
                         last_seen: playerStats.last_seen,
                         kills: playerStats.kills || 0,
                         deaths: playerStats.deaths || 0,
-                        profile_gradient: playerStats.profile_gradient || 'default'
+                        profile_gradient: custom.profile_gradient || 'default',
+                        bio: custom.bio || null
                     };
                 });
 
@@ -2591,6 +2662,7 @@
                     </div>
                     <div class="player-card-info" style="flex:1; min-width:0;">
                         <h3 style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${player.minecraft_name}</h3>
+                        ${player.bio ? `<div style="font-size:0.8rem; color: var(--text-muted); font-style: italic; margin-bottom: 4px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${escapeHtml(player.bio)}</div>` : ''}
                         <div class="player-card-meta" style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
                             <span style="display:inline-flex; align-items:center; gap:5px;"><i data-lucide="clock" style="width:12px;height:12px;"></i> ${formatPlaytime(player.playtime_seconds)}</span>
                             <span style="display:inline-flex; align-items:center; gap:6px; font-size:0.78rem; font-weight:600; padding:3px 10px; border-radius:100px; background:${player.is_online ? 'rgba(46,204,113,0.14)' : 'rgba(110,100,130,0.14)'}; color:${statusColor};">
@@ -2623,7 +2695,7 @@
                 try {
                     const { data, error } = await supabaseClient
                         .from('player_stats')
-                        .select('playtime_seconds, deaths, kills, last_seen, is_online, profile_gradient')
+                        .select('playtime_seconds, deaths, kills, last_seen, is_online')
                         .eq('minecraft_uuid', playerData.minecraft_uuid)
                         .maybeSingle();
                     if (!error && data) {
@@ -2631,6 +2703,21 @@
                     }
                 } catch (e) {
                     console.error("Ошибка при получении полной статистики игрока:", e);
+                }
+            }
+
+            if (playerData.profile_gradient === undefined || playerData.bio === undefined) {
+                try {
+                    const { data: custom } = await supabaseClient
+                        .from('player_profile_customization')
+                        .select('profile_gradient, bio')
+                        .eq('minecraft_uuid', playerData.minecraft_uuid)
+                        .maybeSingle();
+                    playerData.profile_gradient = custom?.profile_gradient || 'default';
+                    playerData.bio = custom?.bio || null;
+                } catch (e) {
+                    console.error("Ошибка при получении кастомизации профиля:", e);
+                    playerData.profile_gradient = playerData.profile_gradient || 'default';
                 }
             }
 
@@ -2668,7 +2755,8 @@
                         <div class="profile-banner-watermark"><i data-lucide="cat"></i></div>
 
                         <img src="https://mc-heads.net/avatar/${playerData.minecraft_name}/80" style="image-rendering:pixelated; border-radius:12px; width:80px; height:80px; margin-bottom: 15px; border: 2px solid rgba(255,255,255,0.25); box-shadow: 0 0 15px rgba(0,0,0,0.2);">
-                        <h2 style="font-family: var(--font-display); font-size: 1.6rem; font-weight: 600; color: #fff; margin-bottom: 22px;">${playerData.minecraft_name}</h2>
+                        <h2 style="font-family: var(--font-display); font-size: 1.6rem; font-weight: 600; color: #fff; margin-bottom: ${playerData.bio ? '6px' : '22px'};">${playerData.minecraft_name}</h2>
+                        ${playerData.bio ? `<div style="font-size:0.85rem; color: rgba(255,255,255,0.7); font-style: italic; margin-bottom: 22px;">${escapeHtml(playerData.bio)}</div>` : ''}
 
                         <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; width: 100%; margin-bottom: 20px;">
                             <div style="background: rgba(0,0,0,0.18); border: 1px solid rgba(255,255,255,0.06); border-radius: 20px; padding: 16px; text-align: left;">
@@ -2711,7 +2799,7 @@
             
             if(tabName === 'donate') { initRouletteGraphic(); renderShopFront(); }
             if(tabName === 'join') renderJoinPrices();
-            if(tabName === 'players') { if (window.lucide) lucide.createIcons(); loadTopLeaderboards('public'); }
+            if(tabName === 'players') { if (window.lucide) lucide.createIcons(); renderPlayersList(); loadTopLeaderboards('public'); }
             if(tabName === 'profile') loadProfileData();
             if(tabName === 'forum') {
                 loadProfileData().then(() => {
