@@ -6,7 +6,7 @@
     <title>Kuromi SMP — Premium UI Minecraft Server</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Unbounded:wght@500;600;700;800;900&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@0.462.0/dist/umd/lucide.js"></script>
 
     <style>
@@ -16,8 +16,10 @@
             --text-main: #ffffff;      
             --text-muted: #6e6482;     
             --primary-purple: #8a2be2; 
-            --accent-pink: #ff007f;    
+            --accent-pink: #ff007f;
+            --accent-acid: #c6ff3d;
             --font-sans: 'Inter', sans-serif;
+            --font-display: 'Unbounded', 'Inter', sans-serif;
         }
 
         * {
@@ -40,6 +42,17 @@
                 radial-gradient(circle at 10% 20%, rgba(138, 43, 226, 0.14) 0%, transparent 45%),
                 radial-gradient(circle at 90% 80%, rgba(255, 0, 127, 0.07) 0%, transparent 45%);
             background-attachment: fixed;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            z-index: 1;
+            pointer-events: none;
+            opacity: 0.5;
+            mix-blend-mode: overlay;
+            background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='140' height='140'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
         }
 
         .particle {
@@ -269,11 +282,14 @@
             margin-bottom: 20px;
         }
 
+        .hero-squiggle { display: block; margin: -12px 0 20px; opacity: 0.9; }
+
         h1 {
-            font-size: 3rem; 
-            font-weight: 600; 
-            line-height: 1.2;
-            letter-spacing: -0.02em;
+            font-family: var(--font-display);
+            font-size: 2.85rem; 
+            font-weight: 700; 
+            line-height: 1.15;
+            letter-spacing: -0.01em;
             margin-bottom: 24px;
             color: var(--text-main);
         }
@@ -352,7 +368,8 @@
         .online-tracker .online-value { font-size: 0.85rem; font-weight: 700; color: var(--text-main); }
 
         .panel-title {
-            font-size: 1.8rem;
+            font-family: var(--font-display);
+            font-size: 1.6rem;
             font-weight: 600;
             margin-bottom: 30px;
         }
@@ -417,6 +434,127 @@
         }
         .info-notice-box h4 { font-size: 1rem; font-weight: 600; color: #b388ff; margin-bottom: 6px; display: flex; align-items: center; gap: 8px; }
         .info-notice-box p { color: var(--text-muted); font-size: 0.88rem; line-height: 1.5; }
+
+        /* ===== Блок «Как попасть» — карточки тарифов ===== */
+        .join-header { text-align: center; margin-bottom: 38px; max-width: 560px; margin-left: auto; margin-right: auto; }
+        .join-eyebrow {
+            font-size: 0.76rem; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase;
+            color: #b985f4; margin-bottom: 12px;
+        }
+        .join-title { font-family: var(--font-display); font-size: 1.7rem; font-weight: 600; line-height: 1.25; margin-bottom: 14px; }
+        .join-title em { font-style: normal; color: var(--accent-pink); }
+        .join-subtitle { color: var(--text-muted); font-size: 0.95rem; line-height: 1.5; }
+
+        .pricing-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 18px;
+            align-items: center;
+            width: 100%;
+            margin-bottom: 34px;
+        }
+
+        .pricing-card {
+            background: rgba(255,255,255,0.015);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 26px;
+            padding: 30px 26px;
+            display: flex;
+            flex-direction: column;
+            text-align: left;
+            position: relative;
+            transition: transform 0.25s ease, border-color 0.25s ease;
+        }
+        .pricing-card:hover { transform: translateY(-4px); }
+
+        .pricing-watermark {
+            position: absolute; right: 6px; bottom: 6px; z-index: 0;
+            opacity: 0.045; transform: rotate(-14deg); pointer-events: none;
+        }
+        .pricing-watermark [data-lucide] { width: 128px; height: 128px; stroke-width: 1; }
+        .pricing-card > *:not(.pricing-watermark) { position: relative; z-index: 1; }
+
+        .pricing-card.tier-express {
+            background: linear-gradient(165deg, rgba(64, 156, 255, 0.12), rgba(64, 156, 255, 0.01));
+            border-color: rgba(64, 156, 255, 0.28);
+        }
+        .pricing-card.tier-express .pricing-mark { border-color: rgba(64,156,255,0.5); color: #8dc3ff; }
+        .pricing-card.tier-express .pricing-watermark { color: #409cff; }
+        .pricing-card.tier-express .pricing-amount { color: #8dc3ff; }
+
+        .pricing-card.tier-free {
+            background: linear-gradient(165deg, rgba(46, 204, 113, 0.12), rgba(46, 204, 113, 0.01));
+            border-color: rgba(46, 204, 113, 0.28);
+        }
+        .pricing-card.tier-free .pricing-mark { border-color: rgba(46,204,113,0.5); color: #7be8a4; }
+        .pricing-card.tier-free .pricing-watermark { color: #2ecc71; }
+        .pricing-card.tier-free .pricing-amount { color: #7be8a4; }
+
+        .pricing-card.featured {
+            background: linear-gradient(165deg, rgba(138,43,226,0.22), rgba(255,0,127,0.07));
+            border: 1px solid rgba(138,43,226,0.45);
+            box-shadow: 0 25px 60px -20px rgba(138,43,226,0.5);
+            padding: 40px 32px;
+        }
+        .pricing-card.featured .pricing-watermark { color: var(--primary-purple); }
+        .pricing-card.featured .pricing-watermark [data-lucide] { width: 156px; height: 156px; }
+
+        .pricing-ribbon {
+            position: absolute; top: -13px; left: 26px; z-index: 2;
+            background: var(--accent-pink); color: #fff;
+            font-size: 0.66rem; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase;
+            padding: 5px 14px; border-radius: 100px;
+        }
+
+        .pricing-mark {
+            width: 38px; height: 38px; border-radius: 50%;
+            border: 1.5px solid rgba(255,255,255,0.16);
+            display: flex; align-items: center; justify-content: center;
+            margin-bottom: 20px; color: #fff; flex-shrink: 0;
+        }
+        .pricing-mark [data-lucide] { width: 17px; height: 17px; }
+        .pricing-card.featured .pricing-mark { width: 46px; height: 46px; border-color: rgba(138,43,226,0.55); color: #d9b3ff; }
+        .pricing-card.featured .pricing-mark [data-lucide] { width: 21px; height: 21px; }
+
+        .pricing-name { font-family: var(--font-display); font-size: 0.98rem; font-weight: 600; margin-bottom: 5px; }
+        .pricing-card.featured .pricing-name { font-size: 1.2rem; }
+        .pricing-tagline { font-size: 0.82rem; color: var(--text-muted); line-height: 1.4; margin-bottom: 22px; min-height: 35px; }
+        .pricing-card.featured .pricing-tagline { font-size: 0.88rem; min-height: 0; }
+
+        .pricing-amount { font-size: 2rem; font-weight: 800; margin-bottom: 18px; letter-spacing: -0.01em; }
+        .pricing-amount sup { font-size: 0.9rem; font-weight: 600; color: var(--text-muted); margin-left: 4px; }
+        .pricing-card.featured .pricing-amount { font-size: 2.6rem; }
+
+        .pricing-cta { width: 100%; padding: 12px 18px; font-size: 0.84rem; margin-bottom: 24px; }
+        .pricing-card.featured .pricing-cta { padding: 15px 18px; font-size: 0.9rem; }
+
+        .pricing-features { list-style: none; display: flex; flex-direction: column; gap: 11px; margin-top: auto; }
+        .pricing-features li { display: flex; align-items: flex-start; gap: 9px; font-size: 0.84rem; color: rgba(255,255,255,0.82); line-height: 1.4; }
+        .pricing-features [data-lucide] { width: 15px; height: 15px; color: #4fdc8e; flex-shrink: 0; margin-top: 2px; }
+        .pricing-card.featured .pricing-features li { font-size: 0.88rem; }
+
+        .verify-info-panel {
+            display: flex; align-items: flex-start; gap: 20px;
+            background: rgba(13, 9, 21, 0.4);
+            border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 22px;
+            padding: 26px 30px;
+            width: 100%;
+        }
+        .verify-info-icon {
+            width: 44px; height: 44px; border-radius: 14px; flex-shrink: 0;
+            background: rgba(138,43,226,0.14); color: #b985f4;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .verify-info-panel h4 { font-size: 1rem; font-weight: 700; color: #fff; margin-bottom: 6px; }
+        .verify-info-panel p { color: var(--text-muted); font-size: 0.88rem; line-height: 1.55; }
+
+        @media (max-width: 900px) {
+            .pricing-grid { grid-template-columns: 1fr; }
+            .pricing-card.featured { order: -1; }
+            .verify-info-panel { flex-direction: column; gap: 14px; }
+        }
+
 
         .rule-node {
             text-align: left;
@@ -871,7 +1009,6 @@
         .icon-badge.b-orange { background: rgba(255, 159, 28, 0.16); color: #ffb95c; }
         .icon-badge.b-red    { background: rgba(231, 76, 60, 0.16); color: #ff7b6e; }
 
-        #tab-admin { position: relative; }
 
         .admin-subnav {
             display: flex; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.04);
@@ -1054,7 +1191,6 @@
             <button id="tab-players" onclick="switchTab('players')">Игроки</button>
             <button id="tab-mechanics" onclick="switchTab('mechanics')">Механики</button>
             <button id="tab-donate" onclick="switchTab('donate')">Донат</button>
-            <button id="tab-admin" onclick="switchTab('admin')" style="display:none;">Админ</button>
         </nav>
     </header>
 
@@ -1069,6 +1205,9 @@
             <div class="ux-panel">
                 <div class="eyebrow">Стань частью нашего проекта</div>
                 <h1>Закрытый ванильный<br>Майнкрафт сервер</h1>
+                <svg class="hero-squiggle" width="220" height="18" viewBox="0 0 220 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M3 12C20 4 34 4 50 11C66 18 82 6 98 8C114 10 128 15 145 9C162 3 178 6 194 12C202 15 210 13 217 8" stroke="#ff007f" stroke-width="3" stroke-linecap="round"/>
+                </svg>
                 
                 <div class="features-line">
                     <div><i data-lucide="lock" style="width:16px;height:16px;"></i> <span>WhiteList</span> доступ</div>
@@ -1099,44 +1238,63 @@
 
         <div id="section-join" class="content-section">
             <div class="ux-panel">
-                <div class="panel-title">Варианты авторизации</div>
-                <div class="join-row">
-                    <div class="ticket-card">
-                        <div class="ticket-info">
-                            <h3 id="join-name-permanent">Постоянный безлимит «Навсегда»</h3>
-                            <p id="join-desc-permanent">Твой ультимативный билет в вечное выживание! Абсолютная свобода от любых продлений, взносов и вайпов на все будущие сезоны проекта. Залетай в WhiteList один раз и забудь о суете навсегда.</p>
-                        </div>
-                        <div>
-                            <div class="ticket-price" id="join-price-permanent">349 ₽</div>
-                            <button class="btn-primary" id="join-btn-permanent" style="padding: 10px 20px; font-size: 0.8rem; margin-top: 10px; width: 100%;" onclick="buyServerPass(349)">Купить доступ</button>
-                        </div>
+                <div class="join-header">
+                    <div class="join-eyebrow">Доступ на сервер</div>
+                    <div class="join-title">Как попасть <em>на KuromiSMP</em></div>
+                    <div class="join-subtitle">Три способа получить доступ — выбери подходящий: быстрая проходка, вечный статус или бесплатный вход по лицензии.</div>
+                </div>
+
+                <div class="pricing-grid">
+                    <div class="pricing-card tier-express">
+                        <div class="pricing-watermark"><i data-lucide="zap"></i></div>
+                        <div class="pricing-mark"><i data-lucide="zap"></i></div>
+                        <div class="pricing-name" id="join-name-30d">Экспресс-пропуск «На 30 дней»</div>
+                        <div class="pricing-tagline" id="join-desc-30d">Мгновенная автоматическая регистрация в WhiteList без анкет и ожидания.</div>
+                        <div class="pricing-amount" id="join-price-30d">149 ₽</div>
+                        <button class="btn-primary pricing-cta" id="join-btn-30d" onclick="buyServerPass(149)">В один клик</button>
+                        <ul class="pricing-features">
+                            <li><i data-lucide="check"></i> Мгновенная запись в WhiteList</li>
+                            <li><i data-lucide="check"></i> Никаких анкет и ожидания</li>
+                            <li><i data-lucide="check"></i> Можно продлить в любой момент</li>
+                        </ul>
                     </div>
 
-                    <div class="ticket-card">
-                        <div class="ticket-info">
-                            <h3 id="join-name-30d">Экспресс-пропуск «На 30 дней»</h3>
-                            <p id="join-desc-30d">Максимальный комфорт для быстрого старта! Мгновенная автоматическая регистрация в WhiteList без томительного ожидания, скучных анкет и долгих проверок. Залетай в игру в один клик прямо сейчас на целый месяц.</p>
-                        </div>
-                        <div>
-                            <div class="ticket-price" id="join-price-30d">149 ₽</div>
-                            <button class="btn-primary" id="join-btn-30d" style="padding: 10px 20px; font-size: 0.8rem; margin-top: 10px; width: 100%;" onclick="buyServerPass(149)">В один клик</button>
-                        </div>
+                    <div class="pricing-card featured">
+                        <div class="pricing-watermark"><i data-lucide="infinity"></i></div>
+                        <div class="pricing-ribbon">Выгоднее всего</div>
+                        <div class="pricing-mark"><i data-lucide="infinity"></i></div>
+                        <div class="pricing-name" id="join-name-permanent">Постоянный безлимит «Навсегда»</div>
+                        <div class="pricing-tagline" id="join-desc-permanent">Один платёж — и никаких продлений, взносов и вайпов на все будущие сезоны.</div>
+                        <div class="pricing-amount" id="join-price-permanent">349 ₽</div>
+                        <button class="btn-primary pricing-cta" id="join-btn-permanent" onclick="buyServerPass(349)">Купить доступ</button>
+                        <ul class="pricing-features">
+                            <li><i data-lucide="check"></i> Всё то же самое, но один раз</li>
+                            <li><i data-lucide="check"></i> Без доплат на будущих сезонах</li>
+                            <li><i data-lucide="check"></i> Вечный статус в WhiteList</li>
+                        </ul>
                     </div>
 
-                    <div class="ticket-card">
-                        <div class="ticket-info">
-                            <h3>Бесплатный доступ</h3>
-                            <p>Эксклюзивный автоматический бонус для обладателей официальной Лицензии Minecraft! Пройди быстрой моментальную верификацию через нашего бота и играй совершенно бесплатно без каких-либо взносов.</p>
-                        </div>
-                        <div>
-                            <div class="ticket-price">0 ₽</div>
-                            <button class="btn-secondary" style="padding: 10px 20px; font-size: 0.8rem; margin-top: 10px; width: 100%;" onclick="openApplicationModal()">Подать заявку</button>
-                        </div>
+                    <div class="pricing-card tier-free">
+                        <div class="pricing-watermark"><i data-lucide="clipboard-check"></i></div>
+                        <div class="pricing-mark"><i data-lucide="clipboard-check"></i></div>
+                        <div class="pricing-name">Бесплатный доступ</div>
+                        <div class="pricing-tagline">Для обладателей официальной лицензии Minecraft — после проверки подлинности аккаунта.</div>
+                        <div class="pricing-amount">0 ₽</div>
+                        <button class="btn-secondary pricing-cta" onclick="openApplicationModal()">Подать заявку</button>
+                        <ul class="pricing-features">
+                            <li><i data-lucide="check"></i> Только для лицензии Minecraft</li>
+                            <li><i data-lucide="check"></i> Проверка подлинности ботом</li>
+                            <li><i data-lucide="check"></i> Решение по заявке вручную</li>
+                        </ul>
                     </div>
                 </div>
-                <div class="info-notice-box">
-                    <h4><i data-lucide="shield-check" style="width:16px;height:16px;"></i> Информация о верификации</h4>
-                    <p>Для игроков с официальной Лицензией Майнкрафт доступ предоставляется бесплатно после подтверждения подлинности аккаунта. Для пользователей пиратских лаунчеров обязательно приобретение проходки. Это ограничение введено для обеспечения жесткой безопасности игрового процесса и полной защиты серверов от повторных заходов забаненных нарушителей.</p>
+
+                <div class="verify-info-panel">
+                    <div class="verify-info-icon"><i data-lucide="shield-check" style="width:20px;height:20px;"></i></div>
+                    <div>
+                        <h4>Информация о верификации</h4>
+                        <p>Для игроков с официальной лицензией Minecraft доступ предоставляется бесплатно после подтверждения подлинности аккаунта. Для пользователей пиратских лаунчеров обязательно приобретение проходки. Это ограничение введено для обеспечения безопасности игрового процесса и защиты сервера от повторных заходов забаненных нарушителей.</p>
+                    </div>
                 </div>
             </div>
         </div>
@@ -3170,8 +3328,6 @@
         /* --- МОДУЛЬ УПРАВЛЕНИЯ ЛЕНТОЙ НОВОСТЕЙ СЕРВЕРА --- */
 
         function updateNewsForm() {
-            const adminTabBtn = document.getElementById('tab-admin');
-            if (adminTabBtn) adminTabBtn.style.display = isUserModerator ? 'inline-block' : 'none';
             const adminFixedBtn = document.getElementById('admin-fixed-btn');
             if (adminFixedBtn) {
                 adminFixedBtn.style.display = isUserModerator ? 'flex' : 'none';
