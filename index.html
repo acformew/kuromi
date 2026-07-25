@@ -2409,7 +2409,7 @@
 
                         <div style="display: flex; justify-content: space-between; align-items: center; width: 100%; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 20px; flex-wrap: wrap; gap: 14px;">
                             <div style="display: flex; align-items: center; gap: 24px;">
-                                <img src="https://mc-heads.net/avatar/${linkedData.minecraft_name}/80" style="border-radius:12px; image-rendering:pixelated; width:80px; border: 2px solid rgba(255,255,255,0.2);">
+                                <img src="https://mc-heads.net/player/${linkedData.minecraft_name}/140" style="image-rendering:pixelated; height:140px; width:auto; filter: drop-shadow(0 8px 12px rgba(0,0,0,0.35));">
                                 <div style="text-align: left;">
                                     <h2 style="font-family: var(--font-display); font-size: 1.4rem; font-weight: 600; color: #fff;">${linkedData.minecraft_name}</h2>
                                     <div style="font-size: 0.85rem; color: rgba(255,255,255,0.65); margin-top: 4px;">Discord: ${discordUsername}</div>
@@ -2521,28 +2521,36 @@
             const swatches = Object.keys(GRADIENT_PRESETS).map(key => {
                 const preset = GRADIENT_PRESETS[key];
                 const isActive = key === (activeKey || 'default');
-                return `<div class="profile-color-swatch ${isActive ? 'active' : ''}" style="background: ${preset.swatch};" onclick="setProfileGradient('${key}')" title="${key}"></div>`;
+                return `<div class="profile-color-swatch ${isActive ? 'active' : ''}" style="background: ${preset.swatch};" onclick="setProfileGradient('${key}', this)" title="${key}"></div>`;
             }).join('');
             return `<div class="profile-color-picker"><span class="label"><i data-lucide="palette" style="width:14px;height:14px;vertical-align:-2px;"></i> Цвет профиля:</span>${swatches}</div>`;
         }
 
-        async function setProfileGradient(key) {
+        function setProfileGradient(key, el) {
             if (!currentUserLinkedData) return;
-            try {
-                const { data, error } = await supabaseClient
-                    .from('player_profile_customization')
-                    .upsert({ minecraft_uuid: currentUserLinkedData.minecraft_uuid, profile_gradient: key, updated_at: new Date().toISOString() }, { onConflict: 'minecraft_uuid' })
-                    .select();
-                if (error) throw error;
-                if (!data || data.length === 0) {
-                    customAlert('⚠️ Не сохранилось', 'Supabase не подтвердил изменение — вероятно, RLS-политика в таблице player_profile_customization блокирует запись. Проверьте настройки доступа.');
-                    return;
-                }
-                loadProfileData();
-            } catch (e) {
-                console.error('Не удалось сохранить цвет профиля:', e);
-                customAlert('❌ Ошибка', 'Не удалось сохранить цвет профиля. Проверьте, что таблица player_profile_customization создана в Supabase.');
+
+            // Применяем визуально мгновенно, не дожидаясь ответа сервера
+            const card = document.querySelector('#section-profile .profile-banner-card');
+            if (card) card.style.setProperty('--pf-gradient', getGradientPreset(key).css);
+            if (el && el.parentElement) {
+                el.parentElement.querySelectorAll('.profile-color-swatch').forEach(s => s.classList.remove('active'));
+                el.classList.add('active');
             }
+
+            // Сохраняем в фоне
+            supabaseClient
+                .from('player_profile_customization')
+                .upsert({ minecraft_uuid: currentUserLinkedData.minecraft_uuid, profile_gradient: key, updated_at: new Date().toISOString() }, { onConflict: 'minecraft_uuid' })
+                .select()
+                .then(({ data, error }) => {
+                    if (error) {
+                        console.error('Не удалось сохранить цвет профиля:', error);
+                        customAlert('❌ Ошибка', 'Цвет отобразился, но не сохранился на сервере. Попробуйте ещё раз.');
+                    } else if (!data || data.length === 0) {
+                        console.error('RLS заблокировал запись цвета профиля');
+                        customAlert('⚠️ Не сохранилось', 'Supabase не подтвердил сохранение — проверьте RLS-политику player_profile_customization.');
+                    }
+                });
         }
 
         async function saveProfileBio() {
@@ -2754,7 +2762,7 @@
                     <div class="profile-banner-card" style="--pf-gradient: ${preset.css}; text-align: center;">
                         <div class="profile-banner-watermark"><i data-lucide="cat"></i></div>
 
-                        <img src="https://mc-heads.net/avatar/${playerData.minecraft_name}/80" style="image-rendering:pixelated; border-radius:12px; width:80px; height:80px; margin-bottom: 15px; border: 2px solid rgba(255,255,255,0.25); box-shadow: 0 0 15px rgba(0,0,0,0.2);">
+                        <img src="https://mc-heads.net/player/${playerData.minecraft_name}/160" style="image-rendering:pixelated; height:160px; width:auto; margin-bottom: 15px; filter: drop-shadow(0 8px 14px rgba(0,0,0,0.35));">
                         <h2 style="font-family: var(--font-display); font-size: 1.6rem; font-weight: 600; color: #fff; margin-bottom: ${playerData.bio ? '6px' : '22px'};">${playerData.minecraft_name}</h2>
                         ${playerData.bio ? `<div style="font-size:0.85rem; color: rgba(255,255,255,0.7); font-style: italic; margin-bottom: 22px;">${escapeHtml(playerData.bio)}</div>` : ''}
 
