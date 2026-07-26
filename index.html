@@ -8,6 +8,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Unbounded:wght@500;600;700;800;900&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@0.462.0/dist/umd/lucide.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/skinview3d@3.1.0/bundles/skinview3d.bundle.js"></script>
 
     <style>
         :root {
@@ -2407,16 +2408,21 @@
                     <div class="profile-banner-card" style="--pf-gradient: ${getGradientPreset(currentCustom.profile_gradient).css};">
                         <div class="profile-banner-watermark"><i data-lucide="cat"></i></div>
 
-                        <div style="display: flex; justify-content: space-between; align-items: center; width: 100%; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 20px; flex-wrap: wrap; gap: 14px;">
-                            <div style="display: flex; align-items: center; gap: 24px;">
-                                <img src="https://mc-heads.net/player/${linkedData.minecraft_name}/140" style="image-rendering:pixelated; height:140px; width:auto; filter: drop-shadow(0 8px 12px rgba(0,0,0,0.35));">
-                                <div style="text-align: left;">
-                                    <h2 style="font-family: var(--font-display); font-size: 1.4rem; font-weight: 600; color: #fff;">${linkedData.minecraft_name}</h2>
-                                    <div style="font-size: 0.85rem; color: rgba(255,255,255,0.65); margin-top: 4px;">Discord: ${discordUsername}</div>
-                                    <div style="font-size: 0.82rem; color: #fff; opacity: 0.85; margin-top: 4px;">На сервере с ${formatDate(currentStats.first_join, false)}</div>
-                                </div>
+                        <div style="display: flex; gap: 26px; width: 100%; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 22px; flex-wrap: wrap;">
+                            <div style="flex-shrink: 0;">
+                                <canvas id="skin-viewer-own" width="150" height="220" style="display:block;"></canvas>
                             </div>
-                            <button class="btn-secondary" style="padding: 8px 16px; font-size: 0.8rem;" onclick="handleSignOut()">Выйти</button>
+                            <div style="flex: 1; min-width: 200px; display: flex; flex-direction: column; justify-content: space-between;">
+                                <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 14px; flex-wrap: wrap;">
+                                    <div style="text-align: left;">
+                                        <h2 style="font-family: var(--font-display); font-size: 1.4rem; font-weight: 600; color: #fff;">${linkedData.minecraft_name}</h2>
+                                        <div style="font-size: 0.85rem; color: rgba(255,255,255,0.65); margin-top: 4px;">Discord: ${discordUsername}</div>
+                                        <div style="font-size: 0.82rem; color: #fff; opacity: 0.85; margin-top: 4px;">На сервере с ${formatDate(currentStats.first_join, false)}</div>
+                                    </div>
+                                    <button class="btn-secondary" style="padding: 8px 16px; font-size: 0.8rem;" onclick="handleSignOut()">Выйти</button>
+                                </div>
+                                <div style="text-align: left; margin-top: 16px; font-size: 0.85rem; color: rgba(255,255,255,0.6);">Последний раз онлайн: ${formatDate(currentStats.last_seen, false)}</div>
+                            </div>
                         </div>
                         <div class="stats-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-top: 20px;">
                             <div class="stat-card" style="background: rgba(0,0,0,0.18); border: 1px solid rgba(255,255,255,0.06); padding: 20px; border-radius: 20px; text-align: left;">
@@ -2436,7 +2442,6 @@
                                 <div class="stat-value" style="font-size: 1.4rem; font-weight: 700; color: #ffb0d9;">${kd}</div>
                             </div>
                         </div>
-                        <div style="text-align: left; margin-top: 20px; font-size: 0.85rem; color: rgba(255,255,255,0.6);">Последний раз онлайн: ${formatDate(currentStats.last_seen, false)}</div>
 
                         <div style="margin-top: 22px; text-align: left;">
                             <div style="font-size: 0.8rem; color: rgba(255,255,255,0.6); margin-bottom: 8px;"><i data-lucide="pen-line" style="width:13px;height:13px;vertical-align:-2px;"></i> Описание профиля <span id="profile-bio-counter" style="color: rgba(255,255,255,0.4);">(${(currentCustom.bio || '').length}/40)</span></div>
@@ -2448,6 +2453,8 @@
 
                         ${renderColorPickerRow(currentCustom.profile_gradient)}
                     </div>`;
+
+                initSkinViewer('skin-viewer-own', linkedData.minecraft_uuid, 150, 220);
             } catch (e) {
                 console.error(e);
                 wrapper.innerHTML = `<div style="color: var(--accent-pink);">Ошибка загрузки профиля.</div>`;
@@ -2496,6 +2503,38 @@
             });
 
             setTimeout(() => { p.remove(); }, 600);
+        }
+
+        const activeSkinViewers = {};
+
+        function disposeSkinViewer(canvasId) {
+            if (activeSkinViewers[canvasId]) {
+                try { activeSkinViewers[canvasId].dispose(); } catch (e) { /* ничего страшного */ }
+                delete activeSkinViewers[canvasId];
+            }
+        }
+
+        function initSkinViewer(canvasId, minecraftUuid, width, height) {
+            disposeSkinViewer(canvasId);
+            const canvas = document.getElementById(canvasId);
+            if (!canvas) return;
+            if (typeof skinview3d === 'undefined') {
+                console.error('Библиотека skinview3d не загрузилась — проверьте подключение CDN.');
+                return;
+            }
+            try {
+                const uuidClean = (minecraftUuid || '').replace(/-/g, '');
+                const viewer = new skinview3d.SkinViewer({ canvas, width, height });
+                viewer.zoom = 0.8;
+                viewer.controls.enableZoom = false;
+                viewer.autoRotate = true;
+                viewer.autoRotateSpeed = 0.8;
+                viewer.animation = new skinview3d.IdleAnimation();
+                viewer.loadSkin(`https://crafatar.com/skins/${uuidClean}`, { model: 'auto-detect' });
+                activeSkinViewers[canvasId] = viewer;
+            } catch (e) {
+                console.error('Не удалось инициализировать 3D-просмотр скина:', e);
+            }
         }
 
         const GRADIENT_PRESETS = {
@@ -2746,6 +2785,7 @@
             
             modalOverlay.onclick = function(e) {
                 if (e.target === modalOverlay) {
+                    disposeSkinViewer('skin-viewer-modal');
                     modalOverlay.remove();
                 }
             };
@@ -2756,17 +2796,23 @@
             const preset = getGradientPreset(playerData.profile_gradient);
 
             modalOverlay.innerHTML = `
-                <div style="background: rgba(16, 11, 28, 0.95); border-radius: 28px; border: 1px solid rgba(138, 43, 226, 0.2); max-width: 480px; width: 100%; padding: 22px; position: relative; box-shadow: 0 20px 50px rgba(0,0,0,0.6); font-family: var(--font-sans); color: #fff;">
-                    <span style="position: absolute; top: 30px; right: 35px; color: #fff; opacity: 0.6; font-size: 1.8rem; cursor: pointer; font-weight: bold; line-height: 1; z-index: 2;" onclick="this.parentElement.parentElement.remove()">&times;</span>
+                <div style="background: rgba(16, 11, 28, 0.95); border-radius: 28px; border: 1px solid rgba(138, 43, 226, 0.2); max-width: 520px; width: 100%; padding: 22px; position: relative; box-shadow: 0 20px 50px rgba(0,0,0,0.6); font-family: var(--font-sans); color: #fff;">
+                    <span style="position: absolute; top: 30px; right: 35px; color: #fff; opacity: 0.6; font-size: 1.8rem; cursor: pointer; font-weight: bold; line-height: 1; z-index: 2;" onclick="disposeSkinViewer('skin-viewer-modal'); this.parentElement.parentElement.remove();">&times;</span>
 
-                    <div class="profile-banner-card" style="--pf-gradient: ${preset.css}; text-align: center;">
+                    <div class="profile-banner-card" style="--pf-gradient: ${preset.css};">
                         <div class="profile-banner-watermark"><i data-lucide="cat"></i></div>
 
-                        <img src="https://mc-heads.net/player/${playerData.minecraft_name}/160" style="image-rendering:pixelated; height:160px; width:auto; margin-bottom: 15px; filter: drop-shadow(0 8px 14px rgba(0,0,0,0.35));">
-                        <h2 style="font-family: var(--font-display); font-size: 1.6rem; font-weight: 600; color: #fff; margin-bottom: ${playerData.bio ? '6px' : '22px'};">${playerData.minecraft_name}</h2>
-                        ${playerData.bio ? `<div style="font-size:0.85rem; color: rgba(255,255,255,0.7); font-style: italic; margin-bottom: 22px;">${escapeHtml(playerData.bio)}</div>` : ''}
+                        <div style="display: flex; gap: 22px; flex-wrap: wrap;">
+                            <div style="flex-shrink: 0;">
+                                <canvas id="skin-viewer-modal" width="150" height="220" style="display:block;"></canvas>
+                            </div>
+                            <div style="flex: 1; min-width: 180px; text-align: left; display: flex; flex-direction: column; justify-content: center;">
+                                <h2 style="font-family: var(--font-display); font-size: 1.5rem; font-weight: 600; color: #fff; margin-bottom: ${playerData.bio ? '6px' : '0'};">${playerData.minecraft_name}</h2>
+                                ${playerData.bio ? `<div style="font-size:0.85rem; color: rgba(255,255,255,0.7); font-style: italic;">${escapeHtml(playerData.bio)}</div>` : ''}
+                            </div>
+                        </div>
 
-                        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; width: 100%; margin-bottom: 20px;">
+                        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; width: 100%; margin: 20px 0;">
                             <div style="background: rgba(0,0,0,0.18); border: 1px solid rgba(255,255,255,0.06); border-radius: 20px; padding: 16px; text-align: left;">
                                 <div style="font-size: 0.8rem; color: rgba(255,255,255,0.6); margin-bottom: 4px;"><i data-lucide="clock" style="width:13px;height:13px;display:inline;vertical-align:-2px;"></i> Время онлайна</div>
                                 <div style="font-size: 1.3rem; font-weight: 700; color: #fff;">${formatPlaytime(playerData.playtime_seconds)}</div>
@@ -2793,6 +2839,7 @@
             `;
             
             document.body.appendChild(modalOverlay);
+            initSkinViewer('skin-viewer-modal', playerData.minecraft_uuid, 150, 220);
             if (window.lucide) lucide.createIcons();
         }
 
