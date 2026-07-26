@@ -382,18 +382,21 @@
             width: 100%;
         }
         .news-card {
-            background: rgba(255, 255, 255, 0.01);
+            background: linear-gradient(155deg, rgba(138,43,226,0.05), rgba(255,255,255,0.01) 60%);
             border: 1px solid rgba(255, 255, 255, 0.02);
             border-radius: 20px;
             padding: 24px;
             text-align: left;
             width: 100%;
             transition: all 0.2s ease;
+            position: relative;
+            overflow: hidden;
         }
         .news-card:hover {
             border-color: rgba(138, 43, 226, 0.2);
-            background: rgba(255, 255, 255, 0.02);
+            background: linear-gradient(155deg, rgba(138,43,226,0.08), rgba(255,255,255,0.02) 60%);
         }
+        .news-card > *:not(.icon-pattern-layer) { position: relative; z-index: 1; }
         .news-meta {
             display: flex;
             gap: 12px;
@@ -410,7 +413,7 @@
         .join-row { display: flex; flex-direction: column; gap: 16px; width: 100%; margin-bottom: 30px; }
 
         .ticket-card {
-            background: rgba(255, 255, 255, 0.01);
+            background: linear-gradient(160deg, rgba(138,43,226,0.06), rgba(255,255,255,0.01) 65%);
             border: 1px solid rgba(255, 255, 255, 0.02);
             border-radius: 24px;
             padding: 24px 35px;
@@ -420,7 +423,10 @@
             align-items: center;
             gap: 40px;
             width: 100%;
+            position: relative;
+            overflow: hidden;
         }
+        .ticket-card > *:not(.icon-pattern-layer) { position: relative; z-index: 1; }
         .ticket-info h3 { font-size: 1.15rem; font-weight: 600; margin-bottom: 4px; }
         .ticket-info p { color: var(--text-muted); font-size: 0.9rem; line-height: 1.4; max-width: 520px; } 
         .ticket-price { font-size: 1.4rem; font-weight: 700; color: var(--accent-pink); white-space: nowrap; text-align: right; }
@@ -619,11 +625,23 @@
         }
         .profile-banner-watermark {
             position: absolute; right: -14px; bottom: -14px; z-index: 0;
-            opacity: 0.07; transform: rotate(-12deg); pointer-events: none;
+            opacity: 0.09; transform: rotate(-12deg); pointer-events: none;
         }
         .profile-banner-watermark [data-lucide] { width: 150px; height: 150px; stroke-width: 1; }
-        .profile-banner-card > *:not(.profile-banner-watermark) { position: relative; z-index: 1; }
+        .profile-banner-card > *:not(.profile-banner-watermark):not(.icon-pattern-layer) { position: relative; z-index: 1; }
+        .profile-banner-card { background-image: radial-gradient(circle at 12% -10%, rgba(255,255,255,0.06), transparent 55%); background-blend-mode: soft-light; }
 
+        /* ===== Текстура из нескольких иконок Lucide на карточках ===== */
+        .icon-pattern-layer {
+            position: absolute; inset: 0; z-index: 0;
+            display: flex; flex-wrap: wrap; align-content: flex-start; align-items: flex-start;
+            overflow: hidden; pointer-events: none; color: #fff;
+        }
+        .icon-pattern-layer [data-lucide] { flex-shrink: 0; stroke-width: 1.3; }
+        .icon-pattern-layer.pattern-soft [data-lucide] { opacity: 0.045; }
+        .icon-pattern-layer.pattern-medium [data-lucide] { opacity: 0.075; }
+
+        /* ===== Палитра цвета профиля (пресеты + кастомный color picker) ===== */
         .profile-color-picker { display: flex; align-items: center; gap: 10px; margin-top: 22px; flex-wrap: wrap; }
         .profile-color-picker .label { font-size: 0.8rem; color: var(--text-muted); margin-right: 4px; }
         .profile-color-swatch {
@@ -634,6 +652,82 @@
         .profile-color-swatch:hover { transform: scale(1.12); }
         .profile-color-swatch.active { border-color: #fff; transform: scale(1.12); }
 
+        .custom-color-trigger {
+            width: 30px; height: 30px; border-radius: 50%;
+            border: 2px dashed rgba(255,255,255,0.4); cursor: pointer;
+            display: inline-flex; align-items: center; justify-content: center;
+            background: conic-gradient(from 180deg, #ff007f, #8a2be2, #409cff, #2ecc71, #ff9f1c, #e74c3c, #ff007f);
+            transition: transform 0.15s ease, border-color 0.15s ease;
+            position: relative; flex-shrink: 0;
+        }
+        .custom-color-trigger.active { border: 2px solid #fff; transform: scale(1.12); }
+        .custom-color-trigger:hover { transform: scale(1.12); }
+        .custom-color-trigger [data-lucide] { width: 14px; height: 14px; color: #fff; filter: drop-shadow(0 0 2px rgba(0,0,0,0.7)); pointer-events: none; }
+        .custom-color-trigger input[type="color"] {
+            position: absolute; inset: 0; width: 100%; height: 100%;
+            opacity: 0; cursor: pointer; border: none; padding: 0; margin: 0;
+        }
+
+        /* ===== Селектор иконки фракции/клана ===== */
+        .faction-icon-trigger {
+            position: absolute; right: 16px; bottom: 16px; z-index: 2;
+            width: 42px; height: 42px; border-radius: 13px;
+            background: rgba(5,3,8,0.55); border: 1px solid rgba(255,255,255,0.15);
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; transition: all 0.2s ease; backdrop-filter: blur(4px);
+        }
+        .faction-icon-trigger:hover { border-color: var(--accent-pink); background: rgba(255,0,127,0.14); transform: scale(1.06); }
+        .faction-icon-trigger [data-lucide] { width: 19px; height: 19px; color: #fff; }
+        .faction-icon-trigger .faction-edit-badge {
+            position: absolute; top: -5px; right: -5px; width: 16px; height: 16px; border-radius: 50%;
+            background: var(--accent-pink); display: flex; align-items: center; justify-content: center;
+            border: 2px solid rgba(16,11,28,1);
+        }
+        .faction-icon-trigger .faction-edit-badge [data-lucide] { width: 8px; height: 8px; }
+
+        #icon-picker-overlay {
+            display: none; position: fixed; inset: 0; background: rgba(5,3,8,0.8);
+            backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+            z-index: 20002; align-items: center; justify-content: center; padding: 20px;
+        }
+        #icon-picker-card {
+            background: rgba(16,11,28,0.98); border: 1px solid rgba(138,43,226,0.3);
+            border-radius: 26px; max-width: 540px; width: 100%; max-height: 82vh;
+            display: flex; flex-direction: column; padding: 26px; box-shadow: 0 20px 50px rgba(0,0,0,0.6);
+        }
+        #icon-picker-card h3 { font-size: 1.15rem; font-weight: 700; color: #fff; display: flex; align-items: center; gap: 8px; }
+        #icon-picker-close { cursor: pointer; color: var(--text-muted); transition: color 0.2s ease; margin-left: auto; }
+        #icon-picker-close:hover { color: #fff; }
+        #icon-picker-search {
+            width: 100%; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 14px; padding: 11px 16px; color: #fff; font-family: var(--font-sans);
+            font-size: 0.88rem; outline: none; margin: 16px 0; box-sizing: border-box;
+        }
+        #icon-picker-search:focus { border-color: var(--primary-purple); }
+        #icon-picker-grid {
+            display: grid; grid-template-columns: repeat(6, 1fr); gap: 10px;
+            overflow-y: auto; padding-right: 4px;
+        }
+        .icon-picker-item {
+            aspect-ratio: 1; border-radius: 14px; background: rgba(255,255,255,0.02);
+            border: 1px solid rgba(255,255,255,0.05); display: flex; align-items: center; justify-content: center;
+            cursor: pointer; transition: all 0.15s ease; color: #cbb8f0;
+        }
+        .icon-picker-item:hover { background: rgba(138,43,226,0.15); border-color: rgba(138,43,226,0.4); color: #fff; transform: scale(1.08); }
+        .icon-picker-item.active { background: rgba(255,0,127,0.18); border-color: var(--accent-pink); color: #fff; }
+        .icon-picker-item [data-lucide] { width: 21px; height: 21px; }
+        #icon-picker-empty { text-align: center; color: var(--text-muted); font-size: 0.85rem; padding: 30px 0; grid-column: 1 / -1; }
+        @media (max-width: 480px) { #icon-picker-grid { grid-template-columns: repeat(4, 1fr); } }
+
+        /* ===== Плашка анкеты и посты форума — паттерн + лёгкий градиент ===== */
+        #app-modal-card {
+            position: relative; overflow: hidden;
+            background-image: linear-gradient(160deg, rgba(46,204,113,0.10), rgba(46,204,113,0.01) 65%);
+        }
+        #app-modal-card > *:not(.icon-pattern-layer) { position: relative; z-index: 1; }
+        .forum-post-card { position: relative; overflow: hidden; }
+        .forum-post-card > *:not(.icon-pattern-layer) { position: relative; z-index: 1; }
+
         .player-head-render { width: 56px; height: 56px; border-radius: 8px; image-rendering: pixelated; background: rgba(255,255,255,0.02); flex-shrink: 0; }
         .player-card-info { text-align: left; overflow: hidden; width: 100%; }
         .player-card-info h3 { font-size: 1.05rem; font-weight: 600; margin-bottom: 4px; }
@@ -641,7 +735,7 @@
 
         .mechanics-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; width: 100%; margin-top: 10px; }
         .mechanic-card {
-            background: rgba(255, 255, 255, 0.01);
+            background: linear-gradient(160deg, rgba(138,43,226,0.05), rgba(255,255,255,0.01) 60%);
             border: 1px solid rgba(255, 255, 255, 0.03);
             border-radius: 24px;
             padding: 24px;
@@ -650,9 +744,12 @@
             gap: 16px;
             text-align: left;
             transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
         }
-        .mechanic-card:hover { border-color: rgba(138, 43, 226, 0.25); background: rgba(255, 255, 255, 0.02); transform: translateY(-2px); }
+        .mechanic-card:hover { border-color: rgba(138, 43, 226, 0.25); background: linear-gradient(160deg, rgba(138,43,226,0.09), rgba(255,255,255,0.02) 60%); transform: translateY(-2px); }
         .mechanic-card { cursor: pointer; }
+        .mechanic-card > *:not(.icon-pattern-layer) { position: relative; z-index: 1; }
         .mechanic-more {
             display: flex; align-items: center; gap: 6px;
             font-size: 0.78rem; font-weight: 600; color: #b985f4;
@@ -1631,6 +1728,9 @@
     <!-- Красивое интерактивное окно подачи Заявки/Анкеты -->
     <div id="app-modal-overlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(5, 3, 8, 0.85); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); z-index: 20001; align-items: center; justify-content: center; padding: 20px;">
         <div id="app-modal-card" style="background: rgba(16, 11, 28, 0.98); border: 1px solid #2ecc71; border-radius: 32px; max-width: 500px; width: 100%; padding: 40px 35px; box-shadow: 0 0 40px rgba(46, 204, 113, 0.2); text-align: left; font-family: var(--font-sans); color: #fff; transform: translateY(30px) scale(0.95); opacity: 0; transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);">
+            <div class="icon-pattern-layer pattern-soft" style="color:#7be8a4;">
+                <i data-lucide="pen-line" style="width:20px;height:20px;margin:10px;transform:rotate(-8deg);"></i><i data-lucide="scroll-text" style="width:26px;height:26px;margin:14px;transform:rotate(10deg);"></i><i data-lucide="check-check" style="width:18px;height:18px;margin:8px;transform:rotate(-14deg);"></i><i data-lucide="user-round-check" style="width:24px;height:24px;margin:12px;transform:rotate(6deg);"></i><i data-lucide="flower-2" style="width:20px;height:20px;margin:16px;transform:rotate(-4deg);"></i><i data-lucide="pen-line" style="width:16px;height:16px;margin:20px;transform:rotate(18deg);"></i><i data-lucide="scroll-text" style="width:18px;height:18px;margin:10px;transform:rotate(-20deg);"></i><i data-lucide="check-check" style="width:22px;height:22px;margin:14px;transform:rotate(12deg);"></i><i data-lucide="user-round-check" style="width:18px;height:18px;margin:8px;transform:rotate(-6deg);"></i><i data-lucide="flower-2" style="width:24px;height:24px;margin:18px;transform:rotate(15deg);"></i><i data-lucide="pen-line" style="width:22px;height:22px;margin:10px;transform:rotate(-10deg);"></i><i data-lucide="scroll-text" style="width:16px;height:16px;margin:12px;transform:rotate(20deg);"></i><i data-lucide="check-check" style="width:20px;height:20px;margin:16px;transform:rotate(-16deg);"></i><i data-lucide="user-round-check" style="width:20px;height:20px;margin:10px;transform:rotate(8deg);"></i><i data-lucide="flower-2" style="width:18px;height:18px;margin:14px;transform:rotate(-12deg);"></i>
+            </div>
             <h3 style="font-size: 1.45rem; font-weight: 700; margin-bottom: 6px; color: #fff; display: flex; align-items: center; gap: 8px;"><i data-lucide="flower-2" style="width:20px;height:20px;color:#7be8a4;"></i> Бесплатный доступ</h3>
             <p style="font-size: 0.86rem; color: var(--text-muted); margin-bottom: 24px;">Анкета верификации для владельцев официальной Лицензии Minecraft.</p>
             
@@ -2382,17 +2482,29 @@
                 const currentStats = stats || { playtime_seconds: 0, deaths: 0, kills: 0, last_seen: null, first_join: null };
                 const kd = currentStats.deaths > 0 ? (currentStats.kills / currentStats.deaths).toFixed(2) : currentStats.kills + ".0";
 
-                let currentCustom = { profile_gradient: 'default', bio: null };
+                let currentCustom = { profile_gradient: 'default', bio: null, profile_watermark_icon: 'cat' };
                 try {
                     const { data: custom } = await supabaseClient
                         .from('player_profile_customization')
-                        .select('profile_gradient, bio')
+                        .select('profile_gradient, bio, profile_watermark_icon')
                         .eq('minecraft_uuid', linkedData.minecraft_uuid)
                         .maybeSingle();
-                    if (custom) currentCustom = custom;
+                    if (custom) currentCustom = { profile_watermark_icon: 'cat', ...custom };
                 } catch (e) {
-                    console.error('Не удалось загрузить кастомизацию профиля (таблица player_profile_customization создана?):', e);
+                    // Если колонки profile_watermark_icon ещё нет в таблице — пробуем без неё, чтобы не ронять весь профиль
+                    console.error('Не удалось загрузить кастомизацию профиля (проверьте, есть ли колонка profile_watermark_icon в player_profile_customization):', e);
+                    try {
+                        const { data: legacyCustom } = await supabaseClient
+                            .from('player_profile_customization')
+                            .select('profile_gradient, bio')
+                            .eq('minecraft_uuid', linkedData.minecraft_uuid)
+                            .maybeSingle();
+                        if (legacyCustom) currentCustom = { profile_watermark_icon: 'cat', ...legacyCustom };
+                    } catch (e2) {
+                        console.error('Не удалось загрузить кастомизацию профиля (таблица player_profile_customization создана?):', e2);
+                    }
                 }
+                currentUserLinkedData.profile_watermark_icon = currentCustom.profile_watermark_icon || 'cat';
 
                 headerWidget.innerHTML = `
                     <div style="display: flex; flex-direction: column; gap: 10px; width: 100%;">
@@ -2410,7 +2522,9 @@
                 
                 wrapper.innerHTML = `
                     <div class="profile-banner-card" style="--pf-gradient: ${getGradientPreset(currentCustom.profile_gradient).css};">
-                        <div class="profile-banner-watermark"><i data-lucide="cat"></i></div>
+                        ${buildIconPatternLayer([currentCustom.profile_watermark_icon || 'cat', 'sparkles', 'gem', 'star'])}
+                        <div class="profile-banner-watermark"><i data-lucide="${currentCustom.profile_watermark_icon || 'cat'}"></i></div>
+                        ${renderFactionIconTrigger(currentCustom.profile_watermark_icon)}
 
                         <div style="display: flex; gap: 26px; width: 100%; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 22px; flex-wrap: wrap;">
                             <div style="flex-shrink: 0;">
@@ -2570,23 +2684,68 @@
             mono:    { css: 'linear-gradient(135deg, rgba(255,255,255,0.10), rgba(255,255,255,0.01))', accent: 'rgba(255,255,255,0.35)', swatch: '#ffffff' }
         };
 
+        // ===== Полноценная палитра цвета (кастомный color picker) =====
+        // Формат хранения в player_profile_customization.profile_gradient:
+        //  - имя пресета из GRADIENT_PRESETS ('default', 'blue', ...) — для обратной совместимости
+        //  - либо 'custom:#rrggbb' — произвольный цвет, выбранный игроком через палитру
+        function hexToRgbParts(hex) {
+            let h = (hex || '').replace('#', '').trim();
+            if (h.length === 3) h = h.split('').map(c => c + c).join('');
+            const num = parseInt(h, 16);
+            if (isNaN(num) || h.length !== 6) return { r: 138, g: 43, b: 226 };
+            return { r: (num >> 16) & 255, g: (num >> 8) & 255, b: num & 255 };
+        }
+
+        function buildCustomGradient(hex) {
+            const { r, g, b } = hexToRgbParts(hex);
+            return {
+                css: `linear-gradient(135deg, rgba(${r},${g},${b},0.28), rgba(${r},${g},${b},0.05))`,
+                accent: `rgba(${r},${g},${b},0.65)`,
+                swatch: /^#[0-9a-fA-F]{6}$/.test(hex) ? hex : `#${((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1)}`
+            };
+        }
+
         function getGradientPreset(key) {
+            if (typeof key === 'string' && key.indexOf('custom:') === 0) {
+                const hex = key.slice(7);
+                return buildCustomGradient(hex.startsWith('#') ? hex : '#' + hex);
+            }
             return GRADIENT_PRESETS[key] || GRADIENT_PRESETS.default;
+        }
+
+        // Возвращает rgba-строку accent'а с заданной альфой (для лёгких градиентов на плашках)
+        function accentWithAlpha(accentStr, alpha) {
+            const m = (accentStr || '').match(/rgba?\(([^)]+)\)/);
+            if (!m) return `rgba(138,43,226,${alpha})`;
+            const parts = m[1].split(',').map(s => s.trim());
+            return `rgba(${parts[0]}, ${parts[1]}, ${parts[2]}, ${alpha})`;
         }
 
         function renderProfileBannerOpen(gradientKey, watermarkIcon) {
             const preset = getGradientPreset(gradientKey);
             return `<div class="profile-banner-card" style="--pf-gradient: ${preset.css};">
-                <div class="profile-banner-watermark"><i data-lucide="${watermarkIcon}"></i></div>`;
+                ${buildIconPatternLayer([watermarkIcon || 'cat', 'sparkles', 'gem'])}
+                <div class="profile-banner-watermark"><i data-lucide="${watermarkIcon || 'cat'}"></i></div>`;
         }
 
         function renderColorPickerRow(activeKey) {
+            const isCustomActive = typeof activeKey === 'string' && activeKey.indexOf('custom:') === 0;
+            const currentHex = isCustomActive
+                ? (activeKey.slice(7).startsWith('#') ? activeKey.slice(7) : '#' + activeKey.slice(7))
+                : '#8a2be2';
             const swatches = Object.keys(GRADIENT_PRESETS).map(key => {
                 const preset = GRADIENT_PRESETS[key];
-                const isActive = key === (activeKey || 'default');
+                const isActive = !isCustomActive && key === (activeKey || 'default');
                 return `<div class="profile-color-swatch ${isActive ? 'active' : ''}" style="background: ${preset.swatch};" onclick="setProfileGradient('${key}', this)" title="${key}"></div>`;
             }).join('');
-            return `<div class="profile-color-picker"><span class="label"><i data-lucide="palette" style="width:14px;height:14px;vertical-align:-2px;"></i> Цвет профиля:</span>${swatches}</div>`;
+            return `<div class="profile-color-picker">
+                <span class="label"><i data-lucide="palette" style="width:14px;height:14px;vertical-align:-2px;"></i> Цвет профиля:</span>
+                ${swatches}
+                <label class="custom-color-trigger ${isCustomActive ? 'active' : ''}" style="${isCustomActive ? `background:${currentHex};` : ''}" title="Свой цвет — открыть палитру">
+                    <i data-lucide="pipette"></i>
+                    <input type="color" value="${currentHex}" oninput="setProfileCustomColor(this.value, this, false)" onchange="setProfileCustomColor(this.value, this, true)">
+                </label>
+            </div>`;
         }
 
         function setProfileGradient(key, el) {
@@ -2597,6 +2756,7 @@
             if (card) card.style.setProperty('--pf-gradient', getGradientPreset(key).css);
             if (el && el.parentElement) {
                 el.parentElement.querySelectorAll('.profile-color-swatch').forEach(s => s.classList.remove('active'));
+                el.parentElement.querySelectorAll('.custom-color-trigger').forEach(s => s.classList.remove('active'));
                 el.classList.add('active');
             }
 
@@ -2611,6 +2771,162 @@
                         customAlert('❌ Ошибка', 'Цвет отобразился, но не сохранился на сервере. Попробуйте ещё раз.');
                     } else if (!data || data.length === 0) {
                         console.error('RLS заблокировал запись цвета профиля');
+                        customAlert('⚠️ Не сохранилось', 'Supabase не подтвердил сохранение — проверьте RLS-политику player_profile_customization.');
+                    }
+                });
+        }
+
+        // Выбор произвольного цвета через нативную палитру (color picker)
+        // commit=false — только предпросмотр во время перетаскивания ползунка/пипетки
+        // commit=true  — сохраняем выбор в Supabase (срабатывает по onchange, при отпускании)
+        function setProfileCustomColor(hex, inputEl, commit) {
+            const preset = buildCustomGradient(hex);
+            const card = document.querySelector('#section-profile .profile-banner-card');
+            if (card) card.style.setProperty('--pf-gradient', preset.css);
+
+            const trigger = inputEl && inputEl.closest('.custom-color-trigger');
+            const row = inputEl && inputEl.closest('.profile-color-picker');
+            if (trigger) {
+                trigger.style.background = hex;
+                trigger.classList.add('active');
+            }
+            if (row) {
+                row.querySelectorAll('.profile-color-swatch').forEach(s => s.classList.remove('active'));
+            }
+
+            if (!commit || !currentUserLinkedData) return;
+
+            supabaseClient
+                .from('player_profile_customization')
+                .upsert({ minecraft_uuid: currentUserLinkedData.minecraft_uuid, profile_gradient: 'custom:' + hex, updated_at: new Date().toISOString() }, { onConflict: 'minecraft_uuid' })
+                .select()
+                .then(({ data, error }) => {
+                    if (error) {
+                        console.error('Не удалось сохранить свой цвет профиля:', error);
+                        customAlert('❌ Ошибка', 'Цвет отобразился, но не сохранился на сервере. Попробуйте ещё раз.');
+                    } else if (!data || data.length === 0) {
+                        console.error('RLS заблокировал запись цвета профиля');
+                        customAlert('⚠️ Не сохранилось', 'Supabase не подтвердил сохранение — проверьте RLS-политику player_profile_customization.');
+                    }
+                });
+        }
+
+        // ===== Фоновая текстура из нескольких иконок Lucide =====
+        // Равномерно покрывает плашку сеткой мелких иконок с лёгким разбросом поворота/размера
+        function buildIconPatternLayer(icons, opts) {
+            opts = opts || {};
+            const count = opts.count || 30;
+            const baseSize = opts.size || 22;
+            const density = opts.density || 'soft';
+            const list = (icons && icons.length) ? icons : ['sparkles'];
+            let items = '';
+            for (let i = 0; i < count; i++) {
+                const icon = list[i % list.length];
+                const rotation = ((i * 47) % 46) - 23;
+                const jitter = ((i * 17) % 12) - 6;
+                const size = Math.max(12, baseSize + jitter);
+                const margin = 6 + (i % 4) * 5;
+                items += `<i data-lucide="${icon}" style="width:${size}px;height:${size}px;margin:${margin}px;transform:rotate(${rotation}deg);"></i>`;
+            }
+            return `<div class="icon-pattern-layer pattern-${density}">${items}</div>`;
+        }
+
+        // ===== Селектор иконки фракции/клана (замена статичной иконки кота) =====
+        const FACTION_ICON_LIBRARY = [
+            'cat', 'dog', 'rabbit', 'bird', 'fish', 'bug', 'squirrel', 'turtle', 'shell', 'snail', 'rat', 'worm', 'feather', 'paw-print',
+            'skull', 'ghost', 'flame', 'snowflake', 'sun', 'sunrise', 'sunset', 'moon', 'moon-star', 'star', 'sparkle', 'sparkles', 'zap',
+            'sword', 'swords', 'shield', 'shield-half', 'shield-check', 'shield-alert', 'axe', 'crosshair', 'target', 'bomb', 'biohazard', 'radiation',
+            'crown', 'gem', 'diamond', 'trophy', 'medal', 'award', 'badge', 'badge-check', 'anchor', 'flag', 'tent', 'castle', 'key',
+            'flower', 'flower-2', 'leaf', 'tree-pine', 'trees', 'mountain', 'waves', 'droplet', 'droplets', 'cloud-lightning', 'cloud-moon', 'cloud-sun', 'rainbow', 'tornado', 'wind', 'umbrella',
+            'pickaxe', 'hammer', 'wrench', 'shovel', 'hard-hat', 'compass', 'map', 'footprints', 'eye', 'rocket', 'satellite', 'orbit',
+            'wand', 'wand-sparkles', 'drama', 'hand-metal', 'gamepad', 'gamepad-2', 'joystick', 'dice-1', 'dice-5', 'puzzle', 'infinity', 'atom',
+            'flask-conical', 'test-tube', 'bone', 'palette', 'brush', 'paintbrush', 'scissors'
+        ];
+
+        function renderFactionIconTrigger(currentIcon) {
+            return `<div class="faction-icon-trigger" title="Выбрать иконку фракции/клана" onclick="openIconPickerModal(event)">
+                <i data-lucide="${currentIcon || 'cat'}"></i>
+                <span class="faction-edit-badge"><i data-lucide="pencil"></i></span>
+            </div>`;
+        }
+
+        function openIconPickerModal() {
+            if (!currentUserLinkedData) {
+                customAlert('🔒 Авторизация', 'Авторизуйтесь через Discord, чтобы выбрать иконку фракции.');
+                return;
+            }
+            let overlay = document.getElementById('icon-picker-overlay');
+            if (!overlay) {
+                overlay = document.createElement('div');
+                overlay.id = 'icon-picker-overlay';
+                overlay.innerHTML = `
+                    <div id="icon-picker-card">
+                        <div style="display:flex; align-items:center;">
+                            <h3><i data-lucide="shapes" style="width:19px;height:19px;color:#b985f4;"></i> Иконка фракции</h3>
+                            <span id="icon-picker-close" onclick="closeIconPickerModal()">&times;</span>
+                        </div>
+                        <input type="text" id="icon-picker-search" placeholder="Поиск иконки... (например: cat, sword, crown)" oninput="filterIconPickerGrid(this.value)">
+                        <div id="icon-picker-grid"></div>
+                    </div>`;
+                document.body.appendChild(overlay);
+                overlay.onclick = function(e) { if (e.target === overlay) closeIconPickerModal(); };
+            }
+            overlay.style.display = 'flex';
+            renderIconPickerGrid(FACTION_ICON_LIBRARY);
+            const search = document.getElementById('icon-picker-search');
+            if (search) { search.value = ''; setTimeout(() => search.focus(), 50); }
+        }
+
+        function closeIconPickerModal() {
+            const overlay = document.getElementById('icon-picker-overlay');
+            if (overlay) overlay.style.display = 'none';
+        }
+
+        function renderIconPickerGrid(icons) {
+            const grid = document.getElementById('icon-picker-grid');
+            if (!grid) return;
+            const activeIcon = (currentUserLinkedData && currentUserLinkedData.profile_watermark_icon) || 'cat';
+            if (!icons.length) {
+                grid.innerHTML = `<div id="icon-picker-empty">Ничего не найдено</div>`;
+                return;
+            }
+            grid.innerHTML = icons.map(icon => `
+                <div class="icon-picker-item ${icon === activeIcon ? 'active' : ''}" title="${icon}" onclick="selectFactionIcon('${icon}')">
+                    <i data-lucide="${icon}"></i>
+                </div>
+            `).join('');
+            if (window.lucide) lucide.createIcons();
+        }
+
+        function filterIconPickerGrid(query) {
+            const q = query.trim().toLowerCase();
+            const filtered = q ? FACTION_ICON_LIBRARY.filter(i => i.includes(q)) : FACTION_ICON_LIBRARY;
+            renderIconPickerGrid(filtered);
+        }
+
+        function selectFactionIcon(icon) {
+            if (!currentUserLinkedData) return;
+
+            // Мгновенный визуальный отклик
+            const trigger = document.querySelector('#section-profile .faction-icon-trigger [data-lucide]');
+            const watermark = document.querySelector('#section-profile .profile-banner-watermark [data-lucide]');
+            if (trigger) trigger.setAttribute('data-lucide', icon);
+            if (watermark) watermark.setAttribute('data-lucide', icon);
+            currentUserLinkedData.profile_watermark_icon = icon;
+            if (window.lucide) lucide.createIcons();
+            closeIconPickerModal();
+
+            // Сохраняем в фоне (требуется колонка profile_watermark_icon в player_profile_customization)
+            supabaseClient
+                .from('player_profile_customization')
+                .upsert({ minecraft_uuid: currentUserLinkedData.minecraft_uuid, profile_watermark_icon: icon, updated_at: new Date().toISOString() }, { onConflict: 'minecraft_uuid' })
+                .select()
+                .then(({ data, error }) => {
+                    if (error) {
+                        console.error('Не удалось сохранить иконку фракции (добавлена ли колонка profile_watermark_icon?):', error);
+                        customAlert('❌ Ошибка', 'Иконка отобразилась, но не сохранилась на сервере. Убедитесь, что в таблице player_profile_customization есть колонка profile_watermark_icon.');
+                    } else if (!data || data.length === 0) {
+                        console.error('RLS заблокировал запись иконки фракции');
                         customAlert('⚠️ Не сохранилось', 'Supabase не подтвердил сохранение — проверьте RLS-политику player_profile_customization.');
                     }
                 });
@@ -2676,16 +2992,25 @@
                 try {
                     const { data: customization } = await supabaseClient
                         .from('player_profile_customization')
-                        .select('minecraft_uuid, profile_gradient, bio')
+                        .select('minecraft_uuid, profile_gradient, bio, profile_watermark_icon')
                         .in('minecraft_uuid', uuids);
                     (customization || []).forEach(c => { customMap[c.minecraft_uuid] = c; });
                 } catch (e) {
-                    console.error('Не удалось загрузить кастомизацию профилей (таблица player_profile_customization создана?):', e);
+                    console.error('Не удалось загрузить кастомизацию профилей (проверьте колонку profile_watermark_icon), пробуем без неё:', e);
+                    try {
+                        const { data: legacyCustomization } = await supabaseClient
+                            .from('player_profile_customization')
+                            .select('minecraft_uuid, profile_gradient, bio')
+                            .in('minecraft_uuid', uuids);
+                        (legacyCustomization || []).forEach(c => { customMap[c.minecraft_uuid] = c; });
+                    } catch (e2) {
+                        console.error('Не удалось загрузить кастомизацию профилей (таблица player_profile_customization создана?):', e2);
+                    }
                 }
 
                 loadedPlayers = data.map(player => {
                     const playerStats = statsMap[player.minecraft_uuid] || { playtime_seconds: 0, is_online: false, last_seen: null, kills: 0, deaths: 0 };
-                    const custom = customMap[player.minecraft_uuid] || { profile_gradient: 'default', bio: null };
+                    const custom = customMap[player.minecraft_uuid] || { profile_gradient: 'default', bio: null, profile_watermark_icon: 'cat' };
                     return {
                         minecraft_uuid: player.minecraft_uuid,
                         minecraft_name: player.minecraft_name,
@@ -2695,7 +3020,8 @@
                         kills: playerStats.kills || 0,
                         deaths: playerStats.deaths || 0,
                         profile_gradient: custom.profile_gradient || 'default',
-                        bio: custom.bio || null
+                        bio: custom.bio || null,
+                        profile_watermark_icon: custom.profile_watermark_icon || 'cat'
                     };
                 });
 
@@ -2781,14 +3107,16 @@
                 try {
                     const { data: custom } = await supabaseClient
                         .from('player_profile_customization')
-                        .select('profile_gradient, bio')
+                        .select('profile_gradient, bio, profile_watermark_icon')
                         .eq('minecraft_uuid', playerData.minecraft_uuid)
                         .maybeSingle();
                     playerData.profile_gradient = custom?.profile_gradient || 'default';
                     playerData.bio = custom?.bio || null;
+                    playerData.profile_watermark_icon = custom?.profile_watermark_icon || 'cat';
                 } catch (e) {
-                    console.error("Ошибка при получении кастомизации профиля:", e);
+                    console.error("Ошибка при получении кастомизации профиля (проверьте колонку profile_watermark_icon):", e);
                     playerData.profile_gradient = playerData.profile_gradient || 'default';
+                    playerData.profile_watermark_icon = playerData.profile_watermark_icon || 'cat';
                 }
             }
 
@@ -2824,7 +3152,8 @@
                     <span style="position: absolute; top: 30px; right: 35px; color: #fff; opacity: 0.6; font-size: 1.8rem; cursor: pointer; font-weight: bold; line-height: 1; z-index: 2;" onclick="disposeSkinViewer('skin-viewer-modal'); this.parentElement.parentElement.remove();">&times;</span>
 
                     <div class="profile-banner-card" style="--pf-gradient: ${preset.css};">
-                        <div class="profile-banner-watermark"><i data-lucide="cat"></i></div>
+                        ${buildIconPatternLayer([playerData.profile_watermark_icon || 'cat', 'sparkles', 'gem', 'star'])}
+                        <div class="profile-banner-watermark"><i data-lucide="${playerData.profile_watermark_icon || 'cat'}"></i></div>
 
                         <div style="display: flex; gap: 22px; flex-wrap: wrap;">
                             <div style="flex-shrink: 0;">
@@ -3601,8 +3930,9 @@
                 const boxDisplayStyle = isBoxOpen ? 'block' : 'none';
 
                 const card = document.createElement('div');
+                card.className = 'forum-post-card';
                 card.style.width = '100%';
-                card.style.background = 'rgba(255, 255, 255, 0.015)';
+                card.style.backgroundImage = `linear-gradient(155deg, ${accentWithAlpha(authorAccent, 0.07)}, rgba(255,255,255,0.012) 65%)`;
                 card.style.border = '1px solid rgba(255, 255, 255, 0.05)';
                 card.style.borderLeft = `3px solid ${authorAccent}`;
                 card.style.borderRadius = '24px';
@@ -3610,6 +3940,7 @@
                 card.style.textAlign = 'left';
 
                 card.innerHTML = `
+                    ${buildIconPatternLayer(['message-square', 'heart', 'sparkles', 'flame'], { count: 22, size: 18 })}
                     <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 14px;">
                         <div style="display: flex; align-items: center; gap: 14px;">
                             <div class="profile-avatar-ring" style="--pf-accent: ${authorAccent}; padding: 2px; border-radius: 10px; cursor: pointer; flex-shrink: 0;" onclick="openPlayerModal('${post.minecraft_uuid}', '${post.minecraft_name}')">
