@@ -638,7 +638,7 @@
             opacity: 0.09; transform: rotate(-12deg); pointer-events: none;
         }
         .profile-banner-watermark [data-lucide] { width: 150px; height: 150px; stroke-width: 1; }
-        .profile-banner-card > *:not(.profile-banner-watermark):not(.icon-pattern-layer) { position: relative; z-index: 1; }
+        .profile-banner-card > *:not(.profile-banner-watermark):not(.icon-pattern-layer):not(.faction-icon-trigger) { position: relative; z-index: 1; }
 
         /* ===== Текстура из нескольких иконок Lucide на карточках ===== */
         .icon-pattern-layer {
@@ -748,7 +748,7 @@
         .faction-icon-trigger:hover { border-color: var(--accent-pink); background: rgba(255,0,127,0.14); transform: scale(1.08); }
         .faction-icon-trigger > [data-lucide] {
             width: 19px; height: 19px; color: #fff;
-            filter: drop-shadow(0 0 5px var(--pf-accent, rgba(138,43,226,0.7)));
+            filter: drop-shadow(0 0 4px var(--pf-accent, rgba(138,43,226,0.9))) drop-shadow(0 0 9px var(--pf-accent, rgba(138,43,226,0.75)));
         }
         .faction-icon-trigger .faction-edit-badge {
             position: absolute; top: -5px; right: -5px; width: 16px; height: 16px; border-radius: 50%;
@@ -3069,6 +3069,22 @@
             closeColorPickerModal();
         }
 
+        // ===== Аватарка-«лицо» из реальной текстуры скина, захваченной сервером =====
+        // Вырезает область лица (8,8)-(16,16) из 64x64 текстуры фоном без запроса к сторонним сервисам.
+        // Мгновенно обновляется вместе со скином. Фолбэк — mc-heads.net по нику (для тех, кто ещё не заходил после апдейта).
+        function renderPlayerFaceAvatar(name, textureUrl, size) {
+            const radius = Math.round(size * 0.2);
+            if (textureUrl) {
+                const scale = size / 8;
+                const bgSize = Math.round(64 * scale);
+                const pos = -Math.round(8 * scale);
+                return `<div style="width:${size}px; height:${size}px; border-radius:${radius}px; overflow:hidden; position:relative; background:#c68958;">
+                    <div style="position:absolute; inset:0; image-rendering:pixelated; background-image:url('${textureUrl}'); background-repeat:no-repeat; background-size:${bgSize}px ${bgSize}px; background-position:${pos}px ${pos}px;"></div>
+                </div>`;
+            }
+            return `<img src="https://mc-heads.net/avatar/${name}/${size}" alt="${name}" width="${size}" height="${size}" style="image-rendering:pixelated; border-radius:${radius}px; display:block;">`;
+        }
+
         // ===== Фоновая текстура из нескольких иконок Lucide =====
         // Равномерно покрывает плашку сеткой мелких иконок с лёгким разбросом поворота/размера
         function buildIconPatternLayer(icons, opts) {
@@ -3232,11 +3248,21 @@
                 }
 
                 const uuids = data.map(p => p.minecraft_uuid);
-                const { data: stats, error: statsError } = await supabaseClient
+                let { data: stats, error: statsError } = await supabaseClient
                     .from('player_stats')
-                    .select('minecraft_uuid, playtime_seconds, is_online, last_seen, kills, deaths')
+                    .select('minecraft_uuid, playtime_seconds, is_online, last_seen, kills, deaths, skin_texture_url, skin_model')
                     .in('minecraft_uuid', uuids);
-                
+
+                if (statsError) {
+                    console.error('Не удалось получить статистику со скином для списка игроков (проверьте колонки skin_texture_url/skin_model), пробуем без них:', statsError);
+                    const fallback = await supabaseClient
+                        .from('player_stats')
+                        .select('minecraft_uuid, playtime_seconds, is_online, last_seen, kills, deaths')
+                        .in('minecraft_uuid', uuids);
+                    stats = fallback.data;
+                    statsError = fallback.error;
+                }
+
                 if (statsError) throw statsError;
 
                 const statsMap = {};
@@ -3277,6 +3303,8 @@
                         last_seen: playerStats.last_seen,
                         kills: playerStats.kills || 0,
                         deaths: playerStats.deaths || 0,
+                        skin_texture_url: playerStats.skin_texture_url || null,
+                        skin_model: playerStats.skin_model || 'default',
                         profile_gradient: custom.profile_gradient || 'default',
                         bio: custom.bio || null,
                         profile_watermark_icon: custom.profile_watermark_icon || 'cat'
@@ -3313,7 +3341,7 @@
 
                 card.innerHTML = `
                     <div class="profile-avatar-ring" style="--pf-accent: ${preset.accent};">
-                        <img src="https://mc-heads.net/avatar/${player.minecraft_name}/50" alt="${player.minecraft_name}" width="50" height="50">
+                        ${renderPlayerFaceAvatar(player.minecraft_name, player.skin_texture_url, 50)}
                     </div>
                     <div class="player-card-info" style="flex:1; min-width:0;">
                         <h3 style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${player.minecraft_name}</h3>
