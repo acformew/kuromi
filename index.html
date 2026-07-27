@@ -498,12 +498,12 @@
         .pricing-card.tier-free .pricing-amount { color: #7be8a4; }
 
         .pricing-card.tier-permanent {
-            background: linear-gradient(165deg, rgba(138, 43, 226, 0.13), rgba(138, 43, 226, 0.01));
-            border-color: rgba(138, 43, 226, 0.3);
+            background: linear-gradient(165deg, rgba(64, 156, 255, 0.12), rgba(64, 156, 255, 0.01));
+            border-color: rgba(64, 156, 255, 0.28);
         }
-        .pricing-card.tier-permanent .pricing-mark { border-color: rgba(138,43,226,0.5); color: #d9b3ff; }
-        .pricing-card.tier-permanent .pricing-watermark { color: var(--primary-purple); }
-        .pricing-card.tier-permanent .pricing-amount { color: #d9b3ff; }
+        .pricing-card.tier-permanent .pricing-mark { border-color: rgba(64,156,255,0.5); color: #8dc3ff; }
+        .pricing-card.tier-permanent .pricing-watermark { color: #409cff; }
+        .pricing-card.tier-permanent .pricing-amount { color: #8dc3ff; }
 
         .pricing-card.featured {
             background: linear-gradient(165deg, rgba(138,43,226,0.22), rgba(255,0,127,0.07));
@@ -744,14 +744,12 @@
             background: rgba(5,3,8,0.55); border: 1px solid rgba(255,255,255,0.2);
             display: flex; align-items: center; justify-content: center;
             cursor: pointer; transition: all 0.2s ease; backdrop-filter: blur(4px);
-            animation: faction-trigger-pulse 2.6s ease-in-out infinite;
         }
-        @keyframes faction-trigger-pulse {
-            0%, 100% { box-shadow: 0 0 0 0 var(--pf-accent, rgba(138,43,226,0.4)), 0 0 10px 0 var(--pf-accent, rgba(138,43,226,0.3)); }
-            50% { box-shadow: 0 0 0 6px rgba(138,43,226,0), 0 0 18px 2px var(--pf-accent, rgba(138,43,226,0.55)); }
+        .faction-icon-trigger:hover { border-color: var(--accent-pink); background: rgba(255,0,127,0.14); transform: scale(1.08); }
+        .faction-icon-trigger > [data-lucide] {
+            width: 19px; height: 19px; color: #fff;
+            filter: drop-shadow(0 0 5px var(--pf-accent, rgba(138,43,226,0.7)));
         }
-        .faction-icon-trigger:hover { border-color: var(--accent-pink); background: rgba(255,0,127,0.14); transform: scale(1.08); animation-play-state: paused; box-shadow: 0 0 20px 2px var(--accent-pink); }
-        .faction-icon-trigger [data-lucide] { width: 19px; height: 19px; color: #fff; }
         .faction-icon-trigger .faction-edit-badge {
             position: absolute; top: -5px; right: -5px; width: 16px; height: 16px; border-radius: 50%;
             background: var(--accent-pink); display: flex; align-items: center; justify-content: center;
