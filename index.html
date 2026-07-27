@@ -497,6 +497,14 @@
         .pricing-card.tier-free .pricing-watermark { color: #2ecc71; }
         .pricing-card.tier-free .pricing-amount { color: #7be8a4; }
 
+        .pricing-card.tier-permanent {
+            background: linear-gradient(165deg, rgba(138, 43, 226, 0.13), rgba(138, 43, 226, 0.01));
+            border-color: rgba(138, 43, 226, 0.3);
+        }
+        .pricing-card.tier-permanent .pricing-mark { border-color: rgba(138,43,226,0.5); color: #d9b3ff; }
+        .pricing-card.tier-permanent .pricing-watermark { color: var(--primary-purple); }
+        .pricing-card.tier-permanent .pricing-amount { color: #d9b3ff; }
+
         .pricing-card.featured {
             background: linear-gradient(165deg, rgba(138,43,226,0.22), rgba(255,0,127,0.07));
             border: 1px solid rgba(138,43,226,0.45);
@@ -629,7 +637,7 @@
             position: absolute; right: -14px; bottom: -14px; z-index: 0;
             opacity: 0.09; transform: rotate(-12deg); pointer-events: none;
         }
-        .profile-banner-watermark [data-lucide] { width: 150px; height: 150px; stroke-width: 1; filter: drop-shadow(0 0 18px var(--pf-accent, rgba(138,43,226,0.5))); }
+        .profile-banner-watermark [data-lucide] { width: 150px; height: 150px; stroke-width: 1; }
         .profile-banner-card > *:not(.profile-banner-watermark):not(.icon-pattern-layer) { position: relative; z-index: 1; }
 
         /* ===== Текстура из нескольких иконок Lucide на карточках ===== */
@@ -665,21 +673,84 @@
         .custom-color-trigger.active { border: 2px solid #fff; transform: scale(1.12); }
         .custom-color-trigger:hover { transform: scale(1.12); }
         .custom-color-trigger [data-lucide] { width: 14px; height: 14px; color: #fff; filter: drop-shadow(0 0 2px rgba(0,0,0,0.7)); pointer-events: none; }
-        .custom-color-trigger input[type="color"] {
-            position: absolute; inset: 0; width: 100%; height: 100%;
-            opacity: 0; cursor: pointer; border: none; padding: 0; margin: 0;
+
+        /* ===== Кастомная UX-палитра цвета (своя стилизация, без нативного OS color picker) ===== */
+        #color-picker-overlay {
+            display: none; position: fixed; inset: 0; background: rgba(5,3,8,0.8);
+            backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+            z-index: 20003; align-items: center; justify-content: center; padding: 20px;
         }
+        #color-picker-card {
+            background: linear-gradient(165deg, rgba(138,43,226,0.14), rgba(16,11,28,0.99) 55%), rgba(16, 11, 28, 0.98);
+            border: 1px solid rgba(138,43,226,0.35);
+            border-radius: 26px; max-width: 360px; width: 100%;
+            padding: 26px; box-shadow: 0 20px 55px rgba(0,0,0,0.6);
+            position: relative; overflow: hidden;
+        }
+        #color-picker-card h3 { position: relative; z-index: 1; font-size: 1.1rem; font-weight: 700; color: #fff; display: flex; align-items: center; gap: 8px; margin-bottom: 18px; }
+        #cp-close { cursor: pointer; color: var(--text-muted); transition: color 0.2s ease; margin-left: auto; font-size: 1.4rem; line-height: 1; }
+        #cp-close:hover { color: #fff; }
+
+        #cp-sv-panel {
+            position: relative; z-index: 1; width: 100%; aspect-ratio: 16 / 10; border-radius: 16px;
+            cursor: crosshair; overflow: hidden; border: 1px solid rgba(255,255,255,0.1);
+            touch-action: none; user-select: none;
+        }
+        #cp-sv-white, #cp-sv-black { position: absolute; inset: 0; pointer-events: none; }
+        #cp-sv-white { background: linear-gradient(to right, #fff, rgba(255,255,255,0)); }
+        #cp-sv-black { background: linear-gradient(to top, #000, rgba(0,0,0,0)); }
+        #cp-sv-cursor {
+            position: absolute; width: 16px; height: 16px; border-radius: 50%;
+            border: 2px solid #fff; box-shadow: 0 0 0 1px rgba(0,0,0,0.5), 0 2px 6px rgba(0,0,0,0.5);
+            transform: translate(-50%, -50%); pointer-events: none;
+        }
+
+        #cp-hue-slider {
+            position: relative; z-index: 1; width: 100%; height: 16px; border-radius: 100px; margin-top: 16px;
+            background: linear-gradient(to right, #ff0000, #ffff00, #00ff00, #00ffff, #0000ff, #ff00ff, #ff0000);
+            cursor: pointer; touch-action: none; user-select: none;
+        }
+        #cp-hue-cursor {
+            position: absolute; top: 50%; width: 20px; height: 20px; border-radius: 50%;
+            background: #fff; border: 2px solid rgba(0,0,0,0.3); box-shadow: 0 2px 6px rgba(0,0,0,0.5);
+            transform: translate(-50%, -50%); pointer-events: none;
+        }
+
+        #cp-preview-row { position: relative; z-index: 1; display: flex; align-items: center; gap: 12px; margin-top: 18px; }
+        #cp-preview-swatch { width: 40px; height: 40px; border-radius: 12px; border: 2px solid rgba(255,255,255,0.15); flex-shrink: 0; }
+        #cp-hex-input {
+            flex: 1; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 12px; padding: 10px 14px; color: #fff; font-family: var(--font-sans);
+            font-size: 0.92rem; outline: none; letter-spacing: 0.02em; text-transform: uppercase;
+        }
+        #cp-hex-input:focus { border-color: var(--primary-purple); }
+
+        #cp-quick-row { position: relative; z-index: 1; display: flex; gap: 8px; margin-top: 16px; flex-wrap: wrap; }
+        #cp-quick-row .profile-color-swatch { width: 24px; height: 24px; }
+
+        #cp-apply-btn {
+            position: relative; z-index: 1; width: 100%; margin-top: 20px;
+            background: linear-gradient(135deg, var(--primary-purple), var(--accent-pink));
+            border: none; color: #fff; padding: 13px; border-radius: 14px;
+            font-family: var(--font-sans); font-size: 0.92rem; font-weight: 600; cursor: pointer;
+            transition: transform 0.15s ease, box-shadow 0.15s ease;
+        }
+        #cp-apply-btn:hover { transform: translateY(-1px); box-shadow: 0 10px 24px rgba(138,43,226,0.35); }
 
         /* ===== Селектор иконки фракции/клана ===== */
         .faction-icon-trigger {
             position: absolute; right: 16px; bottom: 16px; z-index: 2;
             width: 42px; height: 42px; border-radius: 13px;
-            background: rgba(5,3,8,0.55); border: 1px solid rgba(255,255,255,0.15);
+            background: rgba(5,3,8,0.55); border: 1px solid rgba(255,255,255,0.2);
             display: flex; align-items: center; justify-content: center;
             cursor: pointer; transition: all 0.2s ease; backdrop-filter: blur(4px);
-            box-shadow: 0 0 14px var(--pf-accent, rgba(138,43,226,0.35));
+            animation: faction-trigger-pulse 2.6s ease-in-out infinite;
         }
-        .faction-icon-trigger:hover { border-color: var(--accent-pink); background: rgba(255,0,127,0.14); transform: scale(1.06); }
+        @keyframes faction-trigger-pulse {
+            0%, 100% { box-shadow: 0 0 0 0 var(--pf-accent, rgba(138,43,226,0.4)), 0 0 10px 0 var(--pf-accent, rgba(138,43,226,0.3)); }
+            50% { box-shadow: 0 0 0 6px rgba(138,43,226,0), 0 0 18px 2px var(--pf-accent, rgba(138,43,226,0.55)); }
+        }
+        .faction-icon-trigger:hover { border-color: var(--accent-pink); background: rgba(255,0,127,0.14); transform: scale(1.08); animation-play-state: paused; box-shadow: 0 0 20px 2px var(--accent-pink); }
         .faction-icon-trigger [data-lucide] { width: 19px; height: 19px; color: #fff; }
         .faction-icon-trigger .faction-edit-badge {
             position: absolute; top: -5px; right: -5px; width: 16px; height: 16px; border-radius: 50%;
@@ -1455,9 +1526,8 @@
                 </div>
 
                 <div class="pricing-grid">
-                    <div class="pricing-card featured">
+                    <div class="pricing-card tier-permanent">
                         <div class="pricing-watermark"><i data-lucide="infinity"></i></div>
-                        <div class="pricing-ribbon">Выгоднее всего</div>
                         <div class="pricing-mark"><i data-lucide="infinity"></i></div>
                         <div class="pricing-name" id="join-name-permanent">Постоянный безлимит «Навсегда»</div>
                         <div class="pricing-tagline" id="join-desc-permanent">Один платёж — и никаких продлений, взносов и вайпов на все будущие сезоны.</div>
@@ -1470,8 +1540,9 @@
                         </ul>
                     </div>
 
-                    <div class="pricing-card tier-express">
+                    <div class="pricing-card featured">
                         <div class="pricing-watermark"><i data-lucide="zap"></i></div>
+                        <div class="pricing-ribbon">Популярный выбор</div>
                         <div class="pricing-mark"><i data-lucide="zap"></i></div>
                         <div class="pricing-name" id="join-name-30d">Экспресс-пропуск «На 30 дней»</div>
                         <div class="pricing-tagline" id="join-desc-30d">Мгновенная автоматическая регистрация в WhiteList без анкет и ожидания.</div>
@@ -2771,10 +2842,9 @@
             return `<div class="profile-color-picker">
                 <span class="label"><i data-lucide="palette" style="width:14px;height:14px;vertical-align:-2px;"></i> Цвет профиля:</span>
                 ${swatches}
-                <label class="custom-color-trigger ${isCustomActive ? 'active' : ''}" style="${isCustomActive ? `background:${currentHex};` : ''}" title="Свой цвет — открыть палитру">
+                <div class="custom-color-trigger ${isCustomActive ? 'active' : ''}" style="${isCustomActive ? `background:${currentHex};` : ''}" title="Свой цвет — открыть палитру" onclick="openColorPickerModal(this, '${currentHex}')">
                     <i data-lucide="pipette"></i>
-                    <input type="color" value="${currentHex}" oninput="setProfileCustomColor(this.value, this, false)" onchange="setProfileCustomColor(this.value, this, true)">
-                </label>
+                </div>
             </div>`;
         }
 
@@ -2839,6 +2909,166 @@
                         customAlert('⚠️ Не сохранилось', 'Supabase не подтвердил сохранение — проверьте RLS-политику player_profile_customization.');
                     }
                 });
+        }
+
+        // ===== Кастомная UX-палитра цвета (своя стилизация вместо системного диалога ОС) =====
+        let cpState = { h: 280, s: 80, v: 90, triggerEl: null };
+
+        function hsvToHex(h, s, v) {
+            s /= 100; v /= 100;
+            const c = v * s;
+            const x = c * (1 - Math.abs(((h / 60) % 2) - 1));
+            const m = v - c;
+            let r = 0, g = 0, b = 0;
+            if (h < 60) { r = c; g = x; b = 0; }
+            else if (h < 120) { r = x; g = c; b = 0; }
+            else if (h < 180) { r = 0; g = c; b = x; }
+            else if (h < 240) { r = 0; g = x; b = c; }
+            else if (h < 300) { r = x; g = 0; b = c; }
+            else { r = c; g = 0; b = x; }
+            const toHex = n => Math.round((n + m) * 255).toString(16).padStart(2, '0');
+            return `#${toHex(r)}${toHex(g)}${toHex(b)}`;
+        }
+
+        function hexToHsv(hex) {
+            const { r, g, b } = hexToRgbParts(hex);
+            const rn = r / 255, gn = g / 255, bn = b / 255;
+            const max = Math.max(rn, gn, bn), min = Math.min(rn, gn, bn);
+            const d = max - min;
+            let h = 0;
+            if (d !== 0) {
+                if (max === rn) h = 60 * (((gn - bn) / d) % 6);
+                else if (max === gn) h = 60 * ((bn - rn) / d + 2);
+                else h = 60 * ((rn - gn) / d + 4);
+            }
+            if (h < 0) h += 360;
+            const s = max === 0 ? 0 : (d / max) * 100;
+            const v = max * 100;
+            return { h, s, v };
+        }
+
+        function openColorPickerModal(triggerEl, currentHex) {
+            if (!currentUserLinkedData) {
+                customAlert('🔒 Авторизация', 'Авторизуйтесь через Discord, чтобы выбрать цвет профиля.');
+                return;
+            }
+            cpState.triggerEl = triggerEl;
+            const hsv = hexToHsv(currentHex || '#8a2be2');
+            cpState.h = hsv.h; cpState.s = hsv.s; cpState.v = hsv.v;
+
+            let overlay = document.getElementById('color-picker-overlay');
+            if (!overlay) {
+                overlay = document.createElement('div');
+                overlay.id = 'color-picker-overlay';
+                overlay.innerHTML = `
+                    <div id="color-picker-card">
+                        <div style="display:flex; align-items:center;">
+                            <h3><i data-lucide="palette" style="width:18px;height:18px;color:#b985f4;"></i> Свой цвет</h3>
+                            <span id="cp-close" onclick="closeColorPickerModal()">&times;</span>
+                        </div>
+                        <div id="cp-sv-panel" onpointerdown="cpStartDragSV(event)">
+                            <div id="cp-sv-white"></div>
+                            <div id="cp-sv-black"></div>
+                            <div id="cp-sv-cursor"></div>
+                        </div>
+                        <div id="cp-hue-slider" onpointerdown="cpStartDragHue(event)">
+                            <div id="cp-hue-cursor"></div>
+                        </div>
+                        <div id="cp-preview-row">
+                            <div id="cp-preview-swatch"></div>
+                            <input type="text" id="cp-hex-input" maxlength="7" placeholder="#RRGGBB" oninput="cpHandleHexInput(this.value)">
+                        </div>
+                        <div id="cp-quick-row"></div>
+                        <button id="cp-apply-btn" onclick="applyCustomColorFromPicker()">Применить цвет</button>
+                    </div>`;
+                document.body.appendChild(overlay);
+                overlay.onclick = function(e) { if (e.target === overlay) closeColorPickerModal(); };
+
+                const quickRow = overlay.querySelector('#cp-quick-row');
+                quickRow.innerHTML = Object.keys(GRADIENT_PRESETS).map(key => {
+                    const preset = GRADIENT_PRESETS[key];
+                    return `<div class="profile-color-swatch" style="background:${preset.swatch};" title="${key}" onclick="cpPickPreset('${key}')"></div>`;
+                }).join('');
+
+                if (window.lucide) lucide.createIcons();
+            }
+            overlay.style.display = 'flex';
+            cpUpdatePanel();
+        }
+
+        function closeColorPickerModal() {
+            const overlay = document.getElementById('color-picker-overlay');
+            if (overlay) overlay.style.display = 'none';
+        }
+
+        function cpPickPreset(key) {
+            const preset = GRADIENT_PRESETS[key];
+            const swatchColor = preset.swatch.startsWith('#') ? preset.swatch : '#8a2be2';
+            const hsv = hexToHsv(swatchColor);
+            cpState.h = hsv.h; cpState.s = hsv.s; cpState.v = hsv.v;
+            cpUpdatePanel();
+        }
+
+        function cpUpdatePanel() {
+            const hex = hsvToHex(cpState.h, cpState.s, cpState.v);
+            const svPanel = document.getElementById('cp-sv-panel');
+            const svCursor = document.getElementById('cp-sv-cursor');
+            const hueCursor = document.getElementById('cp-hue-cursor');
+            const preview = document.getElementById('cp-preview-swatch');
+            const hexInput = document.getElementById('cp-hex-input');
+            if (svPanel) svPanel.style.background = `hsl(${cpState.h}, 100%, 50%)`;
+            if (svCursor) { svCursor.style.left = `${cpState.s}%`; svCursor.style.top = `${100 - cpState.v}%`; }
+            if (hueCursor) hueCursor.style.left = `${(cpState.h / 360) * 100}%`;
+            if (preview) preview.style.background = hex;
+            if (hexInput) hexInput.value = hex;
+
+            // Живой предпросмотр на плашке профиля, пока двигаем ползунки
+            setProfileCustomColor(hex, cpState.triggerEl, false);
+        }
+
+        function cpHandleHexInput(value) {
+            const v = value.startsWith('#') ? value : '#' + value;
+            if (/^#[0-9a-fA-F]{6}$/.test(v)) {
+                const hsv = hexToHsv(v);
+                cpState.h = hsv.h; cpState.s = hsv.s; cpState.v = hsv.v;
+                cpUpdatePanel();
+            }
+        }
+
+        function cpStartDragSV(e) {
+            const panel = document.getElementById('cp-sv-panel');
+            const move = (ev) => {
+                const rect = panel.getBoundingClientRect();
+                const x = Math.min(Math.max(ev.clientX - rect.left, 0), rect.width);
+                const y = Math.min(Math.max(ev.clientY - rect.top, 0), rect.height);
+                cpState.s = (x / rect.width) * 100;
+                cpState.v = 100 - (y / rect.height) * 100;
+                cpUpdatePanel();
+            };
+            move(e);
+            const up = () => { document.removeEventListener('pointermove', move); document.removeEventListener('pointerup', up); };
+            document.addEventListener('pointermove', move);
+            document.addEventListener('pointerup', up);
+        }
+
+        function cpStartDragHue(e) {
+            const slider = document.getElementById('cp-hue-slider');
+            const move = (ev) => {
+                const rect = slider.getBoundingClientRect();
+                const x = Math.min(Math.max(ev.clientX - rect.left, 0), rect.width);
+                cpState.h = (x / rect.width) * 360;
+                cpUpdatePanel();
+            };
+            move(e);
+            const up = () => { document.removeEventListener('pointermove', move); document.removeEventListener('pointerup', up); };
+            document.addEventListener('pointermove', move);
+            document.addEventListener('pointerup', up);
+        }
+
+        function applyCustomColorFromPicker() {
+            const hex = hsvToHex(cpState.h, cpState.s, cpState.v);
+            setProfileCustomColor(hex, cpState.triggerEl, true);
+            closeColorPickerModal();
         }
 
         // ===== Фоновая текстура из нескольких иконок Lucide =====
