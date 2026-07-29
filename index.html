@@ -1026,6 +1026,30 @@
         }
 
         /* ===== Чёрный рынок — полноценная "vault"-страница, а не плашка среди прочих ===== */
+        #section-blackmarket.content-section.active {
+            position: fixed;
+            inset: 0;
+            z-index: 900;
+            display: flex;
+            justify-content: center;
+            overflow-y: auto;
+            padding: 40px 20px 60px;
+            background:
+                radial-gradient(ellipse 1000px 600px at 20% -10%, rgba(255,255,255,0.05), transparent 60%),
+                radial-gradient(ellipse 800px 500px at 100% 100%, rgba(255,255,255,0.03), transparent 60%),
+                #030304;
+            animation: bmPageIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        @keyframes bmPageIn { from { opacity: 0; } to { opacity: 1; } }
+        #section-blackmarket .bm-portal-wrap { width: 100%; max-width: 980px; }
+        .bm-exit-bar { display: flex; align-items: center; gap: 12px; margin-bottom: 18px; width: 100%; }
+        .bm-exit-btn {
+            display: flex; align-items: center; gap: 6px; background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.14); color: #fff; padding: 9px 16px; border-radius: 100px;
+            font-family: var(--font-sans); font-size: 0.82rem; font-weight: 600; cursor: pointer; transition: all 0.15s ease;
+        }
+        .bm-exit-btn:hover { border-color: rgba(255,255,255,0.4); background: rgba(255,255,255,0.09); }
+        .bm-exit-btn [data-lucide] { width: 14px; height: 14px; }
         .bm-portal {
             position: relative;
             overflow: hidden;
@@ -1090,6 +1114,9 @@
             border-color: rgba(255, 255, 255, 0.4);
             box-shadow: 0 0 10px rgba(255, 255, 255, 0.08);
         }
+        .darknet-input[type="number"] { -moz-appearance: textfield; }
+        .darknet-input[type="number"]::-webkit-inner-spin-button,
+        .darknet-input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
 
         /* Узкие карточки-объявления в несколько колонок, как на маркетплейсах */
         .bounty-grid {
@@ -1216,6 +1243,39 @@
         #bm-chat-input { flex: 1; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 10px 14px; color: #fff; font-family: var(--font-sans); font-size: 0.85rem; outline: none; }
         #bm-chat-input:focus { border-color: var(--accent-pink); }
         #bm-chat-send { background: var(--accent-pink); border: none; border-radius: 12px; padding: 0 16px; color: #fff; cursor: pointer; }
+
+        /* ===== Детальная плашка объявления (открывается кликом по карточке) ===== */
+        .bounty-card { cursor: pointer; }
+        #bm-detail-overlay {
+            display: none; position: fixed; inset: 0; background: rgba(3,3,4,0.85);
+            backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+            z-index: 20005; align-items: center; justify-content: center; padding: 20px;
+        }
+        #bm-detail-card {
+            background: linear-gradient(165deg, rgba(255,255,255,0.05), rgba(3,3,4,0.98) 55%), #0a0a0c;
+            border: 1px solid rgba(255,255,255,0.14); border-radius: 24px;
+            max-width: 440px; width: 100%; max-height: 82vh; overflow-y: auto;
+            padding: 28px; box-shadow: 0 30px 70px rgba(0,0,0,0.7); position: relative;
+            animation: bmPortalIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        #bm-detail-close { position: absolute; top: 18px; right: 20px; cursor: pointer; color: var(--text-muted); font-size: 1.5rem; line-height: 1; }
+        #bm-detail-close:hover { color: #fff; }
+        .bm-detail-head { display: flex; align-items: center; gap: 14px; margin-bottom: 4px; padding-right: 20px; }
+        .bm-detail-head img { border-radius: 12px; border: 1px solid rgba(255,255,255,0.14); background: rgba(255,255,255,0.04); flex-shrink: 0; }
+        .bm-detail-title { font-size: 1.15rem; font-weight: 700; color: #fff; line-height: 1.3; }
+        .bm-detail-sub { font-size: 0.78rem; color: var(--text-muted); margin-top: 3px; }
+        .bm-detail-desc {
+            font-size: 0.86rem; line-height: 1.6; color: rgba(255,255,255,0.7);
+            background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07);
+            border-radius: 14px; padding: 14px 16px; margin: 18px 0; white-space: pre-wrap; word-break: break-word;
+        }
+        .bm-detail-desc.empty { color: rgba(255,255,255,0.3); font-style: italic; }
+        .bm-detail-stats { display: flex; gap: 10px; margin-bottom: 18px; }
+        .bm-detail-stat { flex: 1; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 10px 14px; }
+        .bm-detail-stat .label { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-muted); margin-bottom: 4px; }
+        .bm-detail-stat .value { font-size: 1.05rem; font-weight: 700; color: #fff; }
+        #bm-detail-body .bounty-actions { justify-content: flex-start; }
+        #bm-detail-body .bm-action-btn { font-size: 0.8rem; padding: 8px 15px; }
 
         /* ===== Постоянный подвал: документы + поддержка (нужно банку/платёжке) ===== */
         .site-footer {
@@ -2006,6 +2066,10 @@
         </div>
 
         <div id="section-blackmarket" class="content-section">
+            <div class="bm-portal-wrap">
+                <div class="bm-exit-bar">
+                    <button class="bm-exit-btn" onclick="switchTab('home')"><i data-lucide="arrow-left"></i> Вернуться на сайт</button>
+                </div>
             <div class="bm-portal">
                 <div class="icon-pattern-layer pattern-soft" style="color:#fff;">
                     <i data-lucide="skull" style="width:22px;height:22px;margin:14px;transform:rotate(-10deg);"></i><i data-lucide="package" style="width:18px;height:18px;margin:18px;transform:rotate(8deg);"></i><i data-lucide="hammer" style="width:20px;height:20px;margin:10px;transform:rotate(-16deg);"></i><i data-lucide="crosshair" style="width:16px;height:16px;margin:16px;transform:rotate(14deg);"></i><i data-lucide="banknote" style="width:20px;height:20px;margin:12px;transform:rotate(-6deg);"></i><i data-lucide="skull" style="width:16px;height:16px;margin:20px;transform:rotate(20deg);"></i><i data-lucide="package" style="width:22px;height:22px;margin:10px;transform:rotate(-20deg);"></i><i data-lucide="hammer" style="width:18px;height:18px;margin:14px;transform:rotate(12deg);"></i><i data-lucide="crosshair" style="width:20px;height:20px;margin:8px;transform:rotate(-8deg);"></i><i data-lucide="banknote" style="width:16px;height:16px;margin:18px;transform:rotate(15deg);"></i>
@@ -2080,6 +2144,7 @@
                     </div>
                     <div class="bounty-grid" id="jobs-board-container"><div class="bm-loading">Загрузка вакансий...</div></div>
                 </div>
+            </div>
             </div>
         </div>
 
@@ -2823,7 +2888,30 @@
             }
         }
 
+        // Кэш последних загруженных данных — детальная плашка открывается из него мгновенно, без лишнего запроса
+        let bmBountiesCache = [];
+        let bmListingsCache = [];
+        let bmJobsCache = [];
+
+        function bmDetailShell() {
+            let overlay = document.getElementById('bm-detail-overlay');
+            if (!overlay) {
+                overlay = document.createElement('div');
+                overlay.id = 'bm-detail-overlay';
+                overlay.innerHTML = `<div id="bm-detail-card"><span id="bm-detail-close" onclick="bmCloseDetail()">&times;</span><div id="bm-detail-body"></div></div>`;
+                document.body.appendChild(overlay);
+                overlay.onclick = (e) => { if (e.target === overlay) bmCloseDetail(); };
+            }
+            overlay.style.display = 'flex';
+            return document.getElementById('bm-detail-body');
+        }
+        function bmCloseDetail() {
+            const overlay = document.getElementById('bm-detail-overlay');
+            if (overlay) overlay.style.display = 'none';
+        }
+
         function renderBountyBoard(bounties) {
+            bmBountiesCache = bounties;
             const container = document.getElementById('bounty-board-container');
             if (!container) return;
             if (bounties.length === 0) {
@@ -2831,7 +2919,7 @@
                 return;
             }
             container.innerHTML = bounties.map(b => `
-                <div class="bounty-card">
+                <div class="bounty-card" onclick="bmOpenBountyDetail('${b.id}')">
                     ${buildIconPatternLayer(['skull', 'crosshair', 'flame'], { count: 12, size: 15, density: 'soft' })}
                     <div class="bounty-info">
                         <img src="https://mc-heads.net/avatar/${b.target_name}/48" alt="${b.target_name}" class="player-head-render" width="48" height="48" style="background: rgba(255,255,255,0.04);">
@@ -2840,7 +2928,6 @@
                             <span>Цель в розыске</span>
                         </div>
                     </div>
-                    <div class="bounty-desc ${b.hint ? '' : 'empty'}">${b.hint ? 'Ориентир: ' + b.hint : 'Ориентир не указан'}</div>
                     <div class="bounty-footer">
                         <div class="bounty-price">
                             <div class="bounty-amount"><i data-lucide="gem" style="width:14px;height:14px;vertical-align:-2px;"></i> ${b.amount}</div>
@@ -2849,6 +2936,24 @@
                     </div>
                 </div>
             `).join('');
+            if (window.lucide) lucide.createIcons();
+        }
+
+        function bmOpenBountyDetail(id) {
+            const b = bmBountiesCache.find(x => x.id === id);
+            if (!b) return;
+            const body = bmDetailShell();
+            body.innerHTML = `
+                <div class="bm-detail-head">
+                    <img src="https://mc-heads.net/avatar/${b.target_name}/64" width="64" height="64" alt="${b.target_name}">
+                    <div><div class="bm-detail-title">${b.target_name}</div><div class="bm-detail-sub">Анонимный контракт на устранение</div></div>
+                </div>
+                <div class="bm-detail-desc ${b.hint ? '' : 'empty'}">${b.hint ? 'Ориентир: ' + b.hint : 'Ориентир не указан'}</div>
+                <div class="bm-detail-stats">
+                    <div class="bm-detail-stat"><div class="label">Награда</div><div class="value">${b.amount}</div></div>
+                    <div class="bm-detail-stat"><div class="label">Статус</div><div class="value">В розыске</div></div>
+                </div>
+            `;
             if (window.lucide) lucide.createIcons();
         }
 
@@ -2889,43 +2994,22 @@
                 renderMarketBoard(visible);
             } catch (e) {
                 console.error('Не удалось загрузить лоты площадки:', e);
-                container.innerHTML = `<div class="bm-empty">Не удалось загрузить лоты: ${e.message || 'ошибка сети'}. Проверьте, что миграция БД чёрного рынка выполнена.</div>`;
+                container.innerHTML = `<div class="bm-empty">Не удалось загрузить лоты: ${e.message || 'ошибка сети'}. Проверьте, что миграция БД чёрного рынка выполнена (включая GRANT SELECT).</div>`;
             }
         }
 
         function renderMarketBoard(listings) {
+            bmListingsCache = listings;
             const container = document.getElementById('market-board-container');
             if (!container) return;
             if (listings.length === 0) {
                 container.innerHTML = `<div class="bm-empty">На площадке пока пусто. Выставьте первый лот выше.</div>`;
                 return;
             }
-            const myUuid = currentUserLinkedData?.minecraft_uuid;
             const statusLabels = { active: 'В продаже', reserved: 'Забронировано', handed: 'Передано', disputed: 'Спор' };
 
-            container.innerHTML = listings.map(l => {
-                const isSeller = l.seller_uuid === myUuid;
-                const isBuyer = l.buyer_uuid === myUuid;
-                let actions = '';
-
-                if (l.status === 'active' && isSeller) actions += `<button class="bm-action-btn danger" onclick="bmCancelListing('${l.id}')"><i data-lucide="x"></i> Снять</button>`;
-                if (l.status === 'active' && !isSeller) actions += `<button class="bm-action-btn blue" onclick="bmBuyListing('${l.id}')"><i data-lucide="shopping-cart"></i> Купить</button>`;
-                if (l.status === 'reserved' && isSeller) actions += `<button class="bm-action-btn primary" onclick="bmMarkHanded('${l.id}')"><i data-lucide="package-check"></i> Передал</button>`;
-                if (l.status === 'reserved' && isBuyer) actions += `<button class="bm-action-btn danger" onclick="bmCancelListing('${l.id}')"><i data-lucide="x"></i> Отменить</button>`;
-                if (l.status === 'handed' && isBuyer) {
-                    actions += `<button class="bm-action-btn green" onclick="bmConfirmListing('${l.id}')"><i data-lucide="check"></i> Подтвердить</button>`;
-                    actions += `<button class="bm-action-btn danger" onclick="bmOpenDispute('${l.id}')"><i data-lucide="flag"></i> Спор</button>`;
-                }
-                if (l.status === 'disputed' && isUserModerator) {
-                    actions += `<button class="bm-action-btn green" onclick="bmResolveDispute('${l.id}','seller')">Продавец</button>`;
-                    actions += `<button class="bm-action-btn blue" onclick="bmResolveDispute('${l.id}','buyer')">Покупатель</button>`;
-                }
-                if ((isSeller || isBuyer) && ['reserved', 'handed', 'disputed'].includes(l.status)) {
-                    actions += `<button class="bm-action-btn" onclick="bmOpenChatForContext('marketplace','${l.id}','${(isSeller ? l.buyer_name : l.seller_name) || 'собеседник'}')"><i data-lucide="message-square"></i> Чат</button>`;
-                }
-
-                return `
-                <div class="bounty-card market">
+            container.innerHTML = listings.map(l => `
+                <div class="bounty-card market" onclick="bmOpenListingDetail('${l.id}')">
                     ${buildIconPatternLayer(['package', 'gem', 'handshake'], { count: 12, size: 15, density: 'soft' })}
                     <div class="bounty-info">
                         <img src="https://mc-heads.net/avatar/${l.seller_name}/48" alt="${l.seller_name}" class="player-head-render" width="48" height="48" style="background: rgba(255,255,255,0.04);">
@@ -2934,31 +3018,75 @@
                             <span>Продавец: ${l.seller_name}</span>
                         </div>
                     </div>
-                    <div class="bounty-desc ${l.description ? '' : 'empty'}">${l.description || 'Без описания'}</div>
                     <div class="bounty-footer">
                         <div class="bounty-price">
                             <div class="bounty-amount"><i data-lucide="gem" style="width:14px;height:14px;vertical-align:-2px;"></i> ${l.price}</div>
                             <div class="bounty-status">${statusLabels[l.status] || l.status}</div>
                         </div>
                     </div>
-                    ${actions ? `<div class="bounty-actions">${actions}</div>` : ''}
-                </div>`;
-            }).join('');
+                </div>
+            `).join('');
             if (window.lucide) lucide.createIcons();
         }
 
-        async function bmCancelListing(id) { const { error } = await supabaseClient.rpc('bm_cancel_listing', { p_listing_id: id }); if (error) customAlert('❌ Ошибка', bmFriendlyError(error)); loadBlackMarketListings(); }
+        function bmBuildListingActions(l) {
+            const myUuid = currentUserLinkedData?.minecraft_uuid;
+            const isSeller = l.seller_uuid === myUuid;
+            const isBuyer = l.buyer_uuid === myUuid;
+            let actions = '';
+
+            if (l.status === 'active' && isSeller) actions += `<button class="bm-action-btn danger" onclick="bmCancelListing('${l.id}')"><i data-lucide="x"></i> Снять</button>`;
+            if (l.status === 'active' && !isSeller) actions += `<button class="bm-action-btn blue" onclick="bmBuyListing('${l.id}')"><i data-lucide="shopping-cart"></i> Купить</button>`;
+            if (l.status === 'reserved' && isSeller) actions += `<button class="bm-action-btn primary" onclick="bmMarkHanded('${l.id}')"><i data-lucide="package-check"></i> Передал</button>`;
+            if (l.status === 'reserved' && isBuyer) actions += `<button class="bm-action-btn danger" onclick="bmCancelListing('${l.id}')"><i data-lucide="x"></i> Отменить</button>`;
+            if (l.status === 'handed' && isBuyer) {
+                actions += `<button class="bm-action-btn green" onclick="bmConfirmListing('${l.id}')"><i data-lucide="check"></i> Подтвердить</button>`;
+                actions += `<button class="bm-action-btn danger" onclick="bmOpenDispute('${l.id}')"><i data-lucide="flag"></i> Спор</button>`;
+            }
+            if (l.status === 'disputed' && isUserModerator) {
+                actions += `<button class="bm-action-btn green" onclick="bmResolveDispute('${l.id}','seller')">Продавец</button>`;
+                actions += `<button class="bm-action-btn blue" onclick="bmResolveDispute('${l.id}','buyer')">Покупатель</button>`;
+            }
+            if ((isSeller || isBuyer) && ['reserved', 'handed', 'disputed'].includes(l.status)) {
+                actions += `<button class="bm-action-btn" onclick="bmOpenChatForContext('marketplace','${l.id}','${(isSeller ? l.buyer_name : l.seller_name) || 'собеседник'}')"><i data-lucide="message-square"></i> Чат</button>`;
+            }
+            return actions;
+        }
+
+        function bmOpenListingDetail(id) {
+            const l = bmListingsCache.find(x => x.id === id);
+            if (!l) return;
+            const statusLabels = { active: 'В продаже', reserved: 'Забронировано', handed: 'Передано', disputed: 'Спор' };
+            const actions = bmBuildListingActions(l);
+            const body = bmDetailShell();
+            body.innerHTML = `
+                <div class="bm-detail-head">
+                    <img src="https://mc-heads.net/avatar/${l.seller_name}/64" width="64" height="64" alt="${l.seller_name}">
+                    <div><div class="bm-detail-title">${l.item_name}</div><div class="bm-detail-sub">Продавец: ${l.seller_name}</div></div>
+                </div>
+                <div class="bm-detail-desc ${l.description ? '' : 'empty'}">${l.description || 'Без описания'}</div>
+                <div class="bm-detail-stats">
+                    <div class="bm-detail-stat"><div class="label">Цена</div><div class="value">${l.price}</div></div>
+                    <div class="bm-detail-stat"><div class="label">Статус</div><div class="value">${statusLabels[l.status] || l.status}</div></div>
+                </div>
+                ${actions ? `<div class="bounty-actions">${actions}</div>` : ''}
+            `;
+            if (window.lucide) lucide.createIcons();
+        }
+
+        async function bmCancelListing(id) { const { error } = await supabaseClient.rpc('bm_cancel_listing', { p_listing_id: id }); if (error) customAlert('❌ Ошибка', bmFriendlyError(error)); bmCloseDetail(); loadBlackMarketListings(); }
         async function bmBuyListing(id) {
             const { data, error } = await supabaseClient.rpc('bm_buy_listing', { p_listing_id: id });
             if (error) { customAlert('❌ Ошибка', bmFriendlyError(error)); return; }
             customAlert('✅ Куплено', 'Товар забронирован, деньги заморожены до подтверждения. Договоритесь о встрече в чате.');
+            bmCloseDetail();
             loadBlackMarketListings();
             if (data) bmOpenChat(data, 'продавцом');
         }
-        async function bmMarkHanded(id) { const { error } = await supabaseClient.rpc('bm_mark_handed', { p_listing_id: id }); if (error) customAlert('❌ Ошибка', bmFriendlyError(error)); loadBlackMarketListings(); }
-        async function bmConfirmListing(id) { const { error } = await supabaseClient.rpc('bm_confirm_listing', { p_listing_id: id }); if (error) customAlert('❌ Ошибка', bmFriendlyError(error)); loadBlackMarketListings(); }
-        async function bmOpenDispute(id) { const { error } = await supabaseClient.rpc('bm_open_dispute', { p_listing_id: id }); if (error) customAlert('❌ Ошибка', bmFriendlyError(error)); loadBlackMarketListings(); }
-        async function bmResolveDispute(id, winner) { const { error } = await supabaseClient.rpc('bm_resolve_dispute', { p_listing_id: id, p_winner: winner }); if (error) customAlert('❌ Ошибка', bmFriendlyError(error)); loadBlackMarketListings(); }
+        async function bmMarkHanded(id) { const { error } = await supabaseClient.rpc('bm_mark_handed', { p_listing_id: id }); if (error) customAlert('❌ Ошибка', bmFriendlyError(error)); bmCloseDetail(); loadBlackMarketListings(); }
+        async function bmConfirmListing(id) { const { error } = await supabaseClient.rpc('bm_confirm_listing', { p_listing_id: id }); if (error) customAlert('❌ Ошибка', bmFriendlyError(error)); bmCloseDetail(); loadBlackMarketListings(); }
+        async function bmOpenDispute(id) { const { error } = await supabaseClient.rpc('bm_open_dispute', { p_listing_id: id }); if (error) customAlert('❌ Ошибка', bmFriendlyError(error)); bmCloseDetail(); loadBlackMarketListings(); }
+        async function bmResolveDispute(id, winner) { const { error } = await supabaseClient.rpc('bm_resolve_dispute', { p_listing_id: id, p_winner: winner }); if (error) customAlert('❌ Ошибка', bmFriendlyError(error)); bmCloseDetail(); loadBlackMarketListings(); }
 
         async function submitJob() {
             if (!currentUserLinkedData) { customAlert('🔒 Авторизация', 'Авторизуйтесь через Discord и привяжите Minecraft-аккаунт.'); return; }
@@ -2972,6 +3100,15 @@
             if (!titleInput.value.trim()) { customAlert('❌ Ошибка', 'Укажите название вакансии.'); return; }
             if (!payment || payment <= 0) { customAlert('❌ Ошибка', 'Укажите корректную оплату.'); return; }
             if (!deadline || deadline <= 0) { customAlert('❌ Ошибка', 'Укажите корректный срок выполнения.'); return; }
+
+            // Предварительная проверка баланса — нельзя опубликовать вакансию на сумму, которой нет на счету
+            // (окончательно и надёжно это же проверяется в самой функции bm_create_job на сервере)
+            const { data: balanceRow } = await supabaseClient
+                .from('player_stats').select('currency_balance').eq('minecraft_uuid', currentUserLinkedData.minecraft_uuid).maybeSingle();
+            if (balanceRow && payment > (balanceRow.currency_balance || 0)) {
+                customAlert('❌ Недостаточно средств', `На счету ${balanceRow.currency_balance} валюты — этого не хватит на оплату ${payment}.`);
+                return;
+            }
 
             const { error } = await supabaseClient.rpc('bm_create_job', {
                 p_title: titleInput.value.trim(), p_description: descInput.value.trim() || null, p_payment: payment, p_deadline_hours: deadline
@@ -2996,57 +3133,79 @@
                 renderJobsBoard(visible);
             } catch (e) {
                 console.error('Не удалось загрузить вакансии:', e);
-                container.innerHTML = `<div class="bm-empty">Не удалось загрузить вакансии: ${e.message || 'ошибка сети'}. Проверьте, что миграция БД чёрного рынка выполнена.</div>`;
+                container.innerHTML = `<div class="bm-empty">Не удалось загрузить вакансии: ${e.message || 'ошибка сети'}. Проверьте, что миграция БД чёрного рынка выполнена (включая GRANT SELECT).</div>`;
             }
         }
 
         function renderJobsBoard(jobs) {
+            bmJobsCache = jobs;
             const container = document.getElementById('jobs-board-container');
             if (!container) return;
             if (jobs.length === 0) {
                 container.innerHTML = `<div class="bm-empty">Открытых вакансий сейчас нет. Опубликуйте свою выше.</div>`;
                 return;
             }
-            const myUuid = currentUserLinkedData?.minecraft_uuid;
             const statusLabels = { open: 'Открыто', in_progress: 'В работе', submitted: 'На приёмке' };
 
-            container.innerHTML = jobs.map(j => {
-                const isEmployer = j.employer_uuid === myUuid;
-                const isHired = j.hired_uuid === myUuid;
-                let actions = '';
-
-                if (j.status === 'open' && !isEmployer) actions += `<button class="bm-action-btn green" onclick="bmApplyJob('${j.id}')"><i data-lucide="send"></i> Откликнуться</button>`;
-                if (j.status === 'open' && isEmployer) actions += `<button class="bm-action-btn danger" onclick="bmCancelJob('${j.id}')"><i data-lucide="x"></i> Снять</button>`;
-                if (j.status === 'in_progress' && isHired) actions += `<button class="bm-action-btn primary" onclick="bmSubmitWork('${j.id}')"><i data-lucide="check-check"></i> Сдать</button>`;
-                if (j.status === 'in_progress' && isEmployer) actions += `<button class="bm-action-btn danger" onclick="bmCancelJob('${j.id}')"><i data-lucide="x"></i> Отменить</button>`;
-                if (j.status === 'submitted' && isEmployer) actions += `<button class="bm-action-btn green" onclick="bmAcceptWork('${j.id}')"><i data-lucide="check"></i> Принять</button>`;
-                if ((isEmployer || isHired) && ['in_progress', 'submitted'].includes(j.status)) {
-                    actions += `<button class="bm-action-btn" onclick="bmOpenChatForContext('job','${j.id}','${(isEmployer ? j.hired_name : j.employer_name) || 'собеседник'}')"><i data-lucide="message-square"></i> Чат</button>`;
-                }
-                if (j.status === 'open' && isEmployer) {
-                    actions += `<button class="bm-action-btn" onclick="bmViewApplications('${j.id}')"><i data-lucide="users"></i> Отклики</button>`;
-                }
-
-                return `
-                <div class="bounty-card job">
+            container.innerHTML = jobs.map(j => `
+                <div class="bounty-card job" onclick="bmOpenJobDetail('${j.id}')">
                     ${buildIconPatternLayer(['hammer', 'wrench', 'hard-hat'], { count: 12, size: 15, density: 'soft' })}
                     <div class="bounty-info">
                         <img src="https://mc-heads.net/avatar/${j.employer_name}/48" alt="${j.employer_name}" class="player-head-render" width="48" height="48" style="background: rgba(255,255,255,0.04);">
                         <div class="bounty-meta">
                             <h4>${j.title}</h4>
-                            <span>Заказчик: ${j.employer_name} · ${j.deadline_hours}ч${j.hired_name ? ' · ' + j.hired_name : ''}</span>
+                            <span>Заказчик: ${j.employer_name}</span>
                         </div>
                     </div>
-                    <div class="bounty-desc ${j.description ? '' : 'empty'}">${j.description || 'Без описания ТЗ'}</div>
                     <div class="bounty-footer">
                         <div class="bounty-price">
                             <div class="bounty-amount"><i data-lucide="gem" style="width:14px;height:14px;vertical-align:-2px;"></i> ${j.payment}</div>
                             <div class="bounty-status">${statusLabels[j.status] || j.status}</div>
                         </div>
                     </div>
-                    ${actions ? `<div class="bounty-actions">${actions}</div>` : ''}
-                </div>`;
-            }).join('');
+                </div>
+            `).join('');
+            if (window.lucide) lucide.createIcons();
+        }
+
+        function bmBuildJobActions(j) {
+            const myUuid = currentUserLinkedData?.minecraft_uuid;
+            const isEmployer = j.employer_uuid === myUuid;
+            const isHired = j.hired_uuid === myUuid;
+            let actions = '';
+
+            if (j.status === 'open' && !isEmployer) actions += `<button class="bm-action-btn green" onclick="bmApplyJob('${j.id}')"><i data-lucide="send"></i> Откликнуться</button>`;
+            if (j.status === 'open' && isEmployer) actions += `<button class="bm-action-btn danger" onclick="bmCancelJob('${j.id}')"><i data-lucide="x"></i> Снять</button>`;
+            if (j.status === 'in_progress' && isHired) actions += `<button class="bm-action-btn primary" onclick="bmSubmitWork('${j.id}')"><i data-lucide="check-check"></i> Сдать</button>`;
+            if (j.status === 'in_progress' && isEmployer) actions += `<button class="bm-action-btn danger" onclick="bmCancelJob('${j.id}')"><i data-lucide="x"></i> Отменить</button>`;
+            if (j.status === 'submitted' && isEmployer) actions += `<button class="bm-action-btn green" onclick="bmAcceptWork('${j.id}')"><i data-lucide="check"></i> Принять</button>`;
+            if ((isEmployer || isHired) && ['in_progress', 'submitted'].includes(j.status)) {
+                actions += `<button class="bm-action-btn" onclick="bmOpenChatForContext('job','${j.id}','${(isEmployer ? j.hired_name : j.employer_name) || 'собеседник'}')"><i data-lucide="message-square"></i> Чат</button>`;
+            }
+            if (j.status === 'open' && isEmployer) {
+                actions += `<button class="bm-action-btn" onclick="bmViewApplications('${j.id}')"><i data-lucide="users"></i> Отклики</button>`;
+            }
+            return actions;
+        }
+
+        function bmOpenJobDetail(id) {
+            const j = bmJobsCache.find(x => x.id === id);
+            if (!j) return;
+            const statusLabels = { open: 'Открыто', in_progress: 'В работе', submitted: 'На приёмке' };
+            const actions = bmBuildJobActions(j);
+            const body = bmDetailShell();
+            body.innerHTML = `
+                <div class="bm-detail-head">
+                    <img src="https://mc-heads.net/avatar/${j.employer_name}/64" width="64" height="64" alt="${j.employer_name}">
+                    <div><div class="bm-detail-title">${j.title}</div><div class="bm-detail-sub">Заказчик: ${j.employer_name} · срок ${j.deadline_hours}ч${j.hired_name ? ' · исполнитель: ' + j.hired_name : ''}</div></div>
+                </div>
+                <div class="bm-detail-desc ${j.description ? '' : 'empty'}">${j.description || 'Без описания ТЗ'}</div>
+                <div class="bm-detail-stats">
+                    <div class="bm-detail-stat"><div class="label">Оплата</div><div class="value">${j.payment}</div></div>
+                    <div class="bm-detail-stat"><div class="label">Статус</div><div class="value">${statusLabels[j.status] || j.status}</div></div>
+                </div>
+                ${actions ? `<div class="bounty-actions">${actions}</div>` : ''}
+            `;
             if (window.lucide) lucide.createIcons();
         }
 
@@ -3054,12 +3213,13 @@
             const { data, error } = await supabaseClient.rpc('bm_apply_job', { p_job_id: id });
             if (error) { customAlert('❌ Ошибка', bmFriendlyError(error)); return; }
             customAlert('📨 Отклик отправлен', 'Заказчик увидит ваш отклик и сможет написать вам в чате.');
+            bmCloseDetail();
             loadBlackMarketJobs();
             if (data) bmOpenChat(data, 'заказчиком');
         }
-        async function bmCancelJob(id) { const { error } = await supabaseClient.rpc('bm_cancel_job', { p_job_id: id }); if (error) customAlert('❌ Ошибка', bmFriendlyError(error)); loadBlackMarketJobs(); }
-        async function bmSubmitWork(id) { const { error } = await supabaseClient.rpc('bm_submit_work', { p_job_id: id }); if (error) customAlert('❌ Ошибка', bmFriendlyError(error)); loadBlackMarketJobs(); }
-        async function bmAcceptWork(id) { const { error } = await supabaseClient.rpc('bm_accept_work', { p_job_id: id }); if (error) customAlert('❌ Ошибка', bmFriendlyError(error)); loadBlackMarketJobs(); }
+        async function bmCancelJob(id) { const { error } = await supabaseClient.rpc('bm_cancel_job', { p_job_id: id }); if (error) customAlert('❌ Ошибка', bmFriendlyError(error)); bmCloseDetail(); loadBlackMarketJobs(); }
+        async function bmSubmitWork(id) { const { error } = await supabaseClient.rpc('bm_submit_work', { p_job_id: id }); if (error) customAlert('❌ Ошибка', bmFriendlyError(error)); bmCloseDetail(); loadBlackMarketJobs(); }
+        async function bmAcceptWork(id) { const { error } = await supabaseClient.rpc('bm_accept_work', { p_job_id: id }); if (error) customAlert('❌ Ошибка', bmFriendlyError(error)); bmCloseDetail(); loadBlackMarketJobs(); }
 
         async function bmViewApplications(jobId) {
             try {
@@ -3077,6 +3237,7 @@
                             const { error: hireError } = await supabaseClient.rpc('bm_hire_candidate', { p_job_id: jobId, p_candidate_uuid: a.applicant_uuid, p_candidate_name: a.applicant_name });
                             if (hireError) customAlert('❌ Ошибка', bmFriendlyError(hireError));
                             else customAlert('🤝 Нанято', `${a.applicant_name} нанят(а). Оплата заморожена до сдачи работы.`);
+                            bmCloseDetail();
                             loadBlackMarketJobs();
                         }
                     })).concat([{ text: 'Закрыть', className: 'btn-secondary', action: () => {} }])
