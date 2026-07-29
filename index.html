@@ -1085,13 +1085,95 @@
             align-items: center;
             justify-content: space-between;
             border-left: 4px solid var(--accent-pink);
+            position: relative;
+            overflow: hidden;
         }
+        .bounty-card > *:not(.icon-pattern-layer) { position: relative; z-index: 1; }
         .bounty-info { display: flex; align-items: center; gap: 16px; text-align: left; }
         .bounty-meta h4 { font-size: 1.05rem; font-weight: 600; color: #fff; }
         .bounty-meta span { font-size: 0.8rem; color: var(--text-muted); }
         .bounty-price { text-align: right; }
         .bounty-amount { font-size: 1.15rem; font-weight: 700; color: #ffb700; }
         .bounty-status { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 700; color: var(--accent-pink); animation: bulbBlink 1.5s infinite steps(2); }
+
+        /* ===== Чёрный рынок: вкладки и живая витрина ===== */
+        .bm-tabs { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 22px; }
+        .bm-tab {
+            display: flex; align-items: center; gap: 8px;
+            background: rgba(255, 0, 127, 0.06); border: 1px solid rgba(255, 0, 127, 0.15);
+            color: var(--text-muted); padding: 10px 18px; border-radius: 100px;
+            font-family: var(--font-sans); font-size: 0.85rem; font-weight: 600;
+            cursor: pointer; transition: all 0.2s ease;
+        }
+        .bm-tab [data-lucide] { width: 15px; height: 15px; }
+        .bm-tab:hover { border-color: rgba(255, 0, 127, 0.4); color: #fff; }
+        .bm-tab.active { background: rgba(255, 0, 127, 0.16); border-color: var(--accent-pink); color: #fff; box-shadow: 0 0 16px rgba(255, 0, 127, 0.2); }
+
+        .bm-hint {
+            display: flex; align-items: center; gap: 10px; margin-top: 18px; padding: 12px 18px;
+            background: rgba(0, 0, 0, 0.3); border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 14px;
+            font-size: 0.82rem; color: var(--text-muted); text-align: left;
+        }
+        .bm-hint [data-lucide] { width: 16px; height: 16px; color: var(--accent-pink); flex-shrink: 0; }
+        .bm-hint code { background: rgba(255, 0, 127, 0.1); color: #ffb0d9; padding: 2px 7px; border-radius: 6px; font-family: monospace; }
+
+        .bm-tab-content { display: none; width: 100%; }
+        .bm-tab-content.active { display: block; }
+
+        .bm-empty, .bm-loading { grid-column: 1 / -1; color: var(--text-muted); padding: 30px 20px; text-align: center; font-size: 0.9rem; }
+
+        .bounty-card.market { border-left-color: #409cff; }
+        .bounty-card.market .bounty-amount { color: #8dc3ff; }
+        .bounty-card.job { border-left-color: #2ecc71; }
+        .bounty-card.job .bounty-amount { color: #7be8a4; }
+        .bounty-card.job .bounty-status, .bounty-card.market .bounty-status { animation: none; }
+        .bounty-card.market .bounty-status { color: #409cff; }
+        .bounty-card.job .bounty-status { color: #2ecc71; }
+
+        .bm-form-card {
+            background: rgba(0, 0, 0, 0.25); border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 18px; padding: 20px; margin-top: 20px;
+        }
+        .bm-form-title { display: flex; align-items: center; gap: 8px; font-weight: 700; color: #fff; margin-bottom: 14px; font-size: 0.95rem; }
+        .bm-form-title [data-lucide] { width: 16px; height: 16px; color: var(--accent-pink); }
+        .bm-form-row { display: flex; gap: 10px; flex-wrap: wrap; }
+        .bm-form-row .darknet-input { flex: 1; min-width: 160px; }
+
+        .bounty-card { flex-wrap: wrap; gap: 14px; }
+        .bounty-actions { display: flex; gap: 8px; flex-wrap: wrap; width: 100%; margin-top: 10px; justify-content: flex-end; }
+        .bm-action-btn {
+            background: rgba(255, 255, 255, 0.06); border: 1px solid rgba(255, 255, 255, 0.12); color: #fff;
+            padding: 7px 14px; border-radius: 100px; font-family: var(--font-sans); font-size: 0.78rem; font-weight: 600;
+            cursor: pointer; transition: all 0.15s ease; display: inline-flex; align-items: center; gap: 5px;
+        }
+        .bm-action-btn:hover { transform: translateY(-1px); }
+        .bm-action-btn.primary { background: var(--accent-pink); border-color: var(--accent-pink); }
+        .bm-action-btn.blue { background: #409cff; border-color: #409cff; }
+        .bm-action-btn.green { background: #2ecc71; border-color: #2ecc71; color: #04170c; }
+        .bm-action-btn.danger { background: rgba(231,76,60,0.15); border-color: rgba(231,76,60,0.4); color: #ff9a8d; }
+        .bm-action-btn [data-lucide] { width: 12px; height: 12px; }
+
+        /* ===== Анонимный чат чёрного рынка ===== */
+        #bm-chat-overlay {
+            display: none; position: fixed; inset: 0; background: rgba(5,3,8,0.8);
+            backdrop-filter: blur(10px); z-index: 20004; align-items: center; justify-content: center; padding: 20px;
+        }
+        #bm-chat-card {
+            background: rgba(16,11,28,0.98); border: 1px solid rgba(255,0,127,0.3); border-radius: 24px;
+            max-width: 480px; width: 100%; max-height: 78vh; display: flex; flex-direction: column;
+            padding: 22px; box-shadow: 0 20px 50px rgba(0,0,0,0.6);
+        }
+        #bm-chat-card h3 { display: flex; align-items: center; gap: 8px; font-size: 1.05rem; color: #fff; margin-bottom: 14px; }
+        #bm-chat-close { margin-left: auto; cursor: pointer; color: var(--text-muted); font-size: 1.3rem; }
+        #bm-chat-close:hover { color: #fff; }
+        #bm-chat-messages { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; padding-right: 4px; margin-bottom: 14px; min-height: 120px; }
+        .bm-chat-msg { max-width: 80%; padding: 8px 13px; border-radius: 14px; font-size: 0.85rem; line-height: 1.4; }
+        .bm-chat-msg.me { align-self: flex-end; background: rgba(255,0,127,0.18); color: #fff; }
+        .bm-chat-msg.them { align-self: flex-start; background: rgba(255,255,255,0.06); color: #eee; }
+        #bm-chat-input-row { display: flex; gap: 8px; }
+        #bm-chat-input { flex: 1; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 10px 14px; color: #fff; font-family: var(--font-sans); font-size: 0.85rem; outline: none; }
+        #bm-chat-input:focus { border-color: var(--accent-pink); }
+        #bm-chat-send { background: var(--accent-pink); border: none; border-radius: 12px; padding: 0 16px; color: #fff; cursor: pointer; }
 
         .snake-footer-container {
             position: fixed;
@@ -1714,23 +1796,75 @@
         <div id="section-blackmarket" class="content-section">
             <div class="ux-panel darknet-panel">
                 <div class="darknet-title" style="display:flex; align-items:center; gap:10px;"><span class="icon-badge b-red" style="width:32px;height:32px;"><i data-lucide="skull"></i></span> BLACK MARKET (DARKNET)</div>
-                <div class="eyebrow" style="color: var(--accent-pink); opacity: 0.8;">Анонимная охота за головами игроков сервера</div>
-                
-                <p style="font-size: 0.9rem; color: var(--text-muted); max-width: 600px; line-height: 1.5; margin-top: 10px;">
-                    Здесь можно анонимно назначить награду за ликвидацию любого игрока сервера. Тот, кто совершит убийство цели первым, автоматически заберет весь накопленный банк. Действует полное шифрование данных.
+                <div class="eyebrow" style="color: var(--accent-pink); opacity: 0.8;">Охота за головами · Торговая площадка · Биржа вакансий</div>
+
+                <p style="font-size: 0.9rem; color: var(--text-muted); max-width: 640px; line-height: 1.5; margin-top: 10px;">
+                    Теневой рынок сервера: анонимные контракты на устранение игроков, площадка со встроенным гарантом сделки (escrow) и биржа разовых подрядов. Личность заказчика контракта нигде не раскрывается.
                 </p>
 
-                <div class="darknet-form-box">
-                    <input type="text" id="bounty-target" class="darknet-input" placeholder="Никнейм жертвы...">
-                    <input type="number" id="bounty-reward" class="darknet-input" placeholder="Награда (алмазы)...">
-                    <button class="btn-primary" style="background: var(--accent-pink); box-shadow: 0 4px 15px rgba(255, 0, 127, 0.3);" onclick="placeBountyContract()">Объявить охоту</button>
+                <div class="bm-tabs">
+                    <button class="bm-tab active" id="bm-tab-btn-bounty" onclick="switchBlackMarketTab('bounty', this)"><i data-lucide="skull"></i> Охота за головами</button>
+                    <button class="bm-tab" id="bm-tab-btn-market" onclick="switchBlackMarketTab('market', this)"><i data-lucide="package"></i> Торговая площадка</button>
+                    <button class="bm-tab" id="bm-tab-btn-jobs" onclick="switchBlackMarketTab('jobs', this)"><i data-lucide="hammer"></i> Вакансии</button>
                 </div>
 
-                <div class="panel-title" style="font-size: 1.3rem; text-align: left; width: 100%; color: #fff; border-bottom: 1px solid rgba(255,0,127,0.1); padding-bottom: 10px; margin-bottom: 20px; display:flex; align-items:center; gap:10px;">
-                    <span class="icon-badge b-red" style="width:28px;height:28px;"><i data-lucide="target"></i></span> Активные контракты в розыске
+                <div class="bm-hint">
+                    <i data-lucide="shield-alert"></i> Личность заказчика контракта нигде не отображается. Деньги на площадке и в вакансиях замораживаются до подтверждения сделки.
                 </div>
 
-                <div class="bounty-grid" id="bounty-board-container"></div>
+                <div id="bm-tab-bounty" class="bm-tab-content active">
+                    <div class="bm-form-card">
+                        <div class="bm-form-title"><i data-lucide="crosshair"></i> Объявить охоту</div>
+                        <div class="bm-form-row">
+                            <select id="bounty-target-select" class="darknet-input"><option value="">Загрузка игроков онлайн...</option></select>
+                            <input type="number" id="bounty-amount-input" class="darknet-input" placeholder="Награда (мин. 64)" min="64">
+                        </div>
+                        <input type="text" id="bounty-hint-input" class="darknet-input" style="width:100%; margin-top:10px;" placeholder="Ориентир (необязательно): где видели цель...">
+                        <button class="btn-primary" style="background: var(--accent-pink); box-shadow: 0 4px 15px rgba(255, 0, 127, 0.3); margin-top: 14px;" onclick="submitBounty()">Объявить охоту</button>
+                    </div>
+
+                    <div class="panel-title" style="font-size: 1.3rem; text-align: left; width: 100%; color: #fff; border-bottom: 1px solid rgba(255,0,127,0.1); padding-bottom: 10px; margin: 24px 0 20px;display:flex; align-items:center; gap:10px;">
+                        <span class="icon-badge b-red" style="width:28px;height:28px;"><i data-lucide="target"></i></span> Активные контракты в розыске
+                    </div>
+                    <div class="bounty-grid" id="bounty-board-container"><div class="bm-loading">Загрузка контрактов...</div></div>
+                </div>
+
+                <div id="bm-tab-market" class="bm-tab-content">
+                    <div class="bm-form-card">
+                        <div class="bm-form-title"><i data-lucide="package-plus"></i> Выставить лот</div>
+                        <div class="bm-form-row">
+                            <input type="text" id="market-item-input" class="darknet-input" placeholder="Название товара">
+                            <input type="number" id="market-price-input" class="darknet-input" placeholder="Цена" min="1">
+                        </div>
+                        <input type="text" id="market-desc-input" class="darknet-input" style="width:100%; margin-top:10px;" placeholder="Описание (необязательно)">
+                        <button class="btn-primary" style="background: #409cff; box-shadow: 0 4px 15px rgba(64,156,255,0.3); margin-top: 14px;" onclick="submitListing()">Выставить на продажу</button>
+                    </div>
+
+                    <div class="panel-title" style="font-size: 1.3rem; text-align: left; width: 100%; color: #fff; border-bottom: 1px solid rgba(64,156,255,0.1); padding-bottom: 10px; margin: 24px 0 20px; display:flex; align-items:center; gap:10px;">
+                        <span class="icon-badge b-blue" style="width:28px;height:28px;"><i data-lucide="package"></i></span> Лоты на продажу (под гарантом)
+                    </div>
+                    <div class="bounty-grid" id="market-board-container"><div class="bm-loading">Загрузка лотов...</div></div>
+                </div>
+
+                <div id="bm-tab-jobs" class="bm-tab-content">
+                    <div class="bm-form-card">
+                        <div class="bm-form-title"><i data-lucide="briefcase"></i> Создать вакансию</div>
+                        <div class="bm-form-row">
+                            <input type="text" id="job-title-input" class="darknet-input" placeholder="Название вакансии">
+                        </div>
+                        <div class="bm-form-row" style="margin-top:10px;">
+                            <input type="number" id="job-payment-input" class="darknet-input" placeholder="Оплата" min="1">
+                            <input type="number" id="job-deadline-input" class="darknet-input" placeholder="Срок выполнения, часов" min="1" value="24">
+                        </div>
+                        <input type="text" id="job-desc-input" class="darknet-input" style="width:100%; margin-top:10px;" placeholder="ТЗ / описание (необязательно)">
+                        <button class="btn-primary" style="background: #2ecc71; box-shadow: 0 4px 15px rgba(46,204,113,0.3); margin-top: 14px;" onclick="submitJob()">Опубликовать вакансию</button>
+                    </div>
+
+                    <div class="panel-title" style="font-size: 1.3rem; text-align: left; width: 100%; color: #fff; border-bottom: 1px solid rgba(46,204,113,0.1); padding-bottom: 10px; margin: 24px 0 20px; display:flex; align-items:center; gap:10px;">
+                        <span class="icon-badge b-green" style="width:28px;height:28px;"><i data-lucide="hammer"></i></span> Открытые вакансии
+                    </div>
+                    <div class="bounty-grid" id="jobs-board-container"><div class="bm-loading">Загрузка вакансий...</div></div>
+                </div>
             </div>
         </div>
 
@@ -1875,11 +2009,6 @@
             { text: '🔍 Логи', weight: 8.0, color: '#ffffff' },          
             { text: '👺 Маска', weight: 22.0, color: '#8a2be2' },        
             { text: '👑 НАВСЕГДА', weight: 0.5, color: '#ff007f' }       
-        ];
-
-        const bountyDatabase = [
-            { id: 1, name: 'Pudge', reward: 64, date: '24.06.2026' },
-            { id: 2, name: 'Doni', reward: 32, date: '23.06.2026' }
         ];
 
         let currentRotation = 0; 
@@ -2364,51 +2493,434 @@
             }, 8000);
         }
 
-        function renderBountyBoard() {
-            const container = document.getElementById('bounty-board-container');
-            if(!container) return;
-            container.innerHTML = '';
+        /* --- ЧЁРНЫЙ РЫНОК: вся логика на сайте --- */
+        /* Плагин на сервере только объявляет охоту в игровом чате и засчитывает PvP-убийство —
+           само размещение заказов/лотов/вакансий и вся площадка работают через Supabase-функции. */
 
-            if(bountyDatabase.length === 0) {
-                container.innerHTML = `<div style="grid-column: span 2; color: var(--text-muted); padding: 20px;">Нет активных заказов. Все цели мертвы.</div>`;
+        const BM_ERROR_MESSAGES = {
+            not_linked: 'Сначала привяжите Minecraft-аккаунт через Discord в своём профиле.',
+            self_target: 'Нельзя назначить награду за собственную голову.',
+            min_amount: 'Минимальная сумма заказа — 64 ед.',
+            cooldown: 'Вы уже заказывали охоту недавно — подождите перед следующим заказом (кулдаун 3ч).',
+            insufficient_funds: 'Недостаточно средств на балансе.',
+            invalid_price: 'Некорректная цена.',
+            invalid_params: 'Проверьте введённые значения.',
+            not_available: 'Этот лот уже недоступен.',
+            own_listing: 'Нельзя купить собственный лот.',
+            cannot_mark_handed: 'Не удалось отметить передачу товара.',
+            cannot_confirm: 'Не удалось подтвердить получение.',
+            cannot_dispute: 'Не удалось открыть спор.',
+            not_staff: 'Только модератор может решать споры.',
+            not_disputed: 'Эта сделка не находится в статусе спора.',
+            invalid_winner: 'Некорректный результат спора.',
+            cannot_cancel: 'Отменить пока нельзя.',
+            not_found: 'Запись не найдена.',
+            not_open: 'Вакансия уже закрыта.',
+            own_job: 'Нельзя откликнуться на собственную вакансию.',
+            cannot_hire: 'Не удалось нанять (проверьте статус вакансии).',
+            cannot_submit: 'Не удалось сдать работу.',
+            cannot_accept: 'Не удалось принять работу.',
+            chat_closed: 'Этот чат уже закрыт.',
+            not_a_party: 'Вы не участник этого чата.'
+        };
+
+        function bmFriendlyError(error) {
+            const code = (error?.message || '').trim();
+            return BM_ERROR_MESSAGES[code] || 'Произошла ошибка. Попробуйте ещё раз.';
+        }
+
+        function switchBlackMarketTab(tab, btnEl) {
+            document.querySelectorAll('.bm-tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.bm-tab').forEach(el => el.classList.remove('active'));
+            document.getElementById(`bm-tab-${tab}`)?.classList.add('active');
+            btnEl?.classList.add('active');
+
+            if (tab === 'bounty') { loadOnlinePlayersForBounty(); loadBlackMarketBounties(); }
+            if (tab === 'market') { supabaseClient.rpc('bm_sweep_market_timeouts').finally(loadBlackMarketListings); }
+            if (tab === 'jobs') { supabaseClient.rpc('bm_sweep_job_timeouts').finally(loadBlackMarketJobs); }
+        }
+
+        async function loadOnlinePlayersForBounty() {
+            const select = document.getElementById('bounty-target-select');
+            if (!select) return;
+            try {
+                const { data, error } = await supabaseClient
+                    .from('player_stats')
+                    .select('minecraft_uuid, minecraft_name')
+                    .eq('is_online', true);
+                if (error) throw error;
+                const options = (data || []).filter(p => p.minecraft_uuid !== currentUserLinkedData?.minecraft_uuid);
+                select.innerHTML = options.length
+                    ? `<option value="">Выберите цель...</option>` + options.map(p => `<option value="${p.minecraft_uuid}|${p.minecraft_name}">${p.minecraft_name}</option>`).join('')
+                    : `<option value="">Сейчас никто не в сети</option>`;
+            } catch (e) {
+                console.error('Не удалось загрузить онлайн-игроков:', e);
+                select.innerHTML = `<option value="">Ошибка загрузки списка</option>`;
+            }
+        }
+
+        async function submitBounty() {
+            if (!currentUserLinkedData) { customAlert('🔒 Авторизация', 'Авторизуйтесь через Discord и привяжите Minecraft-аккаунт.'); return; }
+            const select = document.getElementById('bounty-target-select');
+            const amountInput = document.getElementById('bounty-amount-input');
+            const hintInput = document.getElementById('bounty-hint-input');
+            const [targetUuid, targetName] = (select.value || '').split('|');
+            const amount = parseInt(amountInput.value);
+
+            if (!targetUuid) { customAlert('❌ Ошибка', 'Выберите цель из списка игроков онлайн.'); return; }
+            if (!amount || amount < 64) { customAlert('❌ Ошибка', 'Минимальная сумма заказа — 64 ед.'); return; }
+
+            const { error } = await supabaseClient.rpc('bm_place_bounty', {
+                p_target_uuid: targetUuid, p_target_name: targetName, p_amount: amount, p_hint: hintInput.value.trim() || null
+            });
+            if (error) { customAlert('❌ Ошибка', bmFriendlyError(error)); return; }
+
+            amountInput.value = ''; hintInput.value = '';
+            customAlert('☠️ Охота объявлена', `Контракт на ${targetName} размещён. Игрок будет предупреждён лично, а в игровой чат придёт анонимный анонс.`);
+            loadBlackMarketBounties();
+        }
+
+        async function loadBlackMarketBounties() {
+            const container = document.getElementById('bounty-board-container');
+            if (!container) return;
+            try {
+                const { data, error } = await supabaseClient
+                    .from('bm_bounties_public')
+                    .select('*')
+                    .eq('status', 'active')
+                    .order('created_at', { ascending: false });
+                if (error) throw error;
+                renderBountyBoard(data || []);
+            } catch (e) {
+                console.error('Не удалось загрузить контракты охоты:', e);
+                container.innerHTML = `<div class="bm-empty">Не удалось загрузить контракты. Возможно, ещё не выполнена миграция БД чёрного рынка.</div>`;
+            }
+        }
+
+        function renderBountyBoard(bounties) {
+            const container = document.getElementById('bounty-board-container');
+            if (!container) return;
+            if (bounties.length === 0) {
+                container.innerHTML = `<div class="bm-empty">Активных контрактов нет. Все цели пока живы.</div>`;
                 return;
             }
-
-            bountyDatabase.forEach(bounty => {
-                const card = document.createElement('div');
-                card.classList.add('bounty-card');
-                card.innerHTML = `
+            container.innerHTML = bounties.map(b => `
+                <div class="bounty-card">
+                    ${buildIconPatternLayer(['skull', 'crosshair', 'flame'], { count: 16, size: 16, density: 'soft' })}
                     <div class="bounty-info">
-                        <img src="https://minotar.net/helm/${bounty.name}/56.png" alt="${bounty.name}" class="player-head-render" style="background: rgba(255,0,127,0.05); border-radius: 12px;">
+                        <img src="https://mc-heads.net/avatar/${b.target_name}/56" alt="${b.target_name}" class="player-head-render" style="background: rgba(255,0,127,0.05); border-radius: 12px;">
                         <div class="bounty-meta">
-                            <h4>${bounty.name}</h4>
-                            <span>Размещен: ${bounty.date}</span>
+                            <h4>${b.target_name}</h4>
+                            <span>Ориентир: ${b.hint || 'не указан'}</span>
                         </div>
                     </div>
                     <div class="bounty-price">
-                        <div class="bounty-amount"><i data-lucide="gem" style="width:14px;height:14px;vertical-align:-2px;"></i> x${bounty.reward}</div>
-                        <div class="bounty-status">В Розыске</div>
+                        <div class="bounty-amount"><i data-lucide="gem" style="width:14px;height:14px;vertical-align:-2px;"></i> ${b.amount}</div>
+                        <div class="bounty-status">В розыске</div>
                     </div>
-                `;
-                container.appendChild(card);
-            });
+                </div>
+            `).join('');
             if (window.lucide) lucide.createIcons();
         }
 
-        function placeBountyContract() {
-            const targetInput = document.getElementById('bounty-target');
-            const rewardInput = document.getElementById('bounty-reward');
-            const name = targetInput.value.trim();
-            const reward = parseInt(rewardInput.value);
+        async function submitListing() {
+            if (!currentUserLinkedData) { customAlert('🔒 Авторизация', 'Авторизуйтесь через Discord и привяжите Minecraft-аккаунт.'); return; }
+            const itemInput = document.getElementById('market-item-input');
+            const priceInput = document.getElementById('market-price-input');
+            const descInput = document.getElementById('market-desc-input');
+            const price = parseInt(priceInput.value);
 
-            if(!name || isNaN(reward) || reward <= 0) {
-                customAlert("❌ Ошибка выполнения", "Укажите корректный игровой никнейм цели и сумму награды в алмазах!");
+            if (!itemInput.value.trim()) { customAlert('❌ Ошибка', 'Укажите название товара.'); return; }
+            if (!price || price <= 0) { customAlert('❌ Ошибка', 'Укажите корректную цену.'); return; }
+
+            const { error } = await supabaseClient.rpc('bm_create_listing', {
+                p_item_name: itemInput.value.trim(), p_description: descInput.value.trim() || null, p_price: price
+            });
+            if (error) { customAlert('❌ Ошибка', bmFriendlyError(error)); return; }
+
+            itemInput.value = ''; priceInput.value = ''; descInput.value = '';
+            customAlert('📦 Лот выставлен', 'Ваш товар опубликован на площадке.');
+            loadBlackMarketListings();
+        }
+
+        async function loadBlackMarketListings() {
+            const container = document.getElementById('market-board-container');
+            if (!container) return;
+            try {
+                const myUuid = currentUserLinkedData?.minecraft_uuid;
+                let query = supabaseClient.from('bm_listings').select('*').order('created_at', { ascending: false });
+                query = myUuid ? query.or(`status.eq.active,seller_uuid.eq.${myUuid},buyer_uuid.eq.${myUuid}`) : query.eq('status', 'active');
+                const { data, error } = await query;
+                if (error) throw error;
+                renderMarketBoard(data || []);
+            } catch (e) {
+                console.error('Не удалось загрузить лоты площадки:', e);
+                container.innerHTML = `<div class="bm-empty">Не удалось загрузить лоты. Возможно, ещё не выполнена миграция БД чёрного рынка.</div>`;
+            }
+        }
+
+        function renderMarketBoard(listings) {
+            const container = document.getElementById('market-board-container');
+            if (!container) return;
+            if (listings.length === 0) {
+                container.innerHTML = `<div class="bm-empty">На площадке пока пусто. Выставьте первый лот выше.</div>`;
                 return;
             }
+            const myUuid = currentUserLinkedData?.minecraft_uuid;
+            const statusLabels = { active: 'В продаже', reserved: 'Забронировано', handed: 'Передано', disputed: 'Спор', completed: 'Завершено', cancelled: 'Отменено' };
 
-            bountyDatabase.unshift({ id: Date.now(), name: name, reward: reward, date: 'Сегодня' });
-            targetInput.value = ''; rewardInput.value = '';
-            renderBountyBoard();
+            container.innerHTML = listings.map(l => {
+                const isSeller = l.seller_uuid === myUuid;
+                const isBuyer = l.buyer_uuid === myUuid;
+                let actions = '';
+
+                if (l.status === 'active' && isSeller) actions += `<button class="bm-action-btn danger" onclick="bmCancelListing('${l.id}')"><i data-lucide="x"></i> Снять с продажи</button>`;
+                if (l.status === 'active' && !isSeller) actions += `<button class="bm-action-btn blue" onclick="bmBuyListing('${l.id}')"><i data-lucide="shopping-cart"></i> Купить</button>`;
+                if (l.status === 'reserved' && isSeller) actions += `<button class="bm-action-btn primary" onclick="bmMarkHanded('${l.id}')"><i data-lucide="package-check"></i> Я передал товар</button>`;
+                if (l.status === 'reserved' && isBuyer) actions += `<button class="bm-action-btn danger" onclick="bmCancelListing('${l.id}')"><i data-lucide="x"></i> Отменить (24ч истекли)</button>`;
+                if (l.status === 'handed' && isBuyer) {
+                    actions += `<button class="bm-action-btn green" onclick="bmConfirmListing('${l.id}')"><i data-lucide="check"></i> Подтвердить получение</button>`;
+                    actions += `<button class="bm-action-btn danger" onclick="bmOpenDispute('${l.id}')"><i data-lucide="flag"></i> Открыть спор</button>`;
+                }
+                if (l.status === 'disputed' && isUserModerator) {
+                    actions += `<button class="bm-action-btn green" onclick="bmResolveDispute('${l.id}','seller')">Решить: продавец</button>`;
+                    actions += `<button class="bm-action-btn blue" onclick="bmResolveDispute('${l.id}','buyer')">Решить: покупатель</button>`;
+                }
+                if ((isSeller || isBuyer) && ['reserved', 'handed', 'disputed'].includes(l.status)) {
+                    actions += `<button class="bm-action-btn" onclick="bmOpenChatForContext('marketplace','${l.id}','${(isSeller ? l.buyer_name : l.seller_name) || 'собеседник'}')"><i data-lucide="message-square"></i> Написать</button>`;
+                }
+
+                return `
+                <div class="bounty-card market">
+                    ${buildIconPatternLayer(['package', 'gem', 'handshake'], { count: 16, size: 16, density: 'soft' })}
+                    <div class="bounty-info">
+                        <img src="https://mc-heads.net/avatar/${l.seller_name}/56" alt="${l.seller_name}" class="player-head-render" style="background: rgba(64,156,255,0.05); border-radius: 12px;">
+                        <div class="bounty-meta">
+                            <h4>${l.item_name}</h4>
+                            <span>Продавец: ${l.seller_name}${l.description ? ' · ' + l.description : ''}</span>
+                        </div>
+                    </div>
+                    <div class="bounty-price">
+                        <div class="bounty-amount"><i data-lucide="gem" style="width:14px;height:14px;vertical-align:-2px;"></i> ${l.price}</div>
+                        <div class="bounty-status">${statusLabels[l.status] || l.status}</div>
+                    </div>
+                    ${actions ? `<div class="bounty-actions">${actions}</div>` : ''}
+                </div>`;
+            }).join('');
+            if (window.lucide) lucide.createIcons();
+        }
+
+        async function bmCancelListing(id) { const { error } = await supabaseClient.rpc('bm_cancel_listing', { p_listing_id: id }); if (error) customAlert('❌ Ошибка', bmFriendlyError(error)); loadBlackMarketListings(); }
+        async function bmBuyListing(id) {
+            const { data, error } = await supabaseClient.rpc('bm_buy_listing', { p_listing_id: id });
+            if (error) { customAlert('❌ Ошибка', bmFriendlyError(error)); return; }
+            customAlert('✅ Куплено', 'Товар забронирован, деньги заморожены до подтверждения. Договоритесь о встрече в чате.');
+            loadBlackMarketListings();
+            if (data) bmOpenChat(data, 'продавцом');
+        }
+        async function bmMarkHanded(id) { const { error } = await supabaseClient.rpc('bm_mark_handed', { p_listing_id: id }); if (error) customAlert('❌ Ошибка', bmFriendlyError(error)); loadBlackMarketListings(); }
+        async function bmConfirmListing(id) { const { error } = await supabaseClient.rpc('bm_confirm_listing', { p_listing_id: id }); if (error) customAlert('❌ Ошибка', bmFriendlyError(error)); loadBlackMarketListings(); }
+        async function bmOpenDispute(id) { const { error } = await supabaseClient.rpc('bm_open_dispute', { p_listing_id: id }); if (error) customAlert('❌ Ошибка', bmFriendlyError(error)); loadBlackMarketListings(); }
+        async function bmResolveDispute(id, winner) { const { error } = await supabaseClient.rpc('bm_resolve_dispute', { p_listing_id: id, p_winner: winner }); if (error) customAlert('❌ Ошибка', bmFriendlyError(error)); loadBlackMarketListings(); }
+
+        async function submitJob() {
+            if (!currentUserLinkedData) { customAlert('🔒 Авторизация', 'Авторизуйтесь через Discord и привяжите Minecraft-аккаунт.'); return; }
+            const titleInput = document.getElementById('job-title-input');
+            const paymentInput = document.getElementById('job-payment-input');
+            const deadlineInput = document.getElementById('job-deadline-input');
+            const descInput = document.getElementById('job-desc-input');
+            const payment = parseInt(paymentInput.value);
+            const deadline = parseInt(deadlineInput.value);
+
+            if (!titleInput.value.trim()) { customAlert('❌ Ошибка', 'Укажите название вакансии.'); return; }
+            if (!payment || payment <= 0) { customAlert('❌ Ошибка', 'Укажите корректную оплату.'); return; }
+            if (!deadline || deadline <= 0) { customAlert('❌ Ошибка', 'Укажите корректный срок выполнения.'); return; }
+
+            const { error } = await supabaseClient.rpc('bm_create_job', {
+                p_title: titleInput.value.trim(), p_description: descInput.value.trim() || null, p_payment: payment, p_deadline_hours: deadline
+            });
+            if (error) { customAlert('❌ Ошибка', bmFriendlyError(error)); return; }
+
+            titleInput.value = ''; paymentInput.value = ''; descInput.value = ''; deadlineInput.value = '24';
+            customAlert('📋 Вакансия опубликована', 'Оплата спишется с вашего баланса в момент найма исполнителя.');
+            loadBlackMarketJobs();
+        }
+
+        async function loadBlackMarketJobs() {
+            const container = document.getElementById('jobs-board-container');
+            if (!container) return;
+            try {
+                const myUuid = currentUserLinkedData?.minecraft_uuid;
+                let query = supabaseClient.from('bm_jobs').select('*').order('created_at', { ascending: false });
+                query = myUuid ? query.or(`status.eq.open,employer_uuid.eq.${myUuid},hired_uuid.eq.${myUuid}`) : query.eq('status', 'open');
+                const { data, error } = await query;
+                if (error) throw error;
+                renderJobsBoard(data || []);
+            } catch (e) {
+                console.error('Не удалось загрузить вакансии:', e);
+                container.innerHTML = `<div class="bm-empty">Не удалось загрузить вакансии. Возможно, ещё не выполнена миграция БД чёрного рынка.</div>`;
+            }
+        }
+
+        function renderJobsBoard(jobs) {
+            const container = document.getElementById('jobs-board-container');
+            if (!container) return;
+            if (jobs.length === 0) {
+                container.innerHTML = `<div class="bm-empty">Открытых вакансий сейчас нет. Опубликуйте свою выше.</div>`;
+                return;
+            }
+            const myUuid = currentUserLinkedData?.minecraft_uuid;
+            const statusLabels = { open: 'Открыто', in_progress: 'В работе', submitted: 'Сдано, на приёмке', completed: 'Завершено', cancelled: 'Отменено' };
+
+            container.innerHTML = jobs.map(j => {
+                const isEmployer = j.employer_uuid === myUuid;
+                const isHired = j.hired_uuid === myUuid;
+                let actions = '';
+
+                if (j.status === 'open' && !isEmployer) actions += `<button class="bm-action-btn green" onclick="bmApplyJob('${j.id}')"><i data-lucide="send"></i> Откликнуться</button>`;
+                if (j.status === 'open' && isEmployer) actions += `<button class="bm-action-btn danger" onclick="bmCancelJob('${j.id}')"><i data-lucide="x"></i> Снять вакансию</button>`;
+                if (j.status === 'in_progress' && isHired) actions += `<button class="bm-action-btn primary" onclick="bmSubmitWork('${j.id}')"><i data-lucide="check-check"></i> Сдать работу</button>`;
+                if (j.status === 'in_progress' && isEmployer) actions += `<button class="bm-action-btn danger" onclick="bmCancelJob('${j.id}')"><i data-lucide="x"></i> Отменить (просрочено)</button>`;
+                if (j.status === 'submitted' && isEmployer) actions += `<button class="bm-action-btn green" onclick="bmAcceptWork('${j.id}')"><i data-lucide="check"></i> Принять работу</button>`;
+                if ((isEmployer || isHired) && ['in_progress', 'submitted'].includes(j.status)) {
+                    actions += `<button class="bm-action-btn" onclick="bmOpenChatForContext('job','${j.id}','${(isEmployer ? j.hired_name : j.employer_name) || 'собеседник'}')"><i data-lucide="message-square"></i> Написать</button>`;
+                }
+                if (j.status === 'open' && isEmployer) {
+                    actions += `<button class="bm-action-btn" onclick="bmViewApplications('${j.id}')"><i data-lucide="users"></i> Отклики</button>`;
+                }
+
+                return `
+                <div class="bounty-card job">
+                    ${buildIconPatternLayer(['hammer', 'wrench', 'hard-hat'], { count: 16, size: 16, density: 'soft' })}
+                    <div class="bounty-info">
+                        <img src="https://mc-heads.net/avatar/${j.employer_name}/56" alt="${j.employer_name}" class="player-head-render" style="background: rgba(46,204,113,0.05); border-radius: 12px;">
+                        <div class="bounty-meta">
+                            <h4>${j.title}</h4>
+                            <span>Заказчик: ${j.employer_name} · срок ${j.deadline_hours}ч${j.hired_name ? ' · исполнитель: ' + j.hired_name : ''}</span>
+                        </div>
+                    </div>
+                    <div class="bounty-price">
+                        <div class="bounty-amount"><i data-lucide="gem" style="width:14px;height:14px;vertical-align:-2px;"></i> ${j.payment}</div>
+                        <div class="bounty-status">${statusLabels[j.status] || j.status}</div>
+                    </div>
+                    ${actions ? `<div class="bounty-actions">${actions}</div>` : ''}
+                </div>`;
+            }).join('');
+            if (window.lucide) lucide.createIcons();
+        }
+
+        async function bmApplyJob(id) {
+            const { data, error } = await supabaseClient.rpc('bm_apply_job', { p_job_id: id });
+            if (error) { customAlert('❌ Ошибка', bmFriendlyError(error)); return; }
+            customAlert('📨 Отклик отправлен', 'Заказчик увидит ваш отклик и сможет написать вам в чате.');
+            loadBlackMarketJobs();
+            if (data) bmOpenChat(data, 'заказчиком');
+        }
+        async function bmCancelJob(id) { const { error } = await supabaseClient.rpc('bm_cancel_job', { p_job_id: id }); if (error) customAlert('❌ Ошибка', bmFriendlyError(error)); loadBlackMarketJobs(); }
+        async function bmSubmitWork(id) { const { error } = await supabaseClient.rpc('bm_submit_work', { p_job_id: id }); if (error) customAlert('❌ Ошибка', bmFriendlyError(error)); loadBlackMarketJobs(); }
+        async function bmAcceptWork(id) { const { error } = await supabaseClient.rpc('bm_accept_work', { p_job_id: id }); if (error) customAlert('❌ Ошибка', bmFriendlyError(error)); loadBlackMarketJobs(); }
+
+        async function bmViewApplications(jobId) {
+            try {
+                const { data, error } = await supabaseClient.from('bm_job_applications').select('*').eq('job_id', jobId).eq('status', 'pending');
+                if (error) throw error;
+                if (!data || data.length === 0) { customAlert('📋 Отклики', 'Пока никто не откликнулся на эту вакансию.'); return; }
+                const list = data.map(a => `• ${a.applicant_name}`).join('<br>');
+                openCustomModal({
+                    title: '📋 Отклики на вакансию',
+                    text: `${list}<br><br>Напишите кандидату в чате (кнопка «Написать» появится после отклика), затем нанимайте кнопкой ниже.`,
+                    buttons: data.map(a => ({
+                        text: `Нанять ${a.applicant_name}`,
+                        className: 'btn-primary',
+                        action: async () => {
+                            const { error: hireError } = await supabaseClient.rpc('bm_hire_candidate', { p_job_id: jobId, p_candidate_uuid: a.applicant_uuid, p_candidate_name: a.applicant_name });
+                            if (hireError) customAlert('❌ Ошибка', bmFriendlyError(hireError));
+                            else customAlert('🤝 Нанято', `${a.applicant_name} нанят(а). Оплата заморожена до сдачи работы.`);
+                            loadBlackMarketJobs();
+                        }
+                    })).concat([{ text: 'Закрыть', className: 'btn-secondary', action: () => {} }])
+                });
+            } catch (e) {
+                console.error('Не удалось загрузить отклики:', e);
+                customAlert('❌ Ошибка', 'Не удалось загрузить отклики.');
+            }
+        }
+
+        /* ===== Анонимный чат чёрного рынка ===== */
+        let bmActiveChatId = null;
+        let bmChatPollTimer = null;
+
+        async function bmOpenChatForContext(contextType, contextId, otherName) {
+            try {
+                const { data, error } = await supabaseClient
+                    .from('bm_chats').select('id').eq('context_type', contextType).eq('context_id', contextId).is('closed_at', null).maybeSingle();
+                if (error || !data) { customAlert('❌ Ошибка', 'Чат не найден или уже закрыт.'); return; }
+                bmOpenChat(data.id, otherName);
+            } catch (e) {
+                console.error('Не удалось открыть чат:', e);
+            }
+        }
+
+        function bmOpenChat(chatId, otherName) {
+            bmActiveChatId = chatId;
+            let overlay = document.getElementById('bm-chat-overlay');
+            if (!overlay) {
+                overlay = document.createElement('div');
+                overlay.id = 'bm-chat-overlay';
+                overlay.innerHTML = `
+                    <div id="bm-chat-card">
+                        <div style="display:flex; align-items:center;">
+                            <h3><i data-lucide="message-square" style="width:17px;height:17px;color:#ffb0d9;"></i> Анонимный чат</h3>
+                            <span id="bm-chat-close" onclick="bmCloseChat()">&times;</span>
+                        </div>
+                        <div id="bm-chat-messages"></div>
+                        <div id="bm-chat-input-row">
+                            <input type="text" id="bm-chat-input" placeholder="Сообщение..." onkeydown="if(event.key==='Enter') bmSendChatMessage()">
+                            <button id="bm-chat-send" onclick="bmSendChatMessage()"><i data-lucide="send" style="width:15px;height:15px;"></i></button>
+                        </div>
+                    </div>`;
+                document.body.appendChild(overlay);
+                overlay.onclick = (e) => { if (e.target === overlay) bmCloseChat(); };
+            }
+            overlay.style.display = 'flex';
+            overlay.querySelector('h3').innerHTML = `<i data-lucide="message-square" style="width:17px;height:17px;color:#ffb0d9;"></i> Чат с ${otherName || 'собеседником'}`;
+            if (window.lucide) lucide.createIcons();
+            bmLoadChatMessages();
+            if (bmChatPollTimer) clearInterval(bmChatPollTimer);
+            bmChatPollTimer = setInterval(bmLoadChatMessages, 4000);
+        }
+
+        function bmCloseChat() {
+            const overlay = document.getElementById('bm-chat-overlay');
+            if (overlay) overlay.style.display = 'none';
+            if (bmChatPollTimer) { clearInterval(bmChatPollTimer); bmChatPollTimer = null; }
+            bmActiveChatId = null;
+        }
+
+        async function bmLoadChatMessages() {
+            if (!bmActiveChatId) return;
+            const box = document.getElementById('bm-chat-messages');
+            if (!box) return;
+            try {
+                const { data, error } = await supabaseClient
+                    .from('bm_chat_messages').select('*').eq('chat_id', bmActiveChatId).order('sent_at', { ascending: true });
+                if (error) throw error;
+                const myUuid = currentUserLinkedData?.minecraft_uuid;
+                box.innerHTML = (data || []).map(m => `<div class="bm-chat-msg ${m.sender_uuid === myUuid ? 'me' : 'them'}">${m.message}</div>`).join('') || `<div class="bm-empty">Сообщений пока нет. Напишите первым.</div>`;
+                box.scrollTop = box.scrollHeight;
+            } catch (e) {
+                console.error('Не удалось загрузить сообщения чата:', e);
+            }
+        }
+
+        async function bmSendChatMessage() {
+            const input = document.getElementById('bm-chat-input');
+            const text = input.value.trim();
+            if (!text || !bmActiveChatId) return;
+            input.value = '';
+            const { error } = await supabaseClient.rpc('bm_send_chat_message', { p_chat_id: bmActiveChatId, p_message: text });
+            if (error) { customAlert('❌ Ошибка', bmFriendlyError(error)); return; }
+            bmLoadChatMessages();
         }
 
         function openBlackMarket() {
@@ -2416,7 +2928,8 @@
             document.querySelectorAll('nav button').forEach(button => button.classList.remove('active'));
             const section = document.getElementById('section-blackmarket');
             section.classList.add('active');
-            renderBountyBoard();
+            loadOnlinePlayersForBounty();
+            loadBlackMarketBounties();
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
