@@ -1025,22 +1025,39 @@
             margin-bottom: 40px;
         }
 
-        .darknet-panel {
-            border-color: rgba(255, 255, 255, 0.08) !important;
-            background: linear-gradient(180deg, rgba(14, 14, 16, 0.92) 0%, rgba(3, 3, 4, 0.96) 100%);
-            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.8), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+        /* ===== Чёрный рынок — полноценная "vault"-страница, а не плашка среди прочих ===== */
+        .bm-portal {
+            position: relative;
+            overflow: hidden;
+            border-radius: 28px;
+            border: 1px solid rgba(255, 255, 255, 0.09);
+            background:
+                radial-gradient(ellipse 900px 500px at 15% -10%, rgba(255,255,255,0.06), transparent 60%),
+                radial-gradient(ellipse 700px 400px at 100% 110%, rgba(255,255,255,0.03), transparent 60%),
+                linear-gradient(180deg, #0d0d0f 0%, #030304 100%);
+            box-shadow: 0 40px 90px rgba(0,0,0,0.85), inset 0 1px 0 rgba(255,255,255,0.05);
+            padding: 46px 44px 50px;
+            animation: bmPortalIn 0.55s cubic-bezier(0.16, 1, 0.3, 1);
         }
-        .darknet-panel:hover { border-color: rgba(255, 255, 255, 0.16) !important; }
-
-        /* Чёрный рынок оформлен по левому краю, а не по центру, как остальной лендинг */
-        .bm-shell { align-items: flex-start !important; text-align: left !important; }
-        .bm-shell .panel-title, .bm-shell p, .bm-shell .eyebrow, .bm-shell h1, .bm-shell h2, .bm-shell h3 { text-align: left; }
-        .bm-shell > *:not(.icon-pattern-layer) { position: relative; z-index: 1; }
+        @keyframes bmPortalIn {
+            from { opacity: 0; transform: translateY(18px) scale(0.985); }
+            to { opacity: 1; transform: none; }
+        }
+        .bm-portal::before {
+            content: ''; position: absolute; inset: 0; pointer-events: none; z-index: 0;
+            background-image: repeating-linear-gradient(0deg, rgba(255,255,255,0.012) 0px, rgba(255,255,255,0.012) 1px, transparent 1px, transparent 3px);
+            opacity: 0.5;
+        }
+        .bm-portal > *:not(.icon-pattern-layer) { position: relative; z-index: 1; }
+        .bm-portal, .bm-portal .panel-title, .bm-portal p, .bm-portal .eyebrow, .bm-portal h1, .bm-portal h2, .bm-portal h3 {
+            text-align: left;
+        }
+        .bm-portal { display: flex; flex-direction: column; align-items: flex-start; }
 
         .darknet-title {
-            font-size: 1.8rem;
-            font-weight: 700;
-            letter-spacing: 0.04em;
+            font-size: 2rem;
+            font-weight: 800;
+            letter-spacing: 0.03em;
             color: #fff;
             margin-bottom: 6px;
         }
@@ -1074,44 +1091,63 @@
             box-shadow: 0 0 10px rgba(255, 255, 255, 0.08);
         }
 
-        /* Список лотов/контрактов — вертикальные строки в стиле маркетплейса, а не сетка карточек */
+        /* Узкие карточки-объявления в несколько колонок, как на маркетплейсах */
         .bounty-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 14px;
+            width: 100%;
+            margin-top: 15px;
+            align-items: start;
+        }
+        .bounty-card {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.07);
+            padding: 16px 18px;
+            border-radius: 16px;
             display: flex;
             flex-direction: column;
             gap: 10px;
-            width: 100%;
-            margin-top: 15px;
-        }
-        .bounty-card {
-            background: rgba(255, 255, 255, 0.018);
-            border: 1px solid rgba(255, 255, 255, 0.06);
-            padding: 16px 20px;
-            border-radius: 16px;
-            display: flex;
-            align-items: center;
-            gap: 16px;
             position: relative;
             overflow: hidden;
             text-align: left;
-            transition: border-color 0.15s ease, background 0.15s ease;
+            transition: border-color 0.15s ease, background 0.15s ease, transform 0.15s ease;
+            animation: bmCardIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) backwards;
         }
-        .bounty-card:hover { border-color: rgba(255, 255, 255, 0.16); background: rgba(255, 255, 255, 0.035); }
+        @keyframes bmCardIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+        .bounty-card:nth-child(1) { animation-delay: 0.02s; }
+        .bounty-card:nth-child(2) { animation-delay: 0.06s; }
+        .bounty-card:nth-child(3) { animation-delay: 0.1s; }
+        .bounty-card:nth-child(4) { animation-delay: 0.14s; }
+        .bounty-card:nth-child(5) { animation-delay: 0.18s; }
+        .bounty-card:nth-child(n+6) { animation-delay: 0.2s; }
+        .bounty-card:hover { border-color: rgba(255, 255, 255, 0.2); background: rgba(255, 255, 255, 0.04); transform: translateY(-2px); }
         .bounty-card > *:not(.icon-pattern-layer) { position: relative; z-index: 1; }
-        .bounty-info { display: flex; align-items: center; gap: 14px; text-align: left; flex: 1; min-width: 0; }
-        .bounty-info img { border: 1px solid rgba(255, 255, 255, 0.1); flex-shrink: 0; }
-        .bounty-meta { min-width: 0; }
-        .bounty-meta h4 { font-size: 1rem; font-weight: 700; color: #fff; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-        .bounty-meta span { font-size: 0.78rem; color: var(--text-muted); display: block; margin-top: 3px; }
+
+        .bounty-info { display: flex; align-items: center; gap: 12px; text-align: left; min-width: 0; }
+        .bounty-info img { border: 1px solid rgba(255, 255, 255, 0.12); flex-shrink: 0; border-radius: 10px; }
+        .bounty-meta { min-width: 0; flex: 1; }
+        .bounty-meta h4 { font-size: 0.95rem; font-weight: 700; color: #fff; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .bounty-meta span { font-size: 0.74rem; color: rgba(255,255,255,0.4); display: block; margin-top: 2px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+        .bounty-desc {
+            font-size: 0.8rem; line-height: 1.5; color: rgba(255,255,255,0.62);
+            padding-top: 8px; border-top: 1px dashed rgba(255,255,255,0.08);
+            display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;
+        }
+        .bounty-desc.empty { color: rgba(255,255,255,0.28); font-style: italic; }
+
+        .bounty-footer { display: flex; align-items: center; justify-content: space-between; margin-top: auto; padding-top: 4px; }
         .bounty-price { text-align: right; flex-shrink: 0; }
-        .bounty-amount { font-size: 1.1rem; font-weight: 700; color: #fff; }
+        .bounty-amount { font-size: 1.05rem; font-weight: 700; color: #fff; }
         .bounty-status {
-            display: inline-block; margin-top: 5px; font-size: 0.66rem; text-transform: uppercase;
+            display: inline-block; font-size: 0.63rem; text-transform: uppercase;
             letter-spacing: 0.06em; font-weight: 700; color: rgba(255,255,255,0.55);
             border: 1px solid rgba(255,255,255,0.16); padding: 3px 9px; border-radius: 100px;
         }
 
         /* ===== Чёрный рынок: вкладки и живая витрина ===== */
-        .bm-tabs { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 22px; }
+        .bm-tabs { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 26px; }
         .bm-tab {
             display: flex; align-items: center; gap: 8px;
             background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.1);
@@ -1131,10 +1167,11 @@
         .bm-hint [data-lucide] { width: 16px; height: 16px; color: rgba(255,255,255,0.55); flex-shrink: 0; }
         .bm-hint code { background: rgba(255, 255, 255, 0.08); color: #fff; padding: 2px 7px; border-radius: 6px; font-family: monospace; }
 
-        .bm-tab-content { display: none; width: 100%; }
+        .bm-tab-content { display: none; width: 100%; animation: bmFadeUp 0.35s ease; }
         .bm-tab-content.active { display: block; }
+        @keyframes bmFadeUp { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
 
-        .bm-empty, .bm-loading { color: var(--text-muted); padding: 30px 20px; text-align: left; font-size: 0.9rem; }
+        .bm-empty, .bm-loading { color: var(--text-muted); padding: 30px 20px; text-align: left; font-size: 0.9rem; grid-column: 1 / -1; }
 
         .bm-form-card {
             background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.08);
@@ -1145,11 +1182,10 @@
         .bm-form-row { display: flex; gap: 10px; flex-wrap: wrap; }
         .bm-form-row .darknet-input { flex: 1; min-width: 160px; }
 
-        .bounty-card { flex-wrap: wrap; gap: 14px; }
-        .bounty-actions { display: flex; gap: 8px; flex-wrap: wrap; width: 100%; margin-top: 8px; justify-content: flex-start; }
+        .bounty-actions { display: flex; gap: 6px; flex-wrap: wrap; width: 100%; }
         .bm-action-btn {
             background: rgba(255, 255, 255, 0.06); border: 1px solid rgba(255, 255, 255, 0.16); color: #fff;
-            padding: 7px 14px; border-radius: 100px; font-family: var(--font-sans); font-size: 0.78rem; font-weight: 600;
+            padding: 6px 12px; border-radius: 100px; font-family: var(--font-sans); font-size: 0.72rem; font-weight: 600;
             cursor: pointer; transition: all 0.15s ease; display: inline-flex; align-items: center; gap: 5px;
         }
         .bm-action-btn:hover { transform: translateY(-1px); border-color: rgba(255,255,255,0.4); }
@@ -1159,6 +1195,7 @@
         .bm-action-btn [data-lucide] { width: 12px; height: 12px; }
 
         /* ===== Анонимный чат чёрного рынка ===== */
+
         #bm-chat-overlay {
             display: none; position: fixed; inset: 0; background: rgba(5,3,8,0.8);
             backdrop-filter: blur(10px); z-index: 20004; align-items: center; justify-content: center; padding: 20px;
@@ -1969,7 +2006,7 @@
         </div>
 
         <div id="section-blackmarket" class="content-section">
-            <div class="ux-panel darknet-panel bm-shell" style="position:relative; overflow:hidden;">
+            <div class="bm-portal">
                 <div class="icon-pattern-layer pattern-soft" style="color:#fff;">
                     <i data-lucide="skull" style="width:22px;height:22px;margin:14px;transform:rotate(-10deg);"></i><i data-lucide="package" style="width:18px;height:18px;margin:18px;transform:rotate(8deg);"></i><i data-lucide="hammer" style="width:20px;height:20px;margin:10px;transform:rotate(-16deg);"></i><i data-lucide="crosshair" style="width:16px;height:16px;margin:16px;transform:rotate(14deg);"></i><i data-lucide="banknote" style="width:20px;height:20px;margin:12px;transform:rotate(-6deg);"></i><i data-lucide="skull" style="width:16px;height:16px;margin:20px;transform:rotate(20deg);"></i><i data-lucide="package" style="width:22px;height:22px;margin:10px;transform:rotate(-20deg);"></i><i data-lucide="hammer" style="width:18px;height:18px;margin:14px;transform:rotate(12deg);"></i><i data-lucide="crosshair" style="width:20px;height:20px;margin:8px;transform:rotate(-8deg);"></i><i data-lucide="banknote" style="width:16px;height:16px;margin:18px;transform:rotate(15deg);"></i>
                 </div>
@@ -2795,17 +2832,20 @@
             }
             container.innerHTML = bounties.map(b => `
                 <div class="bounty-card">
-                    ${buildIconPatternLayer(['skull', 'crosshair', 'flame'], { count: 16, size: 16, density: 'soft' })}
+                    ${buildIconPatternLayer(['skull', 'crosshair', 'flame'], { count: 12, size: 15, density: 'soft' })}
                     <div class="bounty-info">
-                        <img src="https://mc-heads.net/avatar/${b.target_name}/56" alt="${b.target_name}" class="player-head-render" style="background: rgba(255,0,127,0.05); border-radius: 12px;">
+                        <img src="https://mc-heads.net/avatar/${b.target_name}/48" alt="${b.target_name}" class="player-head-render" width="48" height="48" style="background: rgba(255,255,255,0.04);">
                         <div class="bounty-meta">
                             <h4>${b.target_name}</h4>
-                            <span>Ориентир: ${b.hint || 'не указан'}</span>
+                            <span>Цель в розыске</span>
                         </div>
                     </div>
-                    <div class="bounty-price">
-                        <div class="bounty-amount"><i data-lucide="gem" style="width:14px;height:14px;vertical-align:-2px;"></i> ${b.amount}</div>
-                        <div class="bounty-status">В розыске</div>
+                    <div class="bounty-desc ${b.hint ? '' : 'empty'}">${b.hint ? 'Ориентир: ' + b.hint : 'Ориентир не указан'}</div>
+                    <div class="bounty-footer">
+                        <div class="bounty-price">
+                            <div class="bounty-amount"><i data-lucide="gem" style="width:14px;height:14px;vertical-align:-2px;"></i> ${b.amount}</div>
+                            <div class="bounty-status">В розыске</div>
+                        </div>
                     </div>
                 </div>
             `).join('');
@@ -2832,19 +2872,24 @@
             loadBlackMarketListings();
         }
 
+        // Живые (не завершённые) статусы — всё остальное считается снятым/завершённым и с витрины пропадает
+        const BM_LISTING_ALIVE = ['active', 'reserved', 'handed', 'disputed'];
+        const BM_JOB_ALIVE = ['open', 'in_progress', 'submitted'];
+
         async function loadBlackMarketListings() {
             const container = document.getElementById('market-board-container');
             if (!container) return;
             try {
-                const myUuid = currentUserLinkedData?.minecraft_uuid;
-                let query = supabaseClient.from('bm_listings').select('*').order('created_at', { ascending: false });
-                query = myUuid ? query.or(`status.eq.active,seller_uuid.eq.${myUuid},buyer_uuid.eq.${myUuid}`) : query.eq('status', 'active');
-                const { data, error } = await query;
+                const { data, error } = await supabaseClient
+                    .from('bm_listings')
+                    .select('*')
+                    .order('created_at', { ascending: false });
                 if (error) throw error;
-                renderMarketBoard(data || []);
+                const visible = (data || []).filter(l => BM_LISTING_ALIVE.includes(l.status));
+                renderMarketBoard(visible);
             } catch (e) {
                 console.error('Не удалось загрузить лоты площадки:', e);
-                container.innerHTML = `<div class="bm-empty">Не удалось загрузить лоты. Возможно, ещё не выполнена миграция БД чёрного рынка.</div>`;
+                container.innerHTML = `<div class="bm-empty">Не удалось загрузить лоты: ${e.message || 'ошибка сети'}. Проверьте, что миграция БД чёрного рынка выполнена.</div>`;
             }
         }
 
@@ -2856,42 +2901,45 @@
                 return;
             }
             const myUuid = currentUserLinkedData?.minecraft_uuid;
-            const statusLabels = { active: 'В продаже', reserved: 'Забронировано', handed: 'Передано', disputed: 'Спор', completed: 'Завершено', cancelled: 'Отменено' };
+            const statusLabels = { active: 'В продаже', reserved: 'Забронировано', handed: 'Передано', disputed: 'Спор' };
 
             container.innerHTML = listings.map(l => {
                 const isSeller = l.seller_uuid === myUuid;
                 const isBuyer = l.buyer_uuid === myUuid;
                 let actions = '';
 
-                if (l.status === 'active' && isSeller) actions += `<button class="bm-action-btn danger" onclick="bmCancelListing('${l.id}')"><i data-lucide="x"></i> Снять с продажи</button>`;
+                if (l.status === 'active' && isSeller) actions += `<button class="bm-action-btn danger" onclick="bmCancelListing('${l.id}')"><i data-lucide="x"></i> Снять</button>`;
                 if (l.status === 'active' && !isSeller) actions += `<button class="bm-action-btn blue" onclick="bmBuyListing('${l.id}')"><i data-lucide="shopping-cart"></i> Купить</button>`;
-                if (l.status === 'reserved' && isSeller) actions += `<button class="bm-action-btn primary" onclick="bmMarkHanded('${l.id}')"><i data-lucide="package-check"></i> Я передал товар</button>`;
-                if (l.status === 'reserved' && isBuyer) actions += `<button class="bm-action-btn danger" onclick="bmCancelListing('${l.id}')"><i data-lucide="x"></i> Отменить (24ч истекли)</button>`;
+                if (l.status === 'reserved' && isSeller) actions += `<button class="bm-action-btn primary" onclick="bmMarkHanded('${l.id}')"><i data-lucide="package-check"></i> Передал</button>`;
+                if (l.status === 'reserved' && isBuyer) actions += `<button class="bm-action-btn danger" onclick="bmCancelListing('${l.id}')"><i data-lucide="x"></i> Отменить</button>`;
                 if (l.status === 'handed' && isBuyer) {
-                    actions += `<button class="bm-action-btn green" onclick="bmConfirmListing('${l.id}')"><i data-lucide="check"></i> Подтвердить получение</button>`;
-                    actions += `<button class="bm-action-btn danger" onclick="bmOpenDispute('${l.id}')"><i data-lucide="flag"></i> Открыть спор</button>`;
+                    actions += `<button class="bm-action-btn green" onclick="bmConfirmListing('${l.id}')"><i data-lucide="check"></i> Подтвердить</button>`;
+                    actions += `<button class="bm-action-btn danger" onclick="bmOpenDispute('${l.id}')"><i data-lucide="flag"></i> Спор</button>`;
                 }
                 if (l.status === 'disputed' && isUserModerator) {
-                    actions += `<button class="bm-action-btn green" onclick="bmResolveDispute('${l.id}','seller')">Решить: продавец</button>`;
-                    actions += `<button class="bm-action-btn blue" onclick="bmResolveDispute('${l.id}','buyer')">Решить: покупатель</button>`;
+                    actions += `<button class="bm-action-btn green" onclick="bmResolveDispute('${l.id}','seller')">Продавец</button>`;
+                    actions += `<button class="bm-action-btn blue" onclick="bmResolveDispute('${l.id}','buyer')">Покупатель</button>`;
                 }
                 if ((isSeller || isBuyer) && ['reserved', 'handed', 'disputed'].includes(l.status)) {
-                    actions += `<button class="bm-action-btn" onclick="bmOpenChatForContext('marketplace','${l.id}','${(isSeller ? l.buyer_name : l.seller_name) || 'собеседник'}')"><i data-lucide="message-square"></i> Написать</button>`;
+                    actions += `<button class="bm-action-btn" onclick="bmOpenChatForContext('marketplace','${l.id}','${(isSeller ? l.buyer_name : l.seller_name) || 'собеседник'}')"><i data-lucide="message-square"></i> Чат</button>`;
                 }
 
                 return `
                 <div class="bounty-card market">
-                    ${buildIconPatternLayer(['package', 'gem', 'handshake'], { count: 16, size: 16, density: 'soft' })}
+                    ${buildIconPatternLayer(['package', 'gem', 'handshake'], { count: 12, size: 15, density: 'soft' })}
                     <div class="bounty-info">
-                        <img src="https://mc-heads.net/avatar/${l.seller_name}/56" alt="${l.seller_name}" class="player-head-render" style="background: rgba(64,156,255,0.05); border-radius: 12px;">
+                        <img src="https://mc-heads.net/avatar/${l.seller_name}/48" alt="${l.seller_name}" class="player-head-render" width="48" height="48" style="background: rgba(255,255,255,0.04);">
                         <div class="bounty-meta">
                             <h4>${l.item_name}</h4>
-                            <span>Продавец: ${l.seller_name}${l.description ? ' · ' + l.description : ''}</span>
+                            <span>Продавец: ${l.seller_name}</span>
                         </div>
                     </div>
-                    <div class="bounty-price">
-                        <div class="bounty-amount"><i data-lucide="gem" style="width:14px;height:14px;vertical-align:-2px;"></i> ${l.price}</div>
-                        <div class="bounty-status">${statusLabels[l.status] || l.status}</div>
+                    <div class="bounty-desc ${l.description ? '' : 'empty'}">${l.description || 'Без описания'}</div>
+                    <div class="bounty-footer">
+                        <div class="bounty-price">
+                            <div class="bounty-amount"><i data-lucide="gem" style="width:14px;height:14px;vertical-align:-2px;"></i> ${l.price}</div>
+                            <div class="bounty-status">${statusLabels[l.status] || l.status}</div>
+                        </div>
                     </div>
                     ${actions ? `<div class="bounty-actions">${actions}</div>` : ''}
                 </div>`;
@@ -2939,15 +2987,16 @@
             const container = document.getElementById('jobs-board-container');
             if (!container) return;
             try {
-                const myUuid = currentUserLinkedData?.minecraft_uuid;
-                let query = supabaseClient.from('bm_jobs').select('*').order('created_at', { ascending: false });
-                query = myUuid ? query.or(`status.eq.open,employer_uuid.eq.${myUuid},hired_uuid.eq.${myUuid}`) : query.eq('status', 'open');
-                const { data, error } = await query;
+                const { data, error } = await supabaseClient
+                    .from('bm_jobs')
+                    .select('*')
+                    .order('created_at', { ascending: false });
                 if (error) throw error;
-                renderJobsBoard(data || []);
+                const visible = (data || []).filter(j => BM_JOB_ALIVE.includes(j.status));
+                renderJobsBoard(visible);
             } catch (e) {
                 console.error('Не удалось загрузить вакансии:', e);
-                container.innerHTML = `<div class="bm-empty">Не удалось загрузить вакансии. Возможно, ещё не выполнена миграция БД чёрного рынка.</div>`;
+                container.innerHTML = `<div class="bm-empty">Не удалось загрузить вакансии: ${e.message || 'ошибка сети'}. Проверьте, что миграция БД чёрного рынка выполнена.</div>`;
             }
         }
 
@@ -2959,7 +3008,7 @@
                 return;
             }
             const myUuid = currentUserLinkedData?.minecraft_uuid;
-            const statusLabels = { open: 'Открыто', in_progress: 'В работе', submitted: 'Сдано, на приёмке', completed: 'Завершено', cancelled: 'Отменено' };
+            const statusLabels = { open: 'Открыто', in_progress: 'В работе', submitted: 'На приёмке' };
 
             container.innerHTML = jobs.map(j => {
                 const isEmployer = j.employer_uuid === myUuid;
@@ -2967,12 +3016,12 @@
                 let actions = '';
 
                 if (j.status === 'open' && !isEmployer) actions += `<button class="bm-action-btn green" onclick="bmApplyJob('${j.id}')"><i data-lucide="send"></i> Откликнуться</button>`;
-                if (j.status === 'open' && isEmployer) actions += `<button class="bm-action-btn danger" onclick="bmCancelJob('${j.id}')"><i data-lucide="x"></i> Снять вакансию</button>`;
-                if (j.status === 'in_progress' && isHired) actions += `<button class="bm-action-btn primary" onclick="bmSubmitWork('${j.id}')"><i data-lucide="check-check"></i> Сдать работу</button>`;
-                if (j.status === 'in_progress' && isEmployer) actions += `<button class="bm-action-btn danger" onclick="bmCancelJob('${j.id}')"><i data-lucide="x"></i> Отменить (просрочено)</button>`;
-                if (j.status === 'submitted' && isEmployer) actions += `<button class="bm-action-btn green" onclick="bmAcceptWork('${j.id}')"><i data-lucide="check"></i> Принять работу</button>`;
+                if (j.status === 'open' && isEmployer) actions += `<button class="bm-action-btn danger" onclick="bmCancelJob('${j.id}')"><i data-lucide="x"></i> Снять</button>`;
+                if (j.status === 'in_progress' && isHired) actions += `<button class="bm-action-btn primary" onclick="bmSubmitWork('${j.id}')"><i data-lucide="check-check"></i> Сдать</button>`;
+                if (j.status === 'in_progress' && isEmployer) actions += `<button class="bm-action-btn danger" onclick="bmCancelJob('${j.id}')"><i data-lucide="x"></i> Отменить</button>`;
+                if (j.status === 'submitted' && isEmployer) actions += `<button class="bm-action-btn green" onclick="bmAcceptWork('${j.id}')"><i data-lucide="check"></i> Принять</button>`;
                 if ((isEmployer || isHired) && ['in_progress', 'submitted'].includes(j.status)) {
-                    actions += `<button class="bm-action-btn" onclick="bmOpenChatForContext('job','${j.id}','${(isEmployer ? j.hired_name : j.employer_name) || 'собеседник'}')"><i data-lucide="message-square"></i> Написать</button>`;
+                    actions += `<button class="bm-action-btn" onclick="bmOpenChatForContext('job','${j.id}','${(isEmployer ? j.hired_name : j.employer_name) || 'собеседник'}')"><i data-lucide="message-square"></i> Чат</button>`;
                 }
                 if (j.status === 'open' && isEmployer) {
                     actions += `<button class="bm-action-btn" onclick="bmViewApplications('${j.id}')"><i data-lucide="users"></i> Отклики</button>`;
@@ -2980,17 +3029,20 @@
 
                 return `
                 <div class="bounty-card job">
-                    ${buildIconPatternLayer(['hammer', 'wrench', 'hard-hat'], { count: 16, size: 16, density: 'soft' })}
+                    ${buildIconPatternLayer(['hammer', 'wrench', 'hard-hat'], { count: 12, size: 15, density: 'soft' })}
                     <div class="bounty-info">
-                        <img src="https://mc-heads.net/avatar/${j.employer_name}/56" alt="${j.employer_name}" class="player-head-render" style="background: rgba(46,204,113,0.05); border-radius: 12px;">
+                        <img src="https://mc-heads.net/avatar/${j.employer_name}/48" alt="${j.employer_name}" class="player-head-render" width="48" height="48" style="background: rgba(255,255,255,0.04);">
                         <div class="bounty-meta">
                             <h4>${j.title}</h4>
-                            <span>Заказчик: ${j.employer_name} · срок ${j.deadline_hours}ч${j.hired_name ? ' · исполнитель: ' + j.hired_name : ''}</span>
+                            <span>Заказчик: ${j.employer_name} · ${j.deadline_hours}ч${j.hired_name ? ' · ' + j.hired_name : ''}</span>
                         </div>
                     </div>
-                    <div class="bounty-price">
-                        <div class="bounty-amount"><i data-lucide="gem" style="width:14px;height:14px;vertical-align:-2px;"></i> ${j.payment}</div>
-                        <div class="bounty-status">${statusLabels[j.status] || j.status}</div>
+                    <div class="bounty-desc ${j.description ? '' : 'empty'}">${j.description || 'Без описания ТЗ'}</div>
+                    <div class="bounty-footer">
+                        <div class="bounty-price">
+                            <div class="bounty-amount"><i data-lucide="gem" style="width:14px;height:14px;vertical-align:-2px;"></i> ${j.payment}</div>
+                            <div class="bounty-status">${statusLabels[j.status] || j.status}</div>
+                        </div>
                     </div>
                     ${actions ? `<div class="bounty-actions">${actions}</div>` : ''}
                 </div>`;
