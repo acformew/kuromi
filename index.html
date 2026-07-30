@@ -912,111 +912,6 @@
         .mechanic-text-block h3 { font-size: 1.15rem; font-weight: 600; color: #fff; margin-bottom: 6px; }
         .mechanic-text-block p { font-size: 0.88rem; color: var(--text-muted); line-height: 1.4; }
 
-        .donate-layout {
-            display: flex;
-            gap: 40px;
-            width: 100%;
-            align-items: center;
-            justify-content: center;
-            margin-top: 20px;
-        }
-        
-        .roulette-wrapper {
-            position: relative;
-            width: 360px;
-            height: 420px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            flex-shrink: 0;
-        }
-
-        .roulette-container {
-            position: relative;
-            width: 340px;
-            height: 340px;
-            background: #1e1a24;
-            border-radius: 50%;
-            padding: 16px; 
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5), 0 0 0 4px #2a2433;
-            z-index: 2;
-        }
-
-        .roulette-container::before {
-            content: '';
-            position: absolute;
-            top: 4px; left: 4px; right: 4px; bottom: 4px;
-            border-radius: 50%;
-            border: 2px dashed #ffb700; 
-            pointer-events: none;
-            opacity: 0.8;
-            animation: bulbBlink 1s infinite steps(2);
-        }
-
-        .roulette-stand {
-            width: 160px;
-            height: 60px;
-            background: linear-gradient(180deg, #1b1622 0%, #110d18 100%);
-            clip-path: polygon(20% 0%, 80% 0%, 100% 100%, 0% 100%);
-            margin-top: -15px;
-            border-bottom: 8px solid #09070d;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.6);
-            z-index: 1;
-        }
-
-        .roulette-marker {
-            position: absolute;
-            top: 2px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 0;
-            height: 0;
-            border-left: 14px solid transparent;
-            border-right: 14px solid transparent;
-            border-top: 26px solid #ffb700; 
-            z-index: 10;
-            filter: drop-shadow(0 2px 6px rgba(0,0,0,0.6));
-        }
-
-        .wheel-svg {
-            width: 308px;
-            height: 308px;
-            border-radius: 50%;
-            background: #0d091a;
-            transition: transform 8s cubic-bezier(0.15, 0.85, 0.35, 1);
-            display: block;
-            overflow: visible;
-        }
-
-        .chances-panel {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            gap: 9px;
-            background: rgba(13, 9, 26, 0.4);
-            padding: 24px;
-            border-radius: 24px;
-            border: 1px solid rgba(255, 255, 255, 0.03);
-            text-align: left;
-            backdrop-filter: blur(10px);
-        }
-        .chances-panel h3 { font-size: 1.1rem; font-weight: 600; margin-bottom: 6px; color: #fff; }
-        .chance-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 9px 14px;
-            background: rgba(255, 255, 255, 0.01);
-            border-radius: 12px;
-            border: 1px solid rgba(255, 255, 255, 0.02);
-            font-size: 0.88rem;
-        }
-        .chance-row span:first-child { font-weight: 500; color: var(--text-main); display: flex; align-items: center; gap: 8px; }
-        .chance-row [data-lucide] { color: #b985f4; flex-shrink: 0; }
-        .chance-value { font-weight: 700; color: #ffb700; font-family: monospace; }
-
-        .spin-btn-box { width: 100%; display: flex; justify-content: center; margin-top: 35px; }
-
         .donate-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
@@ -1280,6 +1175,148 @@
         #bm-detail-body .bounty-actions { justify-content: flex-start; }
         #bm-detail-body .bm-action-btn { font-size: 0.8rem; padding: 8px 15px; }
 
+        /* ===== Карта мира — полноэкранная страница, отдельная от остального сайта ===== */
+        .map-fullpage-overlay { display: none; position: fixed; inset: 0; z-index: 950; background: #020103; }
+        .map-fullpage-overlay.active { display: block; animation: bmPageIn 0.35s ease forwards; }
+
+        #map-app { position: relative; width: 100%; height: 100%; }
+        #map-viewport { position: absolute; inset: 0; overflow: hidden; cursor: grab; background: #020103; }
+        #map-viewport.map-panning { cursor: grabbing; }
+        #map-viewport.map-claiming { cursor: crosshair; }
+
+        #map-world { position: absolute; top: 0; left: 0; width: 5000px; height: 5000px; transform-origin: 0 0; will-change: transform; }
+        #map-terrain-canvas { position: absolute; top: 0; left: 0; width: 5000px; height: 5000px; image-rendering: pixelated; image-rendering: crisp-edges; }
+
+        .map-claim-box {
+            position: absolute; border: 2px solid var(--cat-color, var(--accent-pink));
+            background: color-mix(in srgb, var(--cat-color, var(--accent-pink)) 18%, transparent);
+            cursor: pointer; pointer-events: auto;
+        }
+        .map-claim-box:hover { background: color-mix(in srgb, var(--cat-color, var(--accent-pink)) 32%, transparent); }
+
+        #map-preview-box {
+            position: absolute; border: 2px dashed var(--accent-acid, #c6ff3d);
+            background: rgba(198,255,61,0.12); pointer-events: none; display: none;
+        }
+
+        #map-overlay-layer { position: absolute; inset: 0; pointer-events: none; }
+        .map-claim-label {
+            position: absolute; transform: translate(-50%,-100%);
+            background: rgba(5,3,8,0.85); border: 1px solid rgba(255,255,255,0.12); border-radius: 8px;
+            padding: 4px 9px; font-size: 0.72rem; font-weight: 600; white-space: nowrap; color: #fff;
+            display: flex; align-items: center; gap: 6px;
+        }
+        .map-claim-label .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--cat-color); flex-shrink: 0; }
+
+        #map-search-marker {
+            position: absolute; width: 0; height: 0; transform: translate(-50%,-100%);
+            transition: opacity 0.6s ease; opacity: 1; pointer-events: none;
+        }
+        #map-search-marker svg { display: block; filter: drop-shadow(0 0 6px rgba(255,0,127,0.7)); }
+        #map-search-marker .map-marker-label {
+            position: absolute; bottom: 34px; left: 50%; transform: translateX(-50%);
+            background: var(--accent-pink); color: #fff; font-size: 0.72rem; font-weight: 700;
+            padding: 3px 9px; border-radius: 8px; white-space: nowrap;
+        }
+
+        .map-hud {
+            position: absolute; background: var(--bg-card); border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 18px; backdrop-filter: blur(14px); color: #fff; z-index: 20;
+        }
+        #map-panel-top { top: 16px; left: 16px; padding: 14px 16px; display: flex; flex-direction: column; gap: 10px; width: 250px; }
+        .map-exit-btn {
+            display: flex; align-items: center; gap: 6px; background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.14); color: #fff; padding: 8px 14px; border-radius: 100px;
+            font-family: var(--font-sans); font-size: 0.78rem; font-weight: 600; cursor: pointer; transition: all 0.15s ease;
+            align-self: flex-start;
+        }
+        .map-exit-btn:hover { border-color: rgba(255,255,255,0.4); background: rgba(255,255,255,0.09); }
+        .map-exit-btn [data-lucide] { width: 13px; height: 13px; }
+        #map-search-row { display: flex; gap: 6px; }
+        #map-search-input {
+            flex: 1; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 10px; padding: 8px 10px; color: #fff; font-size: 0.82rem; font-family: var(--font-sans);
+        }
+        #map-search-input::placeholder { color: var(--text-muted); }
+        #map-search-btn {
+            background: var(--primary-purple); border: none; border-radius: 10px; color: #fff;
+            padding: 0 12px; font-weight: 600; cursor: pointer; font-size: 0.85rem; display: flex; align-items: center;
+        }
+        #map-search-btn [data-lucide] { width: 15px; height: 15px; }
+        #map-coords-readout { font-size: 0.78rem; color: var(--text-muted); font-variant-numeric: tabular-nums; }
+        #map-coords-readout b { color: var(--accent-acid, #c6ff3d); font-weight: 700; }
+
+        #map-legend { display: flex; flex-direction: column; gap: 5px; margin-top: 2px; }
+        .map-legend-item { display: flex; align-items: center; gap: 7px; font-size: 0.74rem; color: var(--text-muted); }
+        .map-legend-item .dot { width: 8px; height: 8px; border-radius: 50%; }
+
+        #map-zoom-controls { position: absolute; bottom: 16px; left: 16px; display: flex; flex-direction: column; gap: 6px; z-index: 20; }
+        .map-zoom-btn {
+            width: 38px; height: 38px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.08);
+            background: var(--bg-card); color: #fff; font-size: 1.1rem; font-weight: 700; cursor: pointer;
+        }
+
+        #map-claim-cta {
+            position: absolute; bottom: 16px; right: 16px; z-index: 20;
+            background: linear-gradient(135deg, var(--primary-purple), var(--accent-pink));
+            border: none; color: #fff; font-family: var(--font-sans); font-weight: 700; font-size: 0.9rem;
+            padding: 14px 22px; border-radius: 16px; cursor: pointer; box-shadow: 0 8px 24px rgba(138,43,226,0.35);
+            display: flex; align-items: center; gap: 8px;
+        }
+        #map-claim-cta [data-lucide] { width: 16px; height: 16px; }
+
+        #map-claim-banner {
+            position: absolute; top: 16px; left: 50%; transform: translateX(-50%); z-index: 20;
+            background: var(--bg-card); border: 1px solid var(--accent-acid, #c6ff3d); border-radius: 14px;
+            padding: 10px 18px; font-size: 0.82rem; display: none; align-items: center; gap: 14px; color: #fff;
+        }
+        #map-claim-banner button { background: rgba(255,255,255,0.08); border: none; color: #fff; border-radius: 8px; padding: 6px 12px; cursor: pointer; font-size: 0.78rem; }
+
+        .map-modal-overlay {
+            position: fixed; inset: 0; background: rgba(2,1,4,0.75); backdrop-filter: blur(6px);
+            display: none; align-items: center; justify-content: center; z-index: 20010; padding: 20px;
+        }
+        .map-modal-overlay.open { display: flex; }
+        .map-modal-card {
+            background: linear-gradient(160deg, rgba(138,43,226,0.14), rgba(16,11,28,0.99) 55%), rgba(16,11,28,0.98);
+            border: 1px solid var(--primary-purple); border-radius: 24px;
+            width: min(420px,90vw); padding: 28px; color: #fff; text-align: left;
+        }
+        .map-modal-card h3 { font-family: var(--font-display); font-size: 1.05rem; margin-bottom: 6px; }
+        .map-modal-card p.map-sub { color: var(--text-muted); font-size: 0.82rem; margin-bottom: 18px; }
+        .map-cat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
+        .map-cat-option {
+            border: 1px solid rgba(255,255,255,0.1); border-radius: 14px; padding: 12px; cursor: pointer;
+            display: flex; flex-direction: column; gap: 6px; background: rgba(255,255,255,0.03);
+        }
+        .map-cat-option.selected { border-color: var(--cat-color); background: color-mix(in srgb, var(--cat-color) 15%, transparent); }
+        .map-cat-option .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--cat-color); }
+        .map-cat-option .name { font-size: 0.85rem; font-weight: 600; }
+
+        .map-field { margin-bottom: 14px; }
+        .map-field label { display: block; font-size: 0.78rem; color: var(--text-muted); margin-bottom: 6px; }
+        .map-field input, .map-field textarea {
+            width: 100%; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 10px; padding: 10px 12px; color: #fff; font-family: var(--font-sans); font-size: 0.85rem;
+        }
+        .map-field textarea { resize: vertical; min-height: 70px; }
+
+        .map-modal-actions { display: flex; gap: 10px; margin-top: 6px; }
+        .map-btn-primary, .map-btn-ghost {
+            flex: 1; border: none; border-radius: 12px; padding: 12px; font-weight: 700; font-size: 0.85rem;
+            cursor: pointer; font-family: var(--font-sans);
+        }
+        .map-btn-primary { background: linear-gradient(135deg, var(--primary-purple), var(--accent-pink)); color: #fff; }
+        .map-btn-ghost { background: rgba(255,255,255,0.06); color: #fff; }
+        .map-btn-primary:disabled { opacity: 0.4; cursor: not-allowed; }
+
+        .map-info-row { display: flex; justify-content: space-between; font-size: 0.8rem; color: var(--text-muted); margin-bottom: 4px; }
+        .map-info-row b { color: #fff; }
+
+        @media (max-width: 640px) {
+            #map-panel-top { width: calc(100% - 32px); }
+        }
+
         /* ===== Постоянный подвал: документы + поддержка (нужно банку/платёжке) ===== */
         .site-footer {
             width: 100%; padding: 26px 20px 90px; margin-top: 10px;
@@ -1367,10 +1404,6 @@
             .ticket-price { text-align: center; font-size: 1.3rem; }
             header { width: calc(100% - 32px); margin: 25px auto 15px auto; padding: 16px; border-radius: 24px; gap: 14px; }
             
-            .donate-layout { flex-direction: column; gap: 24px; }
-            .roulette-wrapper { width: 280px; height: 360px; }
-            .roulette-container { width: 260px; height: 260px; padding: 12px; }
-            .roulette-stand { width: 120px; height: 45px; margin-top: -10px; }
             .donate-grid { grid-template-columns: 1fr; }
             
             nav { display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 6px; width: 100%; background: none; border: none; padding: 0; border-radius: 0; }
@@ -1683,6 +1716,7 @@
             <button id="tab-rules" onclick="switchTab('rules')">Правила</button>
             <button id="tab-players" onclick="switchTab('players')">Игроки</button>
             <button id="tab-mechanics" onclick="switchTab('mechanics')">Вики</button>
+            <button onclick="openWorldMap()">Карта</button>
             <button id="tab-donate" onclick="switchTab('donate')">Донат</button>
         </nav>
     </header>
@@ -2036,35 +2070,6 @@
                 <div class="donate-grid" id="shop-front-container">
                     <div style="grid-column: span 2; color: var(--text-muted); padding: 20px 0;">Загрузка товаров...</div>
                 </div>
-
-                <div class="panel-title" style="margin-top: 40px; margin-bottom: 10px; font-size: 1.6rem; text-align: left; width: 100%; display:flex; align-items:center; gap:10px;">
-                    <span class="icon-badge b-pink" style="width:32px;height:32px;"><i data-lucide="disc-3"></i></span> Колесо Фортуны
-                </div>
-                <div class="eyebrow" style="margin-bottom: 40px; text-align: left; width: 100%;">Испытай удачу и выбей дорогие привилегии со скидкой</div>
-                
-                <div class="donate-layout">
-                    <div class="roulette-wrapper">
-                        <div class="roulette-marker"></div>
-                        <div class="roulette-container">
-                            <svg id="wheel" class="wheel-svg" viewBox="0 0 300 300"></svg>
-                            <div class="wheel-center-cap"></div>
-                        </div>
-                        <div class="roulette-stand"></div>
-                    </div>
-
-                    <div class="chances-panel">
-                        <h3>Вероятности секторов рулетки:</h3>
-                        <div class="chance-row"><span><i data-lucide="skull" style="width:15px;height:15px;"></i> Кастомная смерть (Частый x3)</span><span class="chance-value">47.5%</span></div>
-                        <div class="chance-row"><span><i data-lucide="venetian-mask" style="width:15px;height:15px;"></i> Маска Анонимуса (x2)</span><span class="chance-value">34.0%</span></div>
-                        <div class="chance-row"><span><i data-lucide="link-2" style="width:15px;height:15px;"></i> Лицензия на Арест /команду</span><span class="chance-value">10.0%</span></div>
-                        <div class="chance-row"><span><i data-lucide="search" style="width:15px;height:15px;"></i> Логи CoreProtect</span><span class="chance-value">8.0%</span></div>
-                        <div class="chance-row"><span><i data-lucide="crown" style="width:15px;height:15px;"></i> Проходка НАВСЕГДА (Легендарный)</span><span class="chance-value">0.5%</span></div>
-                    </div>
-                </div>
-
-                <div class="spin-btn-box">
-                    <button class="btn-primary" id="spin-button" onclick="spinRouletteWheel()">Вращать рулетку (100 ₽)</button>
-                </div>
             </div>
         </div>
 
@@ -2148,6 +2153,91 @@
                     <div class="bounty-grid" id="jobs-board-container"><div class="bm-loading">Загрузка вакансий...</div></div>
                 </div>
             </div>
+            </div>
+        </div>
+
+        <!-- ===== Карта мира (приваты территорий) — отдельная полноэкранная страница ===== -->
+        <div id="map-fullpage" class="map-fullpage-overlay">
+            <div id="map-app">
+                <div id="map-viewport">
+                    <div id="map-world">
+                        <canvas id="map-terrain-canvas" width="500" height="500"></canvas>
+                        <div id="map-preview-box"></div>
+                        <!-- map-claim-box элементы добавляются сюда -->
+                    </div>
+                    <div id="map-overlay-layer">
+                        <!-- метки/пины/маркер поиска добавляются сюда -->
+                    </div>
+                </div>
+
+                <div class="map-hud" id="map-panel-top">
+                    <button class="map-exit-btn" onclick="closeWorldMap()"><i data-lucide="arrow-left"></i> Вернуться на сайт</button>
+                    <div id="map-search-row">
+                        <input id="map-search-input" type="text" placeholder="X Z, напр. -1203 2051">
+                        <button id="map-search-btn"><i data-lucide="search"></i></button>
+                    </div>
+                    <div id="map-coords-readout">X: <b id="map-ro-x">—</b>&nbsp; Z: <b id="map-ro-z">—</b></div>
+                    <div id="map-legend"></div>
+                </div>
+
+                <div id="map-zoom-controls">
+                    <button class="map-zoom-btn" id="map-zoom-in">+</button>
+                    <button class="map-zoom-btn" id="map-zoom-out">−</button>
+                </div>
+
+                <div id="map-claim-banner">
+                    <span>Растяните область на карте, зажав ЛКМ</span>
+                    <button id="map-claim-cancel-drawing">Отмена</button>
+                </div>
+
+                <button id="map-claim-cta"><i data-lucide="flag"></i> Занять территорию</button>
+            </div>
+
+            <!-- Выбор категории -->
+            <div class="map-modal-overlay" id="map-modal-category">
+                <div class="map-modal-card">
+                    <h3>Что вы занимаете?</h3>
+                    <p class="map-sub">Выберите категорию территории, затем нарисуйте её на карте.</p>
+                    <div class="map-cat-grid" id="map-cat-grid"></div>
+                    <div class="map-modal-actions">
+                        <button class="map-btn-ghost" id="map-cat-cancel">Отмена</button>
+                        <button class="map-btn-primary" id="map-cat-next" disabled>Далее →</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Название/описание -->
+            <div class="map-modal-overlay" id="map-modal-details">
+                <div class="map-modal-card">
+                    <h3>Оформление привата</h3>
+                    <p class="map-sub" id="map-details-sub">—</p>
+                    <div class="map-field">
+                        <label>Название</label>
+                        <input id="map-claim-title" type="text" maxlength="40" placeholder="Например: Город Азорис">
+                    </div>
+                    <div class="map-field">
+                        <label>Описание</label>
+                        <textarea id="map-claim-desc" maxlength="300" placeholder="Коротко расскажите о территории..."></textarea>
+                    </div>
+                    <div class="map-modal-actions">
+                        <button class="map-btn-ghost" id="map-details-cancel">Отмена</button>
+                        <button class="map-btn-primary" id="map-details-confirm">Подтвердить приват</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Просмотр привата -->
+            <div class="map-modal-overlay" id="map-modal-info">
+                <div class="map-modal-card">
+                    <h3 id="map-info-title">—</h3>
+                    <p class="map-sub" id="map-info-cat">—</p>
+                    <div class="map-info-row"><span>Владелец</span><b id="map-info-owner">—</b></div>
+                    <div class="map-info-row"><span>Координаты</span><b id="map-info-coords">—</b></div>
+                    <p style="margin-top:14px;font-size:0.85rem;color:#fff;line-height:1.5;" id="map-info-desc"></p>
+                    <div class="map-modal-actions" style="margin-top:20px;">
+                        <button class="map-btn-primary" id="map-info-close">Закрыть</button>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -2293,20 +2383,6 @@
         let currentUserSession = null;
         let currentUserLinkedData = null; 
         let isUserModerator = false;
-
-        const roulettePrizes = [
-            { text: '💀 Смерть', weight: 16.0, color: '#8a2be2' },       
-            { text: '👺 Маска', weight: 12.0, color: '#ffffff' },        
-            { text: '💀 Смерть', weight: 16.0, color: '#8a2be2' },       
-            { text: '⛓️ Арест', weight: 10.0, color: '#ffffff' },        
-            { text: '💀 Смерть', weight: 15.5, color: '#8a2be2' },       
-            { text: '🔍 Логи', weight: 8.0, color: '#ffffff' },          
-            { text: '👺 Маска', weight: 22.0, color: '#8a2be2' },        
-            { text: '👑 НАВСЕГДА', weight: 0.5, color: '#ff007f' }       
-        ];
-
-        let currentRotation = 0; 
-        let isWheelSpinning = false;
 
         /* --- УНИВЕРСАЛЬНЫЙ МОДУЛЬ ДИАЛОГОВЫХ ОКОН С ИСПРАВЛЕННЫМ ВЫРАВНИВАНИЕМ И ПЛЕЙСХОЛДЕРОМ --- */
         const EMOJI_ICON_MAP = {
@@ -2666,126 +2742,6 @@
             return `${dayStr}.${monthStr}.${date.getFullYear()}${timeStr}`;
         }
 
-        function initRouletteGraphic() {
-            const svg = document.getElementById('wheel');
-            if(!svg) return;
-            svg.innerHTML = ''; 
-
-            const numSectors = roulettePrizes.length;
-            const arcSize = 360 / numSectors; 
-            const radius = 150;
-            const center = 150;
-
-            for (let i = 0; i < numSectors; i++) {
-                const startAngle = i * arcSize;
-                const endAngle = startAngle + arcSize;
-                
-                const startRad = (startAngle * Math.PI) / 180;
-                const endRad = (endAngle * Math.PI) / 180;
-
-                const x1 = center + radius * Math.cos(startRad);
-                const y1 = center + radius * Math.sin(startRad);
-                const x2 = center + radius * Math.cos(endRad);
-                const y2 = center + radius * Math.sin(endRad);
-
-                const pathData = `M ${center} ${center} L ${x1} ${y1} A ${radius} ${radius} 0 0 1 ${x2} ${y2} Z`;
-                
-                const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
-                path.setAttribute("d", pathData);
-                path.setAttribute("fill", roulettePrizes[i].color);
-                path.setAttribute("stroke", "#050308");
-                path.setAttribute("stroke-width", "4");
-                svg.appendChild(path);
-
-                const textAngle = startAngle + arcSize / 2;
-                const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
-                
-                text.setAttribute("transform", `translate(${center}, ${center}) rotate(${textAngle}) translate(${radius - 22}, 0)`);
-                text.setAttribute("text-anchor", "end");
-                text.setAttribute("dominant-baseline", "central");
-                text.textContent = roulettePrizes[i].text;
-                
-                text.setAttribute("font-family", "sans-serif");
-                text.setAttribute("font-weight", "bold");
-                text.setAttribute("font-size", "11px");
-                
-                if (roulettePrizes[i].color === '#ffffff') {
-                    text.setAttribute("fill", "#050308");
-                } else {
-                    text.setAttribute("fill", "#ffffff");
-                }
-                
-                svg.appendChild(text);
-            }
-        }
-
-        async function spinRouletteWheel() {
-            if (isWheelSpinning) return;
-
-            if (!currentUserSession) {
-                customAlert("🔒 Авторизация", "Пожалуйста, сначала войдите на сайт через ваш Discord-аккаунт!");
-                return;
-            }
-
-            const { data: profile } = await supabaseClient
-                .from('profiles')
-                .select('rub_balance, has_pass')
-                .eq('id', currentUserSession.user.id)
-                .single();
-
-            if (!profile || !profile.has_pass) {
-                customAlert("⛔ Доступ ограничен", "Вы не имеете права крутить Колесо Фортуны, пока не приобретете «Проходку» на сервер!");
-                return;
-            }
-
-            if (profile.rub_balance < 100) {
-                customLowBalance(100, profile.rub_balance);
-                return;
-            }
-
-            await supabaseClient
-                .from('profiles')
-                .update({ rub_balance: profile.rub_balance - 100 })
-                .eq('id', currentUserSession.user.id);
-
-            document.getElementById('ruble-balance-display').textContent = profile.rub_balance - 100;
-
-            const rand = Math.random() * 100;
-            let cumulativeWeight = 0;
-            let winningIndex = 0;
-
-            for (let i = 0; i < roulettePrizes.length; i++) {
-                cumulativeWeight += roulettePrizes[i].weight;
-                if (rand <= cumulativeWeight) {
-                    winningIndex = i;
-                    break;
-                }
-            }
-
-            isWheelSpinning = true;
-            const btn = document.getElementById('spin-button');
-            const wheel = document.getElementById('wheel');
-            btn.disabled = true;
-            btn.style.opacity = '0.5';
-
-            const numSectors = roulettePrizes.length;
-            const arcSize = 360 / numSectors;
-            const targetSectorAngle = (winningIndex * arcSize) + (arcSize / 2);
-            
-            let targetAngle = (270 - targetSectorAngle + 360) % 360;
-            let currentAngleOffset = currentRotation % 360;
-            let additionalRotation = (targetAngle - currentAngleOffset + 360) % 360;
-            
-            currentRotation += (360 * 6) + additionalRotation;
-            wheel.style.transform = `rotate(${currentRotation}deg)`;
-
-            setTimeout(() => {
-                isWheelSpinning = false;
-                btn.disabled = false;
-                btn.style.opacity = '1';
-                customAlert("🎰 Поздравляем!", `🎉 Вы выиграли игровой кастомный предмет: [ <span style="color:var(--primary-purple); font-weight:700;">${roulettePrizes[winningIndex].text}</span> ]! Награда будет выдана при следующем заходе.`);
-            }, 8000);
-        }
 
         /* --- ЧЁРНЫЙ РЫНОК: вся логика на сайте --- */
         /* Плагин на сервере только объявляет охоту в игровом чате и засчитывает PvP-убийство —
@@ -3326,6 +3282,439 @@
             const { error } = await supabaseClient.rpc('bm_send_chat_message', { p_chat_id: bmActiveChatId, p_message: text });
             if (error) { customAlert('❌ Ошибка', bmFriendlyError(error)); return; }
             bmLoadChatMessages();
+        }
+
+        /* =========================================================================
+           КАРТА МИРА — приваты территорий.
+           Чёрно-белая карта-плейсхолдер (суша/чёрный, вода/белый) 5000×5000 блоков,
+           пан/зум колесом и зажатым ЛКМ, поиск по координатам, рисование приватов.
+           Приваты хранятся в Supabase (таблица territory_claims) — видны всем игрокам.
+           ЗАМЕНА НА РЕАЛЬНУЮ КАРТУ: когда будет готов рендер из Chunky, вместо
+           generateMapTerrain() просто нарисуйте свой PNG на #map-terrain-canvas
+           (или замените canvas на <img>) — вся остальная логика координат/приватов
+           не изменится, она завязана на систему координат, а не на то, как
+           именно отрисована карта.
+           ========================================================================= */
+
+        const MAP_WORLD_SIZE = 5000;
+        const MAP_HALF = MAP_WORLD_SIZE / 2;
+
+        const MAP_CATEGORIES = [
+            { key: 'city',      name: 'Город',      color: '#c6ff3d' },
+            { key: 'structure', name: 'Постройка',  color: '#ff007f' },
+            { key: 'base',      name: 'Приват/Дом', color: '#8a2be2' },
+            { key: 'farm',      name: 'Ферма',      color: '#3dd6ff' },
+            { key: 'mine',      name: 'Шахта',      color: '#ffb03d' },
+            { key: 'other',     name: 'Другое',     color: '#ffffff' },
+        ];
+        const mapCatByKey = Object.fromEntries(MAP_CATEGORIES.map(c => [c.key, c]));
+
+        let mapInitialized = false;
+        let mapViewportEl, mapWorldEl, mapOverlayEl;
+        let mapScale = 1, mapPanX = 0, mapPanY = 0, mapMinScale = 0.1, mapMaxScale = 24;
+        let mapIsPanning = false, mapPanStart = { x: 0, y: 0 }, mapPanOrigin = { x: 0, y: 0 };
+        let mapClaims = [];
+        let mapClaimFlow = { active: false, stage: null, category: null, drawing: false, startLocal: null, currentRect: null };
+        let mapMarkerEl = null, mapMarkerTimer = null;
+        let mapSelectedCategory = null;
+        let mapPendingClaim = null;
+
+        function openWorldMap() {
+            const overlay = document.getElementById('map-fullpage');
+            if (!overlay) return;
+            overlay.classList.add('active');
+            document.body.style.overflow = 'hidden';
+            if (!mapInitialized) {
+                initWorldMap();
+                mapInitialized = true;
+            }
+            requestAnimationFrame(mapFitToScreen);
+            loadTerritoryClaims();
+            if (window.lucide) lucide.createIcons();
+        }
+
+        function closeWorldMap() {
+            const overlay = document.getElementById('map-fullpage');
+            if (!overlay) return;
+            overlay.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        function mapWorldToLocal(wx, wz) { return { lx: wx + MAP_HALF, ly: wz + MAP_HALF }; }
+        function mapLocalToWorld(lx, ly) { return { wx: lx - MAP_HALF, wz: ly - MAP_HALF }; }
+        function mapLocalToScreen(lx, ly) { return { sx: lx * mapScale + mapPanX, sy: ly * mapScale + mapPanY }; }
+        function mapScreenToLocal(sx, sy) { return { lx: (sx - mapPanX) / mapScale, ly: (sy - mapPanY) / mapScale }; }
+        function mapClampScale(s) { return Math.max(mapMinScale, Math.min(mapMaxScale, s)); }
+
+        function mapApplyTransform() {
+            mapWorldEl.style.transform = `translate(${mapPanX}px, ${mapPanY}px) scale(${mapScale})`;
+            mapRenderOverlayPositions();
+        }
+
+        function mapHash(x, y, seed) {
+            let n = (x * 374761393 + y * 668265263 + seed * 2147483647) | 0;
+            n = (n ^ (n >>> 13)) * 1274126177;
+            n = n ^ (n >>> 16);
+            return ((n >>> 0) % 100000) / 100000;
+        }
+        function mapSmoothNoise(x, y, seed) {
+            const xi = Math.floor(x), yi = Math.floor(y), xf = x - xi, yf = y - yi;
+            const v00 = mapHash(xi, yi, seed), v10 = mapHash(xi + 1, yi, seed), v01 = mapHash(xi, yi + 1, seed), v11 = mapHash(xi + 1, yi + 1, seed);
+            const i1 = v00 * (1 - xf) + v10 * xf, i2 = v01 * (1 - xf) + v11 * xf;
+            return i1 * (1 - yf) + i2 * yf;
+        }
+        function mapFbm(x, y) {
+            const octaves = [[0.01, 1], [0.025, 0.55], [0.06, 0.28], [0.14, 0.12]];
+            let total = 0, maxAmp = 0;
+            for (const [f, a] of octaves) { total += mapSmoothNoise(x * f, y * f, 7) * a; maxAmp += a; }
+            return total / maxAmp;
+        }
+        function generateMapTerrain() {
+            const canvas = document.getElementById('map-terrain-canvas');
+            const res = canvas.width;
+            const ctx = canvas.getContext('2d');
+            const img = ctx.createImageData(res, res);
+            const center = res / 2;
+            for (let y = 0; y < res; y++) {
+                for (let x = 0; x < res; x++) {
+                    const dx = (x - center) / center, dy = (y - center) / center;
+                    const edgeFalloff = Math.min(1, (dx * dx + dy * dy));
+                    let v = mapFbm(x, y) - edgeFalloff * 0.35;
+                    const land = v > 0.42;
+                    const i = (y * res + x) * 4;
+                    const c = land ? 8 : 234;
+                    img.data[i] = c; img.data[i + 1] = c; img.data[i + 2] = c + (land ? 4 : 6); img.data[i + 3] = 255;
+                }
+            }
+            ctx.putImageData(img, 0, 0);
+        }
+
+        function mapFitToScreen() {
+            const rect = mapViewportEl.getBoundingClientRect();
+            if (rect.width === 0 || rect.height === 0) return;
+            const fitScale = Math.min(rect.width, rect.height) / MAP_WORLD_SIZE * 0.92;
+            mapScale = mapClampScale(fitScale);
+            mapMinScale = fitScale * 0.9;
+            mapPanX = (rect.width - MAP_WORLD_SIZE * mapScale) / 2;
+            mapPanY = (rect.height - MAP_WORLD_SIZE * mapScale) / 2;
+            mapApplyTransform();
+        }
+
+        function initWorldMap() {
+            mapViewportEl = document.getElementById('map-viewport');
+            mapWorldEl = document.getElementById('map-world');
+            mapOverlayEl = document.getElementById('map-overlay-layer');
+
+            generateMapTerrain();
+
+            document.getElementById('map-legend').innerHTML = MAP_CATEGORIES.map(c => `
+                <div class="map-legend-item"><span class="dot" style="background:${c.color}"></span>${c.name}</div>
+            `).join('');
+
+            window.addEventListener('resize', () => { if (document.getElementById('map-fullpage').classList.contains('active')) mapFitToScreen(); });
+
+            mapViewportEl.addEventListener('mousedown', (e) => {
+                if (mapClaimFlow.stage === 'drawing') { mapStartDrawing(e); return; }
+                mapIsPanning = true;
+                mapViewportEl.classList.add('map-panning');
+                mapPanStart = { x: e.clientX, y: e.clientY };
+                mapPanOrigin = { x: mapPanX, y: mapPanY };
+            });
+
+            window.addEventListener('mousemove', (e) => {
+                if (!document.getElementById('map-fullpage').classList.contains('active')) return;
+                const rect = mapViewportEl.getBoundingClientRect();
+                const sx = e.clientX - rect.left, sy = e.clientY - rect.top;
+
+                if (mapClaimFlow.drawing) {
+                    mapUpdateDrawing(sx, sy);
+                } else if (mapIsPanning) {
+                    mapPanX = mapPanOrigin.x + (e.clientX - mapPanStart.x);
+                    mapPanY = mapPanOrigin.y + (e.clientY - mapPanStart.y);
+                    mapApplyTransform();
+                }
+
+                if (sx >= 0 && sy >= 0 && sx <= rect.width && sy <= rect.height) {
+                    const { lx, ly } = mapScreenToLocal(sx, sy);
+                    const { wx, wz } = mapLocalToWorld(lx, ly);
+                    document.getElementById('map-ro-x').textContent = Math.round(wx);
+                    document.getElementById('map-ro-z').textContent = Math.round(wz);
+                }
+            });
+
+            window.addEventListener('mouseup', (e) => {
+                if (mapIsPanning) { mapIsPanning = false; mapViewportEl.classList.remove('map-panning'); }
+                if (mapClaimFlow.drawing) { mapFinishDrawing(e); }
+            });
+
+            mapViewportEl.addEventListener('wheel', (e) => {
+                e.preventDefault();
+                const rect = mapViewportEl.getBoundingClientRect();
+                const sx = e.clientX - rect.left, sy = e.clientY - rect.top;
+                const { lx, ly } = mapScreenToLocal(sx, sy);
+                const factor = e.deltaY < 0 ? 1.18 : 1 / 1.18;
+                mapScale = mapClampScale(mapScale * factor);
+                mapPanX = sx - lx * mapScale;
+                mapPanY = sy - ly * mapScale;
+                mapApplyTransform();
+            }, { passive: false });
+
+            document.getElementById('map-zoom-in').onclick = () => mapZoomStep(1.3);
+            document.getElementById('map-zoom-out').onclick = () => mapZoomStep(1 / 1.3);
+
+            document.getElementById('map-search-btn').onclick = mapDoSearch;
+            document.getElementById('map-search-input').addEventListener('keydown', e => { if (e.key === 'Enter') mapDoSearch(); });
+
+            const mapCatGrid = document.getElementById('map-cat-grid');
+            mapCatGrid.innerHTML = MAP_CATEGORIES.map(c => `
+                <div class="map-cat-option" data-key="${c.key}" style="--cat-color:${c.color}">
+                    <span class="dot"></span><span class="name">${c.name}</span>
+                </div>
+            `).join('');
+            mapCatGrid.querySelectorAll('.map-cat-option').forEach(opt => {
+                opt.addEventListener('click', () => {
+                    mapCatGrid.querySelectorAll('.map-cat-option').forEach(o => o.classList.remove('selected'));
+                    opt.classList.add('selected');
+                    mapSelectedCategory = opt.dataset.key;
+                    document.getElementById('map-cat-next').disabled = false;
+                });
+            });
+
+            document.getElementById('map-claim-cta').onclick = () => {
+                if (!currentUserLinkedData) {
+                    customAlert('🔒 Авторизация', 'Авторизуйтесь через Discord и привяжите Minecraft-аккаунт, чтобы занимать территории.');
+                    return;
+                }
+                mapSelectedCategory = null;
+                document.getElementById('map-cat-next').disabled = true;
+                mapCatGrid.querySelectorAll('.map-cat-option').forEach(o => o.classList.remove('selected'));
+                document.getElementById('map-modal-category').classList.add('open');
+            };
+            document.getElementById('map-cat-cancel').onclick = () => document.getElementById('map-modal-category').classList.remove('open');
+            document.getElementById('map-cat-next').onclick = () => {
+                document.getElementById('map-modal-category').classList.remove('open');
+                mapEnterDrawingMode(mapSelectedCategory);
+            };
+            document.getElementById('map-claim-cancel-drawing').onclick = mapExitDrawingMode;
+
+            document.getElementById('map-details-cancel').onclick = () => {
+                document.getElementById('map-modal-details').classList.remove('open');
+            };
+            document.getElementById('map-details-confirm').onclick = mapConfirmClaim;
+            document.getElementById('map-info-close').onclick = () => document.getElementById('map-modal-info').classList.remove('open');
+        }
+
+        function mapZoomStep(factor) {
+            const rect = mapViewportEl.getBoundingClientRect();
+            const cx = rect.width / 2, cy = rect.height / 2;
+            const { lx, ly } = mapScreenToLocal(cx, cy);
+            mapScale = mapClampScale(mapScale * factor);
+            mapPanX = cx - lx * mapScale;
+            mapPanY = cy - ly * mapScale;
+            mapApplyTransform();
+        }
+
+        function mapDoSearch() {
+            const raw = document.getElementById('map-search-input').value.trim();
+            const nums = raw.match(/-?\d+/g);
+            if (!nums || nums.length < 2) {
+                customAlert('❌ Ошибка', 'Введите координаты в формате: X Z, например: -1203 2051');
+                return;
+            }
+            const wx = parseInt(nums[0], 10), wz = parseInt(nums[1], 10);
+            mapPanToWorld(wx, wz);
+            mapShowSearchMarker(wx, wz);
+        }
+
+        function mapPanToWorld(wx, wz, targetScale) {
+            const rect = mapViewportEl.getBoundingClientRect();
+            const { lx, ly } = mapWorldToLocal(wx, wz);
+            const endScale = mapClampScale(targetScale || Math.max(mapScale, 4));
+            const startScale = mapScale, startPanX = mapPanX, startPanY = mapPanY;
+            const endPanX = rect.width / 2 - lx * endScale;
+            const endPanY = rect.height / 2 - ly * endScale;
+            const duration = 550, t0 = performance.now();
+            function step(t) {
+                const p = Math.min(1, (t - t0) / duration);
+                const ease = 1 - Math.pow(1 - p, 3);
+                mapScale = startScale + (endScale - startScale) * ease;
+                mapPanX = startPanX + (endPanX - startPanX) * ease;
+                mapPanY = startPanY + (endPanY - startPanY) * ease;
+                mapApplyTransform();
+                if (p < 1) requestAnimationFrame(step);
+            }
+            requestAnimationFrame(step);
+        }
+
+        function mapShowSearchMarker(wx, wz) {
+            if (mapMarkerEl) { mapMarkerEl.remove(); clearTimeout(mapMarkerTimer); }
+            mapMarkerEl = document.createElement('div');
+            mapMarkerEl.id = 'map-search-marker';
+            mapMarkerEl.innerHTML = `
+                <div class="map-marker-label">${wx}, ${wz}</div>
+                <svg width="26" height="34" viewBox="0 0 26 34"><path d="M13 34C13 34 26 20.4 26 13C26 5.8 20.2 0 13 0C5.8 0 0 5.8 0 13C0 20.4 13 34 13 34Z" fill="#ff007f"/><circle cx="13" cy="13" r="5" fill="#fff"/></svg>
+            `;
+            mapMarkerEl._world = { wx, wz };
+            mapOverlayEl.appendChild(mapMarkerEl);
+            mapPositionMarker(mapMarkerEl);
+            mapMarkerTimer = setTimeout(() => {
+                mapMarkerEl.style.opacity = '0';
+                setTimeout(() => { if (mapMarkerEl) { mapMarkerEl.remove(); mapMarkerEl = null; } }, 650);
+            }, 1300);
+        }
+        function mapPositionMarker(el) {
+            const { wx, wz } = el._world;
+            const { lx, ly } = mapWorldToLocal(wx, wz);
+            const { sx, sy } = mapLocalToScreen(lx, ly);
+            el.style.left = sx + 'px';
+            el.style.top = sy + 'px';
+        }
+
+        function mapEnterDrawingMode(categoryKey) {
+            mapClaimFlow = { active: true, stage: 'drawing', category: categoryKey, drawing: false, startLocal: null };
+            mapViewportEl.classList.add('map-claiming');
+            document.getElementById('map-claim-banner').style.display = 'flex';
+        }
+        function mapExitDrawingMode() {
+            mapClaimFlow = { active: false, stage: null, category: null, drawing: false };
+            mapViewportEl.classList.remove('map-claiming');
+            document.getElementById('map-claim-banner').style.display = 'none';
+            document.getElementById('map-preview-box').style.display = 'none';
+        }
+
+        function mapStartDrawing(e) {
+            const rect = mapViewportEl.getBoundingClientRect();
+            const sx = e.clientX - rect.left, sy = e.clientY - rect.top;
+            const { lx, ly } = mapScreenToLocal(sx, sy);
+            mapClaimFlow.drawing = true;
+            mapClaimFlow.startLocal = { lx, ly };
+            const box = document.getElementById('map-preview-box');
+            box.style.display = 'block';
+            box.style.left = lx + 'px'; box.style.top = ly + 'px';
+            box.style.width = '0px'; box.style.height = '0px';
+        }
+        function mapUpdateDrawing(sx, sy) {
+            const { lx, ly } = mapScreenToLocal(sx, sy);
+            const s = mapClaimFlow.startLocal;
+            const x = Math.min(s.lx, lx), y = Math.min(s.ly, ly);
+            const w = Math.abs(lx - s.lx), h = Math.abs(ly - s.ly);
+            const box = document.getElementById('map-preview-box');
+            box.style.left = x + 'px'; box.style.top = y + 'px';
+            box.style.width = w + 'px'; box.style.height = h + 'px';
+            mapClaimFlow.currentRect = { x, y, w, h };
+        }
+        function mapFinishDrawing(e) {
+            mapClaimFlow.drawing = false;
+            const r = mapClaimFlow.currentRect;
+            document.getElementById('map-preview-box').style.display = 'none';
+            if (!r || r.w < 8 || r.h < 8) return;
+            const p1 = mapLocalToWorld(r.x, r.y);
+            const p2 = mapLocalToWorld(r.x + r.w, r.y + r.h);
+            mapOpenDetailsModal({
+                category: mapClaimFlow.category,
+                x1: Math.round(p1.wx), z1: Math.round(p1.wz),
+                x2: Math.round(p2.wx), z2: Math.round(p2.wz),
+            });
+        }
+
+        function mapOpenDetailsModal(data) {
+            mapPendingClaim = data;
+            const cat = mapCatByKey[data.category];
+            document.getElementById('map-details-sub').textContent =
+                `${cat.name} · ${Math.abs(data.x2 - data.x1)}×${Math.abs(data.z2 - data.z1)} блоков · (${data.x1}, ${data.z1}) → (${data.x2}, ${data.z2})`;
+            document.getElementById('map-claim-title').value = '';
+            document.getElementById('map-claim-desc').value = '';
+            document.getElementById('map-modal-details').classList.add('open');
+        }
+
+        async function mapConfirmClaim() {
+            const title = document.getElementById('map-claim-title').value.trim();
+            const desc = document.getElementById('map-claim-desc').value.trim();
+            if (!title) { customAlert('❌ Ошибка', 'Введите название территории.'); return; }
+            if (!currentUserLinkedData) { customAlert('🔒 Авторизация', 'Авторизуйтесь через Discord и привяжите Minecraft-аккаунт.'); return; }
+
+            const { data: newId, error } = await supabaseClient.rpc('territory_claim_place', {
+                p_category: mapPendingClaim.category,
+                p_title: title,
+                p_description: desc || null,
+                p_x1: mapPendingClaim.x1, p_z1: mapPendingClaim.z1,
+                p_x2: mapPendingClaim.x2, p_z2: mapPendingClaim.z2
+            });
+            if (error) {
+                console.error('Не удалось создать приват:', error);
+                customAlert('❌ Ошибка', 'Не удалось сохранить территорию. Попробуйте ещё раз.');
+                return;
+            }
+
+            const claim = {
+                id: newId,
+                owner_name: currentUserLinkedData.minecraft_name,
+                category: mapPendingClaim.category,
+                title, description: desc,
+                x1: Math.min(mapPendingClaim.x1, mapPendingClaim.x2), z1: Math.min(mapPendingClaim.z1, mapPendingClaim.z2),
+                x2: Math.max(mapPendingClaim.x1, mapPendingClaim.x2), z2: Math.max(mapPendingClaim.z1, mapPendingClaim.z2),
+            };
+            mapClaims.push(claim);
+            mapRenderClaimBox(claim);
+
+            document.getElementById('map-modal-details').classList.remove('open');
+            mapExitDrawingMode();
+        }
+
+        async function loadTerritoryClaims() {
+            try {
+                const { data, error } = await supabaseClient.from('territory_claims').select('*').order('created_at', { ascending: true });
+                if (error) throw error;
+                document.querySelectorAll('.map-claim-box, .map-claim-label').forEach(el => el.remove());
+                mapClaims = data || [];
+                mapClaims.forEach(mapRenderClaimBox);
+            } catch (e) {
+                console.error('Не удалось загрузить приваты территорий:', e);
+            }
+        }
+
+        function mapRenderClaimBox(claim) {
+            const cat = mapCatByKey[claim.category] || mapCatByKey.other;
+            const { lx: lx1, ly: ly1 } = mapWorldToLocal(claim.x1, claim.z1);
+            const { lx: lx2, ly: ly2 } = mapWorldToLocal(claim.x2, claim.z2);
+
+            const box = document.createElement('div');
+            box.className = 'map-claim-box';
+            box.style.setProperty('--cat-color', cat.color);
+            box.style.left = lx1 + 'px'; box.style.top = ly1 + 'px';
+            box.style.width = (lx2 - lx1) + 'px'; box.style.height = (ly2 - ly1) + 'px';
+            box.addEventListener('mousedown', ev => ev.stopPropagation());
+            box.addEventListener('click', () => mapOpenInfoModal(claim));
+            mapWorldEl.appendChild(box);
+
+            const label = document.createElement('div');
+            label.className = 'map-claim-label';
+            label.innerHTML = `<span class="dot" style="--cat-color:${cat.color}"></span>${claim.title}`;
+            label._claim = claim;
+            mapOverlayEl.appendChild(label);
+
+            claim._els = { box, label };
+            mapPositionClaimLabel(claim);
+        }
+        function mapPositionClaimLabel(claim) {
+            const { lx, ly } = mapWorldToLocal((claim.x1 + claim.x2) / 2, claim.z1);
+            const { sx, sy } = mapLocalToScreen(lx, ly);
+            claim._els.label.style.left = sx + 'px';
+            claim._els.label.style.top = (sy - 4) + 'px';
+        }
+        function mapOpenInfoModal(claim) {
+            const cat = mapCatByKey[claim.category] || mapCatByKey.other;
+            document.getElementById('map-info-title').textContent = claim.title;
+            document.getElementById('map-info-cat').textContent = cat.name;
+            document.getElementById('map-info-owner').textContent = claim.owner_name;
+            document.getElementById('map-info-coords').textContent = `(${claim.x1}, ${claim.z1}) → (${claim.x2}, ${claim.z2})`;
+            document.getElementById('map-info-desc').textContent = claim.description || 'Без описания.';
+            document.getElementById('map-modal-info').classList.add('open');
+        }
+
+        function mapRenderOverlayPositions() {
+            mapClaims.forEach(c => { if (c._els) mapPositionClaimLabel(c); });
+            if (mapMarkerEl) mapPositionMarker(mapMarkerEl);
         }
 
         function openBlackMarket() {
@@ -4426,7 +4815,7 @@
             const targetTabBtn = document.getElementById(`tab-${tabName}`);
             if(targetTabBtn) targetTabBtn.classList.add('active');
             
-            if(tabName === 'donate') { initRouletteGraphic(); renderShopFront(); }
+            if(tabName === 'donate') { renderShopFront(); }
             if(tabName === 'join') renderJoinPrices();
             if(tabName === 'players') { if (window.lucide) lucide.createIcons(); renderPlayersList(); loadTopLeaderboards('public'); }
             if(tabName === 'profile') loadProfileData();
@@ -5543,7 +5932,6 @@
         });
 
         window.onload = () => {
-            initRouletteGraphic();
             if (window.lucide) lucide.createIcons();
         };
     </script>
