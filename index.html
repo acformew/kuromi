@@ -1394,8 +1394,13 @@
         }
 
         @media (max-width: 768px) {
+            .logo-img-left, .logo-img-right {
+                display: none;
+            }
+
             h1 { font-size: 1.8rem; } 
             .ux-panel { padding: 24px 16px; border-radius: 24px; margin-bottom: 16px; }
+            /* ... остальные существующие мобильные стили ниже ... */
             .features-line { flex-direction: column; gap: 12px; white-space: normal !important; flex-wrap: wrap !important; }
             .cta-group { flex-direction: column; gap: 10px; width: 100%; margin-top: 24px; }
             .btn-primary, .btn-secondary { width: 100%; text-align: center; justify-content: center; }
