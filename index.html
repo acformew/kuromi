@@ -2739,16 +2739,23 @@
                 return;
             }
 
+            if (!currentUserSession || !currentUserSession.user) {
+                customAlert("🔒 Ошибка авторизации", "Сессия истекла. Пожалуйста, войдите через Discord заново.");
+                return;
+            }
+
             submitBtn.disabled = true;
             submitBtn.innerText = "Отправка...";
             submitBtn.style.opacity = "0.6";
 
             try {
-                const { data: existingApp } = await supabaseClient
+                const { data: existingApp, error: selectError } = await supabaseClient
                     .from('server_applications')
                     .select('id')
                     .eq('user_id', currentUserSession.user.id)
                     .maybeSingle();
+
+                if (selectError) throw selectError;
 
                 if (existingApp) {
                     customAlert("👑 Информация", "Вы уже успешно отправляли анкету ранее. Пожалуйста, ожидайте вердикта администрации в Telegram!");
@@ -2756,7 +2763,7 @@
                     return;
                 }
 
-                const { error } = await supabaseClient
+                const { error: insertError } = await supabaseClient
                     .from('server_applications')
                     .insert({
                         user_id: currentUserSession.user.id,
@@ -2766,9 +2773,10 @@
                         plans: plans
                     });
 
-                if (error) throw error;
+                if (insertError) throw insertError;
 
                 closeApplicationModal();
+
                 openCustomModal({
                     title: "🎉 Анкета отправлена!",
                     text: `Ваша заявка успешно сохранена.<br><br>
@@ -2793,8 +2801,8 @@
                 });
 
             } catch (e) {
-                console.error(e);
-                customAlert("❌ Ошибка отправки", "Не удалось сохранить анкету из-за сбоя сети. Пожалуйста, попробуйте позже.");
+                console.error("Ошибка при отправке анкеты:", e);
+                customAlert("❌ Ошибка отправки", "Не удалось сохранить анкету: " + (e.message || "сбой сети") + ". Проверьте консоль (F12).");
             } finally {
                 submitBtn.disabled = false;
                 submitBtn.innerText = "Отправить анкету";
@@ -5364,60 +5372,6 @@
             card.style.transform = 'translateY(30px) scale(0.95)';
             card.style.opacity = '0';
             setTimeout(() => { overlay.style.display = 'none'; }, 250);
-        }
-
-        async function submitServerApplication() {
-            const nick = document.getElementById('app-mc-nick').value.trim();
-            const license = document.getElementById('app-has-license').value;
-            const tg = document.getElementById('app-tg-contact').value.trim();
-            const plans = document.getElementById('app-plans').value.trim();
-            const submitBtn = document.getElementById('app-submit-btn');
-
-            if (!nick || !tg || !plans) {
-                customAlert("⚠️ Ошибка заполнения", "Пожалуйста, заполните абсолютно все текстовые поля анкеты куратора!");
-                return;
-            }
-
-            submitBtn.disabled = true;
-            submitBtn.innerText = "Отправка...";
-            submitBtn.style.opacity = "0.6";
-
-            try {
-                const { data: existingApp } = await supabaseClient
-                    .from('server_applications')
-                    .select('id')
-                    .eq('user_id', currentUserSession.user.id)
-                    .maybeSingle();
-
-                if (existingApp) {
-                    customAlert("👑 Информация", "Вы уже успешно отправляли анкету ранее. Пожалуйста, ожидайте вердикта администрации в Telegram!");
-                    closeApplicationModal();
-                    return;
-                }
-
-                const { error } = await supabaseClient
-                    .from('server_applications')
-                    .insert({
-                        user_id: currentUserSession.user.id,
-                        minecraft_name: nick,
-                        has_license: license,
-                        telegram_contact: tg,
-                        plans: plans
-                    });
-
-                if (error) throw error;
-
-                closeApplicationModal();
-                customAlert("🎉 Успешно отправлено!", "Ваша анкета успешно сохранена и передана кураторам KuromiSMP. Мы свяжемся с вами в Telegram после проверки!");
-
-            } catch (e) {
-                console.error(e);
-                customAlert("❌ Ошибка отправки", "Не удалось сохранить анкету из-за сбоя сети. Пожалуйста, попробуйте позже.");
-            } finally {
-                submitBtn.disabled = false;
-                submitBtn.innerText = "Отправить анкету";
-                submitBtn.style.opacity = "1";
-            }
         }
 
         /* --- ФУНКЦИОНАЛ ФОРУМА С МИКРО-АНИМАЦИЯМИ И САЛЮТОМ ИСКР --- */
