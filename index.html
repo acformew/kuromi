@@ -2420,7 +2420,16 @@
                 const el = document.getElementById(SECTION_NAV_MAP[key].navId);
                 if (!el) return;
                 const allowed = canAccessSection(key);
-                el.style.display = allowed ? '' : 'none';
+
+                // Особенность для черного рынка: картинка уха остается видимой, но становится некликабельной
+                if (key === 'blackmarket') {
+                    el.style.display = ''; 
+                    el.style.pointerEvents = allowed ? 'auto' : 'none';
+                    el.style.cursor = allowed ? 'pointer' : 'default';
+                } else {
+                    el.style.display = allowed ? '' : 'none';
+                }
+
                 if (allowed && sectionVisibilityMap[key] === 'moderators_only') {
                     el.title = 'Скрыто от игроков — сейчас виден только модераторам';
                     el.style.outline = '1px dashed rgba(255, 0, 127, 0.55)';
