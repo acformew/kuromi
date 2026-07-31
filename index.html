@@ -6162,15 +6162,16 @@ async function toggleSectionDisabled(key) {
         /* ---------- ПЕРЕКЛЮЧЕНИЕ ПОДВКЛАДОК АДМИНКИ ---------- */
 
         function switchAdminTab(tab) {
-            currentAdminTab = tab;
-            ['shop', 'players', 'logs'].forEach(t => {
-                const btn = document.getElementById('atab-' + t);
-                if (btn) btn.classList.toggle('active', t === tab);
-            });
-            if (tab === 'shop') renderAdminShopTab();
-            if (tab === 'players') renderAdminPlayersTab();
-            if (tab === 'logs') renderAdminLogsTab();
-        }
+    currentAdminTab = tab;
+    ['shop', 'players', 'logs', 'sections'].forEach(t => {
+        const btn = document.getElementById('atab-' + t);
+        if (btn) btn.classList.toggle('active', t === tab);
+    });
+    if (tab === 'shop') renderAdminShopTab();
+    if (tab === 'players') renderAdminPlayersTab();
+    if (tab === 'logs') renderAdminLogsTab();
+    if (tab === 'sections') renderAdminSectionsTab();
+}
 
         /* ================= МАГАЗИН (АДМИН) ================= */
 
