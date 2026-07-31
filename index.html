@@ -3321,18 +3321,22 @@
         let mapPendingClaim = null;
 
         function openWorldMap() {
-            const overlay = document.getElementById('map-fullpage');
-            if (!overlay) return;
-            overlay.classList.add('active');
-            document.body.style.overflow = 'hidden';
-            if (!mapInitialized) {
-                initWorldMap();
-                mapInitialized = true;
-            }
-            requestAnimationFrame(mapFitToScreen);
-            loadTerritoryClaims();
-            if (window.lucide) lucide.createIcons();
-        }
+    if (!isUserModerator && disabledSections.includes('map')) {
+        customAlert("🔒 Раздел отключен", "Карта мира временно отключена администрацией.");
+        return;
+    }
+    const overlay = document.getElementById('map-fullpage');
+    if (!overlay) return;
+    overlay.classList.add('active');
+    document.body.style.overflow = 'hidden';
+    if (!mapInitialized) {
+        initWorldMap();
+        mapInitialized = true;
+    }
+    requestAnimationFrame(mapFitToScreen);
+    loadTerritoryClaims();
+    if (window.lucide) lucide.createIcons();
+}
 
         function closeWorldMap() {
             const overlay = document.getElementById('map-fullpage');
