@@ -2769,7 +2769,28 @@
                 if (error) throw error;
 
                 closeApplicationModal();
-                customAlert("🎉 Успешно отправлено!", "Ваша анкета успешно сохранена и передана кураторам KuromiSMP. Мы свяжемся с вами в Telegram после проверки!");
+                openCustomModal({
+                    title: "🎉 Анкета отправлена!",
+                    text: `Ваша заявка успешно сохранена.<br><br>
+                           <b style="color: var(--accent-pink);">ОБЯЗАТЕЛЬНЫЙ ШАГ:</b><br>
+                           Из-за ограничений Telegram мы не можем писать пользователям первыми. Напишите любой текст (например, свой ник) в диалог поддержки, чтобы мы смогли выслать вам решение по заявке.`,
+                    showInput: false,
+                    buttons: [
+                        {
+                            text: "Позже",
+                            className: "btn-secondary",
+                            action: () => true
+                        },
+                        {
+                            text: "Написать в @kuromi_support →",
+                            className: "btn-primary",
+                            action: () => {
+                                window.open('https://t.me/kuromi_support', '_blank');
+                                return true;
+                            }
+                        }
+                    ]
+                });
 
             } catch (e) {
                 console.error(e);
