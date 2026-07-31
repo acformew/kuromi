@@ -3723,14 +3723,18 @@
         }
 
         function openBlackMarket() {
-            const overlay = document.getElementById('bm-fullpage');
-            if (!overlay) return;
-            overlay.classList.add('active');
-            document.body.style.overflow = 'hidden';
-            loadOnlinePlayersForBounty();
-            loadBlackMarketBounties();
-            if (window.lucide) lucide.createIcons();
-        }
+    if (!isUserModerator && disabledSections.includes('blackmarket')) {
+        customAlert("🔒 Раздел отключен", "Чёрный рынок временно отключен администрацией.");
+        return;
+    }
+    const overlay = document.getElementById('bm-fullpage');
+    if (!overlay) return;
+    overlay.classList.add('active');
+    document.body.style.overflow = 'hidden';
+    loadOnlinePlayersForBounty();
+    loadBlackMarketBounties();
+    if (window.lucide) lucide.createIcons();
+}
 
         function closeBlackMarket() {
             const overlay = document.getElementById('bm-fullpage');
