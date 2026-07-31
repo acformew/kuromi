@@ -1704,7 +1704,7 @@
 <body>
 
     <header>
-        <img src="LogoKuromi.png" alt="Logo Left" class="logo-img-left" onclick="openBlackMarket()">
+        <img src="LogoKuromi.png" alt="Logo Left" class="logo-img-left" id="bm-trigger-logo" onclick="openBlackMarket()">
         <img src="LogoKuromi.png" alt="Logo Right" class="logo-img-right">
         
         <a href="#" class="logo-text" onclick="switchTab('home')">
@@ -1716,7 +1716,7 @@
             <button id="tab-rules" onclick="switchTab('rules')">Правила</button>
             <button id="tab-players" onclick="switchTab('players')">Игроки</button>
             <button id="tab-mechanics" onclick="switchTab('mechanics')">Вики</button>
-            <button onclick="openWorldMap()">Карта</button>
+            <button id="tab-map" onclick="openWorldMap()">Карта</button>
             <button id="tab-donate" onclick="switchTab('donate')">Донат</button>
         </nav>
     </header>
@@ -2270,8 +2270,8 @@
                 <div class="admin-subnav">
                     <button id="atab-shop" onclick="switchAdminTab('shop')"><i data-lucide="store" style="width:16px;height:16px;"></i> Магазин</button>
                     <button id="atab-players" onclick="switchAdminTab('players')"><i data-lucide="users" style="width:16px;height:16px;"></i> Игроки</button>
-                    <button id="atab-logs" onclick="switchAdminTab('logs')"><i data-lucide="scroll-text" style="width:16px;height:16px;"></i> Журнал</button>
                     <button id="atab-sections" onclick="switchAdminTab('sections')"><i data-lucide="eye-off" style="width:16px;height:16px;"></i> Разделы</button>
+                    <button id="atab-logs" onclick="switchAdminTab('logs')"><i data-lucide="scroll-text" style="width:16px;height:16px;"></i> Журнал</button>
                 </div>
 
                 <div id="admin-tab-content"></div>
@@ -2384,6 +2384,65 @@
         let currentUserSession = null;
         let currentUserLinkedData = null; 
         let isUserModerator = false;
+        let sectionVisibilityMap = {};
+
+        /* ================= ВИДИМОСТЬ РАЗДЕЛОВ САЙТА ================= */
+
+        const SECTION_LABELS = {
+            join: 'Как попасть на сервер',
+            rules: 'Правила',
+            players: 'Игроки / Статистика',
+            mechanics: 'Вики / Механики',
+            donate: 'Донат / Магазин',
+            forum: 'Форум',
+            map: 'Карта мира',
+            blackmarket: 'Чёрный рынок'
+        };
+
+        const SECTION_NAV_MAP = {
+            join: { navId: 'tab-join' },
+            rules: { navId: 'tab-rules' },
+            players: { navId: 'tab-players' },
+            mechanics: { navId: 'tab-mechanics' },
+            donate: { navId: 'tab-donate' },
+            forum: { navId: 'forum-fixed-btn' },
+            map: { navId: 'tab-map' },
+            blackmarket: { navId: 'bm-trigger-logo' }
+        };
+
+        function canAccessSection(key) {
+            const vis = sectionVisibilityMap[key] || 'visible';
+            return vis === 'visible' || !!isUserModerator;
+        }
+
+        function applySectionVisibility() {
+            Object.keys(SECTION_NAV_MAP).forEach(key => {
+                const el = document.getElementById(SECTION_NAV_MAP[key].navId);
+                if (!el) return;
+                const allowed = canAccessSection(key);
+                el.style.display = allowed ? '' : 'none';
+                if (allowed && sectionVisibilityMap[key] === 'moderators_only') {
+                    el.title = 'Скрыто от игроков — сейчас виден только модераторам';
+                    el.style.outline = '1px dashed rgba(255, 0, 127, 0.55)';
+                    el.style.outlineOffset = '3px';
+                } else {
+                    el.title = '';
+                    el.style.outline = '';
+                }
+            });
+        }
+
+        async function loadSectionVisibility() {
+            try {
+                const { data, error } = await supabaseClient.from('site_sections').select('*');
+                if (error) throw error;
+                sectionVisibilityMap = {};
+                (data || []).forEach(row => { sectionVisibilityMap[row.key] = row.visibility; });
+            } catch (e) {
+                console.error('[SectionVisibility] Не удалось загрузить видимость разделов (проверьте таблицу site_sections):', e);
+            }
+            applySectionVisibility();
+        }
 
         /* --- УНИВЕРСАЛЬНЫЙ МОДУЛЬ ДИАЛОГОВЫХ ОКОН С ИСПРАВЛЕННЫМ ВЫРАВНИВАНИЕМ И ПЛЕЙСХОЛДЕРОМ --- */
         const EMOJI_ICON_MAP = {
@@ -3321,22 +3380,22 @@
         let mapPendingClaim = null;
 
         function openWorldMap() {
-    if (!isUserModerator && disabledSections.includes('map')) {
-        customAlert("🔒 Раздел отключен", "Карта мира временно отключена администрацией.");
-        return;
-    }
-    const overlay = document.getElementById('map-fullpage');
-    if (!overlay) return;
-    overlay.classList.add('active');
-    document.body.style.overflow = 'hidden';
-    if (!mapInitialized) {
-        initWorldMap();
-        mapInitialized = true;
-    }
-    requestAnimationFrame(mapFitToScreen);
-    loadTerritoryClaims();
-    if (window.lucide) lucide.createIcons();
-}
+            if (!canAccessSection('map')) {
+                customAlert('🔒 Карта скрыта', 'Карта мира сейчас в разработке и доступна только модераторам сервера.');
+                return;
+            }
+            const overlay = document.getElementById('map-fullpage');
+            if (!overlay) return;
+            overlay.classList.add('active');
+            document.body.style.overflow = 'hidden';
+            if (!mapInitialized) {
+                initWorldMap();
+                mapInitialized = true;
+            }
+            requestAnimationFrame(mapFitToScreen);
+            loadTerritoryClaims();
+            if (window.lucide) lucide.createIcons();
+        }
 
         function closeWorldMap() {
             const overlay = document.getElementById('map-fullpage');
@@ -3723,18 +3782,18 @@
         }
 
         function openBlackMarket() {
-    if (!isUserModerator && disabledSections.includes('blackmarket')) {
-        customAlert("🔒 Раздел отключен", "Чёрный рынок временно отключен администрацией.");
-        return;
-    }
-    const overlay = document.getElementById('bm-fullpage');
-    if (!overlay) return;
-    overlay.classList.add('active');
-    document.body.style.overflow = 'hidden';
-    loadOnlinePlayersForBounty();
-    loadBlackMarketBounties();
-    if (window.lucide) lucide.createIcons();
-}
+            if (!canAccessSection('blackmarket')) {
+                customAlert('🔒 Чёрный рынок скрыт', 'Этот раздел сейчас доступен только модераторам сервера.');
+                return;
+            }
+            const overlay = document.getElementById('bm-fullpage');
+            if (!overlay) return;
+            overlay.classList.add('active');
+            document.body.style.overflow = 'hidden';
+            loadOnlinePlayersForBounty();
+            loadBlackMarketBounties();
+            if (window.lucide) lucide.createIcons();
+        }
 
         function closeBlackMarket() {
             const overlay = document.getElementById('bm-fullpage');
@@ -3749,8 +3808,8 @@
             if (!wrapper) return;
 
             try {
-                await loadSectionSettings(); // <--- ВСТАВИТЬ СЮДА
                 const { data: { session }, error: sessionError } = await supabaseClient.auth.getSession();
+                if (sessionError) throw sessionError;
 
                 if (!session || !session.user) {
                     currentUserSession = null;
@@ -4815,41 +4874,42 @@
             if (window.lucide) lucide.createIcons();
         }
 
+        const GATED_TAB_SECTIONS = ['join', 'rules', 'players', 'mechanics', 'donate', 'forum'];
+
         function switchTab(tabName) {
-    if (!isUserModerator && disabledSections.includes(tabName)) {
-        customAlert("🔒 Раздел отключен", "Этот раздел временно отключен администрацией.");
-        switchTab('home');
-        return;
-    }
+            if (GATED_TAB_SECTIONS.includes(tabName) && !canAccessSection(tabName)) {
+                customAlert('🔒 Раздел скрыт', 'Этот раздел сейчас доступен только модераторам сервера. Загляните позже!');
+                return;
+            }
 
-    document.querySelectorAll('.content-section').forEach(section => section.classList.remove('active'));
-    document.querySelectorAll('nav button').forEach(button => button.classList.remove('active'));
-    
-    const targetSection = document.getElementById(`section-${tabName}`);
-    if(targetSection) targetSection.classList.add('active');
-    const targetTabBtn = document.getElementById(`tab-${tabName}`);
-    if(targetTabBtn) targetTabBtn.classList.add('active');
-    
-    if(tabName === 'donate') { renderShopFront(); }
-    if(tabName === 'join') renderJoinPrices();
-    if(tabName === 'players') { if (window.lucide) lucide.createIcons(); renderPlayersList(); loadTopLeaderboards('public'); }
-    if(tabName === 'profile') loadProfileData();
-    if(tabName === 'forum') {
-        loadProfileData().then(() => {
-            loadForumFeed(false); 
-        });
-    }
-    if(tabName === 'admin') {
-        if (!isUserModerator) {
-            customAlert("🔒 Доступ закрыт", "Эта страница доступна только модераторам сервера.");
-            switchTab('home');
-            return;
+            document.querySelectorAll('.content-section').forEach(section => section.classList.remove('active'));
+            document.querySelectorAll('nav button').forEach(button => button.classList.remove('active'));
+            
+            const targetSection = document.getElementById(`section-${tabName}`);
+            if(targetSection) targetSection.classList.add('active');
+            const targetTabBtn = document.getElementById(`tab-${tabName}`);
+            if(targetTabBtn) targetTabBtn.classList.add('active');
+            
+            if(tabName === 'donate') { renderShopFront(); }
+            if(tabName === 'join') renderJoinPrices();
+            if(tabName === 'players') { if (window.lucide) lucide.createIcons(); renderPlayersList(); loadTopLeaderboards('public'); }
+            if(tabName === 'profile') loadProfileData();
+            if(tabName === 'forum') {
+                loadProfileData().then(() => {
+                    loadForumFeed(false); 
+                });
+            }
+            if(tabName === 'admin') {
+                if (!isUserModerator) {
+                    customAlert("🔒 Доступ закрыт", "Эта страница доступна только модераторам сервера.");
+                    switchTab('home');
+                    return;
+                }
+                switchAdminTab(currentAdminTab || 'shop');
+            }
+
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
-        switchAdminTab(currentAdminTab || 'shop');
-    }
-
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-}
 
         function copyIp(ip) {
             navigator.clipboard.writeText(ip);
@@ -5809,6 +5869,13 @@
                 if (activeSection && activeSection.classList.contains('active')) switchTab('home');
             }
 
+            applySectionVisibility();
+            const activeGatedTab = GATED_TAB_SECTIONS.find(key => {
+                const sec = document.getElementById(`section-${key}`);
+                return sec && sec.classList.contains('active');
+            });
+            if (activeGatedTab && !canAccessSection(activeGatedTab)) switchTab('home');
+
             const container = document.getElementById('news-admin-container');
             if (!container) return;
 
@@ -5945,6 +6012,7 @@
         loadProfileData().then(() => {
             loadNewsFeed();
         });
+        loadSectionVisibility();
 
         window.onload = () => {
             if (window.lucide) lucide.createIcons();
@@ -5958,172 +6026,7 @@
            admin_audit_logs и доп. колонок в linked_accounts / wallet_transactions.
            См. schema_admin.sql — выполните его в Supabase перед использованием.
            ================================================================ */
-/* ================================================================
-   ФУНКЦИОНАЛ ОТКЛЮЧЕНИЯ И СКРЫТИЯ РАЗДЕЛОВ ДЛЯ ОБЫЧНЫХ ПОЛЬЗОВАТЕЛЕЙ
-   ================================================================ */
-let disabledSections = [];
 
-const ALL_SECTIONS_CONFIG = [
-    { key: 'home', name: 'Главная', btnId: 'tab-home', allowDisable: false },
-    { key: 'join', name: 'Как попасть', btnId: 'tab-join', allowDisable: true },
-    { key: 'rules', name: 'Правила', btnId: 'tab-rules', allowDisable: true },
-    { key: 'players', name: 'Игроки', btnId: 'tab-players', allowDisable: true },
-    { key: 'mechanics', name: 'Вики', btnId: 'tab-mechanics', allowDisable: true },
-    { key: 'map', name: 'Карта', btnId: 'tab-map', allowDisable: true },
-    { key: 'donate', name: 'Донат', btnId: 'tab-donate', allowDisable: true },
-    { key: 'forum', name: 'Форум', btnId: 'forum-fixed-btn', allowDisable: true }
-];
-
-async function loadSectionSettings() {
-    try {
-        const { data, error } = await supabaseClient
-            .from('site_settings')
-            .select('value')
-            .eq('key', 'disabled_sections')
-            .maybeSingle();
-        
-        if (data && data.value) {
-            disabledSections = Array.isArray(data.value) ? data.value : JSON.parse(data.value);
-            localStorage.setItem('kuromi_disabled_sections', JSON.stringify(disabledSections));
-        } else {
-            const saved = localStorage.getItem('kuromi_disabled_sections');
-            if (saved) disabledSections = JSON.parse(saved);
-        }
-    } catch (e) {
-        console.error('Ошибка при загрузке настроек разделов:', e);
-        const saved = localStorage.getItem('kuromi_disabled_sections');
-        if (saved) disabledSections = JSON.parse(saved);
-    }
-    applySectionVisibility();
-}
-
-async function saveSectionSettings() {
-    localStorage.setItem('kuromi_disabled_sections', JSON.stringify(disabledSections));
-    try {
-        await supabaseClient
-            .from('site_settings')
-            .upsert({ key: 'disabled_sections', value: disabledSections, updated_at: new Date().toISOString() }, { onConflict: 'key' });
-    } catch (e) {
-        console.error('Не удалось сохранить настройки разделов в Supabase:', e);
-    }
-    applySectionVisibility();
-}
-
-function applySectionVisibility() {
-    ALL_SECTIONS_CONFIG.forEach(sec => {
-        if (!sec.allowDisable) return;
-        
-        let btnEl = null;
-        if (sec.key === 'map') {
-            btnEl = document.querySelector('nav button[onclick="openWorldMap()"]');
-        } else {
-            btnEl = document.getElementById(sec.btnId);
-        }
-
-        const isDisabled = disabledSections.includes(sec.key);
-
-        if (btnEl) {
-            if (isDisabled) {
-                if (isUserModerator) {
-                    btnEl.style.display = (sec.key === 'forum') ? 'flex' : 'inline-block';
-                    btnEl.style.opacity = '0.45';
-                    btnEl.title = 'Раздел отключен для обычных пользователей (доступен модераторам)';
-                } else {
-                    btnEl.style.display = 'none';
-                }
-            } else {
-                btnEl.style.display = (sec.key === 'forum') ? 'flex' : 'inline-block';
-                btnEl.style.opacity = '1';
-                btnEl.title = '';
-            }
-        }
-    });
-
-    const activeSec = document.querySelector('.content-section.active');
-    if (activeSec && !isUserModerator) {
-        const secId = activeSec.id.replace('section-', '');
-        if (disabledSections.includes(secId)) {
-            switchTab('home');
-        }
-    }
-}
-
-function renderAdminSectionsTab() {
-    const container = document.getElementById('admin-tab-content');
-    if (!container) return;
-
-    let html = `
-        <div style="margin-bottom: 22px; text-align: left;">
-            <div class="admin-field-label" style="font-size:0.85rem; color:#fff; margin-bottom: 6px;">
-                Управление видимостью разделов сайта
-            </div>
-            <p style="font-size: 0.86rem; color: var(--text-muted); line-height: 1.5;">
-                Отключенные разделы скрываются из меню для обычных пользователей. Модераторы видят их со сниженной прозрачностью и сохраняют полный доступ.
-            </p>
-        </div>
-        <div style="display: flex; flex-direction: column; gap: 12px; width: 100%;">
-    `;
-
-    ALL_SECTIONS_CONFIG.forEach(sec => {
-        if (!sec.allowDisable) return;
-        const isDisabled = disabledSections.includes(sec.key);
-        const statusLabel = isDisabled ? 'Скрыт (только модераторы)' : 'Виден всем';
-        const pillClass = isDisabled ? 'hidden' : 'active';
-        const icon = isDisabled ? 'eye-off' : 'eye';
-
-        html += `
-            <div class="admin-card" style="display: flex; align-items: center; justify-content: space-between; gap: 14px; padding: 18px 22px; flex-wrap: wrap;">
-                <div style="display: flex; align-items: center; gap: 14px;">
-                    <span class="icon-badge ${isDisabled ? 'b-mono' : 'b-purple'}" style="width:36px;height:36px;">
-                        <i data-lucide="${icon}"></i>
-                    </span>
-                    <div style="text-align: left;">
-                        <div style="font-weight: 700; font-size: 1rem; color: #fff;">${escapeHtml(sec.name)}</div>
-                        <div style="font-size: 0.78rem; color: var(--text-muted);">Идентификатор: ${sec.key}</div>
-                    </div>
-                </div>
-                <div style="display: flex; align-items: center; gap: 12px; margin-left: auto;">
-                    <span class="status-pill ${pillClass}">
-                        <i data-lucide="${icon}"></i> ${statusLabel}
-                    </span>
-                    <button class="btn-mini ${isDisabled ? 'save' : 'danger'}" onclick="toggleSectionDisabled('${sec.key}')">
-                        ${isDisabled ? 'Включить раздел' : 'Отключить'}
-                    </button>
-                </div>
-            </div>
-        `;
-    });
-
-    html += `</div>`;
-    container.innerHTML = html;
-    if (window.lucide) lucide.createIcons();
-}
-
-async function toggleSectionDisabled(key) {
-    const idx = disabledSections.indexOf(key);
-    const wasDisabled = idx !== -1;
-    if (wasDisabled) {
-        disabledSections.splice(idx, 1);
-    } else {
-        disabledSections.push(key);
-    }
-
-    await saveSectionSettings();
-
-    const secObj = ALL_SECTIONS_CONFIG.find(s => s.key === key);
-    const secName = secObj ? secObj.name : key;
-
-    await logAdminAction({
-        action_type: 'section_visibility_change',
-        severity: 'medium',
-        target_type: 'section',
-        target_label: secName,
-        reason: wasDisabled ? 'Раздел включен' : 'Раздел скрыт',
-        details: { section: key, disabled: !wasDisabled }
-    });
-
-    renderAdminSectionsTab();
-}
         let currentAdminTab = 'shop';
         let adminShopItemsCache = {};
         let currentLogFilter = 'all';
@@ -6176,16 +6079,73 @@ async function toggleSectionDisabled(key) {
         /* ---------- ПЕРЕКЛЮЧЕНИЕ ПОДВКЛАДОК АДМИНКИ ---------- */
 
         function switchAdminTab(tab) {
-    currentAdminTab = tab;
-    ['shop', 'players', 'logs', 'sections'].forEach(t => {
-        const btn = document.getElementById('atab-' + t);
-        if (btn) btn.classList.toggle('active', t === tab);
-    });
-    if (tab === 'shop') renderAdminShopTab();
-    if (tab === 'players') renderAdminPlayersTab();
-    if (tab === 'logs') renderAdminLogsTab();
-    if (tab === 'sections') renderAdminSectionsTab();
-}
+            currentAdminTab = tab;
+            ['shop', 'players', 'sections', 'logs'].forEach(t => {
+                const btn = document.getElementById('atab-' + t);
+                if (btn) btn.classList.toggle('active', t === tab);
+            });
+            if (tab === 'shop') renderAdminShopTab();
+            if (tab === 'players') renderAdminPlayersTab();
+            if (tab === 'sections') renderAdminSectionsTab();
+            if (tab === 'logs') renderAdminLogsTab();
+        }
+
+        /* ================= ВИДИМОСТЬ РАЗДЕЛОВ (АДМИН) ================= */
+
+        async function renderAdminSectionsTab() {
+            const c = document.getElementById('admin-tab-content');
+            c.innerHTML = `
+                <div style="margin-bottom:18px;">
+                    <div class="admin-field-label" style="margin:0 0 8px 0; font-size:0.8rem;">Видимость разделов сайта</div>
+                    <div style="font-size:0.82rem; color:var(--text-muted); line-height:1.55;">
+                        Раздел, помеченный «Только модераторам», полностью скрывается от обычных игроков (кнопка в шапке пропадает, а прямой переход блокируется) и остаётся доступным только пользователям из таблицы <b style="color:#b388ff;">forum_moderators</b>. Удобно, пока раздел в разработке.
+                    </div>
+                </div>
+                <div id="admin-sections-container"><div style="color:var(--text-muted); padding:20px 0;">Загрузка...</div></div>
+            `;
+            if (window.lucide) lucide.createIcons();
+            await loadAdminSectionsList();
+        }
+
+        async function loadAdminSectionsList() {
+            const container = document.getElementById('admin-sections-container');
+            if (!container) return;
+            try {
+                const { data, error } = await supabaseClient.from('site_sections').select('*');
+                if (error) throw error;
+                const rows = data || [];
+                container.innerHTML = Object.keys(SECTION_LABELS).map(key => {
+                    const row = rows.find(r => r.key === key);
+                    const vis = row ? row.visibility : 'visible';
+                    return `
+                    <div style="display:flex; align-items:center; justify-content:space-between; gap:14px; flex-wrap:wrap; padding:14px 18px; border:1px solid rgba(255,255,255,0.06); border-radius:16px; margin-bottom:10px; background: rgba(255,255,255,0.015);">
+                        <div style="font-weight:600; font-size:0.92rem; color:#fff;">${escapeHtml(SECTION_LABELS[key])}</div>
+                        <select class="admin-select" style="min-width:230px;" onchange="saveSectionVisibility('${key}', this.value)">
+                            <option value="visible" ${vis === 'visible' ? 'selected' : ''}>👁️ Виден всем игрокам</option>
+                            <option value="moderators_only" ${vis === 'moderators_only' ? 'selected' : ''}>🔒 Только модераторам</option>
+                        </select>
+                    </div>`;
+                }).join('');
+            } catch (e) {
+                console.error(e);
+                container.innerHTML = '<div style="color:#ff5c7a; padding:20px 0; font-size:0.88rem; line-height:1.5;">Не удалось загрузить таблицу <b>site_sections</b>. Убедитесь, что она создана в Supabase (см. инструкцию schema_sections.sql).</div>';
+            }
+        }
+
+        async function saveSectionVisibility(key, value) {
+            try {
+                const { error } = await supabaseClient.from('site_sections').upsert({ key, visibility: value, updated_at: new Date().toISOString() }, { onConflict: 'key' });
+                if (error) throw error;
+                sectionVisibilityMap[key] = value;
+                applySectionVisibility();
+                logAdminAction({ action_type: 'section_visibility_change', severity: 'medium', target_type: 'site_section', target_label: SECTION_LABELS[key], details: { key, visibility: value } });
+                customAlert('✅ Сохранено', `Раздел «${SECTION_LABELS[key]}» теперь ${value === 'visible' ? 'виден всем игрокам' : 'виден только модераторам'}.`);
+            } catch (e) {
+                console.error(e);
+                customAlert('❌ Ошибка', 'Не удалось сохранить видимость раздела. Проверьте RLS-политику таблицы site_sections.');
+                await loadAdminSectionsList();
+            }
+        }
 
         /* ================= МАГАЗИН (АДМИН) ================= */
 
