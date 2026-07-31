@@ -3749,8 +3749,8 @@
             if (!wrapper) return;
 
             try {
+                await loadSectionSettings(); // <--- ВСТАВИТЬ СЮДА
                 const { data: { session }, error: sessionError } = await supabaseClient.auth.getSession();
-                if (sessionError) throw sessionError;
 
                 if (!session || !session.user) {
                     currentUserSession = null;
