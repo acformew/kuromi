@@ -3625,6 +3625,36 @@ async function loadSectionVisibility() {
             if (document.getElementById('map-fullpage')?.classList.contains('active')) mapPositionRightPanel();
         });
 
+        // Если currentUserLinkedData ещё не успел загрузиться (loadProfileData()
+        // асинхронный и мог не завершиться к моменту клика) — проверяем напрямую,
+        // а не молча считаем игрока непривязанным.
+        async function mapEnsureLinkedIdentity() {
+            if (currentUserLinkedData) return currentUserLinkedData;
+            try {
+                const { data: { session } } = await supabaseClient.auth.getSession();
+                if (!session || !session.user) return null;
+
+                const discordId = session.user.user_metadata.provider_id || session.user.id;
+                const { data: linkedData, error } = await supabaseClient
+                    .from('linked_accounts')
+                    .select('minecraft_uuid, minecraft_name')
+                    .eq('discord_id', discordId)
+                    .maybeSingle();
+                if (error || !linkedData) return null;
+
+                currentUserSession = session;
+                currentUserLinkedData = {
+                    minecraft_uuid: linkedData.minecraft_uuid,
+                    minecraft_name: linkedData.minecraft_name,
+                    discord_id: discordId
+                };
+                return currentUserLinkedData;
+            } catch (e) {
+                console.error('Не удалось проверить привязку аккаунта:', e);
+                return null;
+            }
+        }
+
         function mapPositionRightPanel() {
             const left = document.querySelector('.map-panel-left');
             const right = document.querySelector('.map-panel-right');
@@ -3795,8 +3825,9 @@ async function loadSectionVisibility() {
                 });
             });
 
-            document.getElementById('map-claim-cta').onclick = () => {
-                if (!currentUserLinkedData) {
+            document.getElementById('map-claim-cta').onclick = async () => {
+                const linked = await mapEnsureLinkedIdentity();
+                if (!linked) {
                     customAlert('🔒 Авторизация', 'Авторизуйтесь через Discord и привяжите Minecraft-аккаунт, чтобы занимать территории.');
                     return;
                 }
@@ -4049,7 +4080,9 @@ async function loadSectionVisibility() {
             const title = document.getElementById('map-claim-title').value.trim();
             const desc = document.getElementById('map-claim-desc').value.trim();
             if (!title) { customAlert('❌ Ошибка', 'Введите название территории.'); return; }
-            if (!currentUserLinkedData) { customAlert('🔒 Авторизация', 'Авторизуйтесь через Discord и привяжите Minecraft-аккаунт.'); return; }
+
+            const linked = await mapEnsureLinkedIdentity();
+            if (!linked) { customAlert('🔒 Авторизация', 'Авторизуйтесь через Discord и привяжите Minecraft-аккаунт.'); return; }
 
             // Перепроверяем пересечение прямо перед отправкой — вдруг кто-то
             // другой занял это место, пока открыто окно названия/описания.
