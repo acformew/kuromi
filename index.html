@@ -3537,42 +3537,27 @@ async function loadSectionVisibility() {
             mapRenderOverlayPositions();
         }
 
-        function mapHash(x, y, seed) {
-            let n = (x * 374761393 + y * 668265263 + seed * 2147483647) | 0;
-            n = (n ^ (n >>> 13)) * 1274126177;
-            n = n ^ (n >>> 16);
-            return ((n >>> 0) % 100000) / 100000;
-        }
-        function mapSmoothNoise(x, y, seed) {
-            const xi = Math.floor(x), yi = Math.floor(y), xf = x - xi, yf = y - yi;
-            const v00 = mapHash(xi, yi, seed), v10 = mapHash(xi + 1, yi, seed), v01 = mapHash(xi, yi + 1, seed), v11 = mapHash(xi + 1, yi + 1, seed);
-            const i1 = v00 * (1 - xf) + v10 * xf, i2 = v01 * (1 - xf) + v11 * xf;
-            return i1 * (1 - yf) + i2 * yf;
-        }
-        function mapFbm(x, y) {
-            const octaves = [[0.01, 1], [0.025, 0.55], [0.06, 0.28], [0.14, 0.12]];
-            let total = 0, maxAmp = 0;
-            for (const [f, a] of octaves) { total += mapSmoothNoise(x * f, y * f, 7) * a; maxAmp += a; }
-            return total / maxAmp;
-        }
         function generateMapTerrain() {
             const canvas = document.getElementById('map-terrain-canvas');
-            const res = canvas.width;
+            canvas.width = 5000;
+            canvas.height = 5000;
+            
             const ctx = canvas.getContext('2d');
-            const img = ctx.createImageData(res, res);
-            const center = res / 2;
-            for (let y = 0; y < res; y++) {
-                for (let x = 0; x < res; x++) {
-                    const dx = (x - center) / center, dy = (y - center) / center;
-                    const edgeFalloff = Math.min(1, (dx * dx + dy * dy));
-                    let v = mapFbm(x, y) - edgeFalloff * 0.35;
-                    const land = v > 0.42;
-                    const i = (y * res + x) * 4;
-                    const c = land ? 8 : 234;
-                    img.data[i] = c; img.data[i + 1] = c; img.data[i + 2] = c + (land ? 4 : 6); img.data[i + 3] = 255;
+            const mapImage = new Image();
+            
+            // Если сохранил в .png или .jpg — замени расширение здесь
+            mapImage.src = 'map.jpg'; 
+
+            mapImage.onload = () => {
+                ctx.drawImage(mapImage, 0, 0, canvas.width, canvas.height);
+                if (typeof mapApplyTransform === 'function') {
+                    mapApplyTransform();
                 }
-            }
-            ctx.putImageData(img, 0, 0);
+            };
+
+            mapImage.onerror = () => {
+                console.error('Ошибка: файл карты не найден. Проверь путь и расширение файла.');
+            };
         }
 
         function mapFitToScreen() {
