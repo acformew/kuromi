@@ -1190,23 +1190,35 @@
         .map-claim-box {
             position: absolute; border: 2px solid var(--cat-color, var(--accent-pink));
             background: color-mix(in srgb, var(--cat-color, var(--accent-pink)) 18%, transparent);
-            cursor: pointer; pointer-events: auto;
+            cursor: pointer; pointer-events: auto; border-radius: 3px;
+            animation: mapClaimPop 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+            transition: background 0.15s ease, box-shadow 0.15s ease;
         }
-        .map-claim-box:hover { background: color-mix(in srgb, var(--cat-color, var(--accent-pink)) 32%, transparent); }
+        .map-claim-box:hover { background: color-mix(in srgb, var(--cat-color, var(--accent-pink)) 34%, transparent); box-shadow: 0 0 0 2px color-mix(in srgb, var(--cat-color) 60%, transparent); }
+        @keyframes mapClaimPop { from { opacity: 0; transform: scale(0.85); } to { opacity: 1; transform: scale(1); } }
 
         #map-preview-box {
             position: absolute; border: 2px dashed var(--accent-acid, #c6ff3d);
-            background: rgba(198,255,61,0.12); pointer-events: none; display: none;
+            background: rgba(198,255,61,0.12); pointer-events: none; display: none; border-radius: 3px;
         }
 
         #map-overlay-layer { position: absolute; inset: 0; pointer-events: none; }
         .map-claim-label {
             position: absolute; transform: translate(-50%,-100%);
-            background: rgba(5,3,8,0.85); border: 1px solid rgba(255,255,255,0.12); border-radius: 8px;
-            padding: 4px 9px; font-size: 0.72rem; font-weight: 600; white-space: nowrap; color: #fff;
+            background: rgba(5,3,8,0.88); border: 1px solid rgba(255,255,255,0.14); border-radius: 9px;
+            padding: 5px 10px; font-size: 0.74rem; font-weight: 700; white-space: nowrap; color: #fff;
             display: flex; align-items: center; gap: 6px;
+            animation: mapLabelIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) both;
         }
         .map-claim-label .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--cat-color); flex-shrink: 0; }
+        @keyframes mapLabelIn { from { opacity: 0; transform: translate(-50%,-90%) scale(0.7); } to { opacity: 1; transform: translate(-50%,-100%) scale(1); } }
+
+        #map-cursor-tooltip {
+            position: absolute; top: 0; left: 0; z-index: 25; pointer-events: none;
+            transform: translate(14px, -28px); background: rgba(5,3,8,0.88); border: 1px solid rgba(255,255,255,0.14);
+            border-radius: 8px; padding: 4px 9px; font-size: 0.72rem; font-weight: 700; color: var(--accent-acid, #c6ff3d);
+            font-variant-numeric: tabular-nums; white-space: nowrap; display: none;
+        }
 
         #map-search-marker {
             position: absolute; width: 0; height: 0; transform: translate(-50%,-100%);
@@ -1220,18 +1232,29 @@
         }
 
         .map-hud {
-            position: absolute; background: var(--bg-card); border: 1px solid rgba(255,255,255,0.06);
-            border-radius: 18px; backdrop-filter: blur(14px); color: #fff; z-index: 20;
+            position: absolute; background: linear-gradient(160deg, rgba(138,43,226,0.12), rgba(10,7,16,0.97) 60%), var(--bg-card);
+            border: 1px solid rgba(255,255,255,0.08); border-radius: 20px; overflow: hidden;
+            backdrop-filter: blur(14px); color: #fff; z-index: 20;
+            box-shadow: 0 20px 44px rgba(0,0,0,0.5);
+            animation: mapPanelIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) both;
         }
-        #map-panel-top { top: 16px; left: 16px; padding: 14px 16px; display: flex; flex-direction: column; gap: 10px; width: 250px; }
+        @keyframes mapPanelIn { from { opacity: 0; transform: translateY(-10px) scale(0.96); } to { opacity: 1; transform: none; } }
+        .map-hud-pattern { position: absolute; inset: 0; z-index: 0; display: flex; flex-wrap: wrap; overflow: hidden; pointer-events: none; color: #fff; opacity: 0.05; }
+        .map-hud > *:not(.map-hud-pattern) { position: relative; z-index: 1; }
+
+        .map-panel-left { top: 16px; left: 16px; padding: 16px; display: flex; flex-direction: column; gap: 12px; width: 250px; }
+        .map-panel-right { bottom: 16px; right: 16px; padding: 14px; display: flex; flex-direction: column; gap: 10px; align-items: stretch; }
+
         .map-exit-btn {
             display: flex; align-items: center; gap: 6px; background: rgba(255,255,255,0.05);
             border: 1px solid rgba(255,255,255,0.14); color: #fff; padding: 8px 14px; border-radius: 100px;
-            font-family: var(--font-sans); font-size: 0.78rem; font-weight: 600; cursor: pointer; transition: all 0.15s ease;
+            font-family: var(--font-sans); font-size: 0.78rem; font-weight: 600; cursor: pointer;
+            transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), border-color 0.15s ease, background 0.15s ease;
             align-self: flex-start;
         }
-        .map-exit-btn:hover { border-color: rgba(255,255,255,0.4); background: rgba(255,255,255,0.09); }
+        .map-exit-btn:hover { border-color: rgba(255,255,255,0.4); background: rgba(255,255,255,0.09); transform: translateX(-2px); }
         .map-exit-btn [data-lucide] { width: 13px; height: 13px; }
+
         #map-search-row { display: flex; gap: 6px; }
         #map-search-input {
             flex: 1; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
@@ -1241,34 +1264,49 @@
         #map-search-btn {
             background: var(--primary-purple); border: none; border-radius: 10px; color: #fff;
             padding: 0 12px; font-weight: 600; cursor: pointer; font-size: 0.85rem; display: flex; align-items: center;
+            transition: transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
+        #map-search-btn:hover { transform: scale(1.08); }
         #map-search-btn [data-lucide] { width: 15px; height: 15px; }
-        #map-coords-readout { font-size: 0.78rem; color: var(--text-muted); font-variant-numeric: tabular-nums; }
-        #map-coords-readout b { color: var(--accent-acid, #c6ff3d); font-weight: 700; }
 
-        #map-legend { display: flex; flex-direction: column; gap: 5px; margin-top: 2px; }
-        .map-legend-item { display: flex; align-items: center; gap: 7px; font-size: 0.74rem; color: var(--text-muted); }
-        .map-legend-item .dot { width: 8px; height: 8px; border-radius: 50%; }
-
-        #map-zoom-controls { position: absolute; bottom: 16px; left: 16px; display: flex; flex-direction: column; gap: 6px; z-index: 20; }
-        .map-zoom-btn {
-            width: 38px; height: 38px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.08);
-            background: var(--bg-card); color: #fff; font-size: 1.1rem; font-weight: 700; cursor: pointer;
+        .map-cities-btn {
+            display: flex; align-items: center; justify-content: center; gap: 7px;
+            background: rgba(198,255,61,0.08); border: 1px solid rgba(198,255,61,0.25); color: #d9ffa3;
+            padding: 9px 12px; border-radius: 12px; font-family: var(--font-sans); font-size: 0.8rem; font-weight: 600;
+            cursor: pointer; transition: all 0.15s ease;
         }
+        .map-cities-btn:hover { background: rgba(198,255,61,0.14); transform: translateY(-1px); }
+        .map-cities-btn [data-lucide] { width: 14px; height: 14px; }
+
+        #map-legend { display: flex; flex-direction: column; gap: 6px; margin-top: 2px; padding-top: 10px; border-top: 1px dashed rgba(255,255,255,0.08); }
+        .map-legend-item { display: flex; align-items: center; justify-content: space-between; font-size: 0.72rem; color: var(--text-muted); }
+        .map-legend-item .map-legend-name { display: flex; align-items: center; gap: 7px; }
+        .map-legend-item .dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+        .map-legend-item .map-legend-limit { font-variant-numeric: tabular-nums; opacity: 0.7; }
+
+        .map-zoom-controls { display: flex; gap: 6px; justify-content: flex-end; }
+        .map-zoom-btn {
+            width: 38px; height: 38px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1);
+            background: rgba(255,255,255,0.04); color: #fff; font-size: 1.1rem; font-weight: 700; cursor: pointer;
+            transition: transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.15s ease;
+        }
+        .map-zoom-btn:hover { background: rgba(255,255,255,0.1); transform: scale(1.08); }
 
         #map-claim-cta {
-            position: absolute; bottom: 16px; right: 16px; z-index: 20;
             background: linear-gradient(135deg, var(--primary-purple), var(--accent-pink));
             border: none; color: #fff; font-family: var(--font-sans); font-weight: 700; font-size: 0.9rem;
             padding: 14px 22px; border-radius: 16px; cursor: pointer; box-shadow: 0 8px 24px rgba(138,43,226,0.35);
-            display: flex; align-items: center; gap: 8px;
+            display: flex; align-items: center; justify-content: center; gap: 8px;
+            transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s ease;
         }
+        #map-claim-cta:hover { transform: translateY(-2px) scale(1.02); box-shadow: 0 12px 30px rgba(138,43,226,0.5); }
         #map-claim-cta [data-lucide] { width: 16px; height: 16px; }
 
         #map-claim-banner {
             position: absolute; top: 16px; left: 50%; transform: translateX(-50%); z-index: 20;
             background: var(--bg-card); border: 1px solid var(--accent-acid, #c6ff3d); border-radius: 14px;
             padding: 10px 18px; font-size: 0.82rem; display: none; align-items: center; gap: 14px; color: #fff;
+            animation: mapPanelIn 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) both;
         }
         #map-claim-banner button { background: rgba(255,255,255,0.08); border: none; color: #fff; border-radius: 8px; padding: 6px 12px; cursor: pointer; font-size: 0.78rem; }
 
@@ -1280,41 +1318,89 @@
         .map-modal-card {
             background: linear-gradient(160deg, rgba(138,43,226,0.14), rgba(16,11,28,0.99) 55%), rgba(16,11,28,0.98);
             border: 1px solid var(--primary-purple); border-radius: 24px;
-            width: min(420px,90vw); padding: 28px; color: #fff; text-align: left;
+            width: min(420px,90vw); max-height: 85vh; overflow-y: auto; padding: 28px; color: #fff; text-align: left;
+            position: relative; overflow-x: hidden;
+            animation: mapModalIn 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) both;
         }
-        .map-modal-card h3 { font-family: var(--font-display); font-size: 1.05rem; margin-bottom: 6px; }
+        @keyframes mapModalIn { from { opacity: 0; transform: scale(0.92) translateY(10px); } to { opacity: 1; transform: none; } }
+        .map-modal-pattern {
+            position: absolute; top: 0; left: 0; right: 0; height: 90px; z-index: 0;
+            display: flex; flex-wrap: wrap; overflow: hidden; pointer-events: none; color: #b985f4; opacity: 0.12;
+        }
+        .map-modal-pattern [data-lucide] { width: 22px; height: 22px; margin: 12px; }
+        .map-modal-card > *:not(.map-modal-pattern) { position: relative; z-index: 1; }
+        .map-modal-card h3 { font-family: var(--font-display); font-size: 1.05rem; margin-bottom: 6px; display: flex; align-items: center; gap: 6px; }
         .map-modal-card p.map-sub { color: var(--text-muted); font-size: 0.82rem; margin-bottom: 18px; }
+
         .map-cat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
         .map-cat-option {
             border: 1px solid rgba(255,255,255,0.1); border-radius: 14px; padding: 12px; cursor: pointer;
             display: flex; flex-direction: column; gap: 6px; background: rgba(255,255,255,0.03);
+            transition: transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1), border-color 0.15s ease, background 0.15s ease;
         }
+        .map-cat-option:hover { transform: translateY(-2px); }
         .map-cat-option.selected { border-color: var(--cat-color); background: color-mix(in srgb, var(--cat-color) 15%, transparent); }
         .map-cat-option .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--cat-color); }
         .map-cat-option .name { font-size: 0.85rem; font-weight: 600; }
+        .map-cat-option .map-cat-limit { font-size: 0.68rem; color: var(--text-muted); }
 
         .map-field { margin-bottom: 14px; }
         .map-field label { display: block; font-size: 0.78rem; color: var(--text-muted); margin-bottom: 6px; }
         .map-field input, .map-field textarea {
             width: 100%; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
             border-radius: 10px; padding: 10px 12px; color: #fff; font-family: var(--font-sans); font-size: 0.85rem;
+            box-sizing: border-box; transition: border-color 0.15s ease;
         }
+        .map-field input:focus, .map-field textarea:focus { border-color: var(--primary-purple); outline: none; }
         .map-field textarea { resize: vertical; min-height: 70px; }
 
         .map-modal-actions { display: flex; gap: 10px; margin-top: 6px; }
-        .map-btn-primary, .map-btn-ghost {
+        .map-btn-primary, .map-btn-ghost, .map-btn-danger {
             flex: 1; border: none; border-radius: 12px; padding: 12px; font-weight: 700; font-size: 0.85rem;
-            cursor: pointer; font-family: var(--font-sans);
+            cursor: pointer; font-family: var(--font-sans); display: flex; align-items: center; justify-content: center; gap: 6px;
+            transition: transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
+        .map-btn-primary:hover, .map-btn-ghost:hover, .map-btn-danger:hover { transform: translateY(-1px); }
         .map-btn-primary { background: linear-gradient(135deg, var(--primary-purple), var(--accent-pink)); color: #fff; }
         .map-btn-ghost { background: rgba(255,255,255,0.06); color: #fff; }
-        .map-btn-primary:disabled { opacity: 0.4; cursor: not-allowed; }
+        .map-btn-danger { background: rgba(255,70,70,0.12); border: 1px solid rgba(255,70,70,0.3); color: #ff8f8f; }
+        .map-btn-primary:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+        .map-btn-primary [data-lucide], .map-btn-danger [data-lucide] { width: 14px; height: 14px; }
 
-        .map-info-row { display: flex; justify-content: space-between; font-size: 0.8rem; color: var(--text-muted); margin-bottom: 4px; }
-        .map-info-row b { color: #fff; }
+        .map-info-head { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
+        .map-info-cat-badge {
+            width: 42px; height: 42px; border-radius: 12px; display: flex; align-items: center; justify-content: center;
+            background: color-mix(in srgb, var(--cat-color, var(--primary-purple)) 22%, transparent);
+            border: 1px solid color-mix(in srgb, var(--cat-color, var(--primary-purple)) 50%, transparent);
+            color: var(--cat-color, #fff); flex-shrink: 0;
+        }
+        .map-info-row {
+            display: flex; justify-content: space-between; align-items: center; font-size: 0.8rem; color: var(--text-muted);
+            padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+        .map-info-row span { display: flex; align-items: center; gap: 6px; }
+        .map-info-row b { color: #fff; font-variant-numeric: tabular-nums; }
+        .map-info-desc {
+            margin-top: 14px; font-size: 0.85rem; color: rgba(255,255,255,0.75); line-height: 1.6;
+            background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 12px;
+            padding: 12px 14px; white-space: pre-wrap; word-break: break-word;
+        }
+
+        #map-city-list { display: flex; flex-direction: column; gap: 8px; max-height: 320px; overflow-y: auto; margin-bottom: 10px; }
+        .map-city-item {
+            display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 12px;
+            background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); cursor: pointer;
+            transition: all 0.15s ease;
+        }
+        .map-city-item:hover { background: rgba(198,255,61,0.08); border-color: rgba(198,255,61,0.25); transform: translateX(3px); }
+        .map-city-item .dot { width: 9px; height: 9px; border-radius: 50%; background: #c6ff3d; flex-shrink: 0; }
+        .map-city-item .map-city-name { font-weight: 700; font-size: 0.88rem; flex: 1; }
+        .map-city-item .map-city-owner { font-size: 0.72rem; color: var(--text-muted); }
+        #map-city-empty { color: var(--text-muted); font-size: 0.85rem; padding: 20px 0; text-align: center; }
 
         @media (max-width: 640px) {
-            #map-panel-top { width: calc(100% - 32px); }
+            .map-panel-left { width: calc(100% - 32px); }
+            .map-panel-right { flex-direction: row; align-items: center; bottom: 12px; right: 12px; }
         }
 
         /* ===== Постоянный подвал: документы + поддержка (нужно банку/платёжке) ===== */
@@ -1394,13 +1480,8 @@
         }
 
         @media (max-width: 768px) {
-            .logo-img-left, .logo-img-right {
-                display: none;
-            }
-
             h1 { font-size: 1.8rem; } 
             .ux-panel { padding: 24px 16px; border-radius: 24px; margin-bottom: 16px; }
-            /* ... остальные существующие мобильные стили ниже ... */
             .features-line { flex-direction: column; gap: 12px; white-space: normal !important; flex-wrap: wrap !important; }
             .cta-group { flex-direction: column; gap: 10px; width: 100%; margin-top: 24px; }
             .btn-primary, .btn-secondary { width: 100%; text-align: center; justify-content: center; }
@@ -1718,7 +1799,6 @@
         <nav>
             <button id="tab-home" class="active" onclick="switchTab('home')">Главная</button>
             <button id="tab-join" onclick="switchTab('join')">Как попасть</button>
-            <button id="tab-rules" onclick="switchTab('rules')">Правила</button>
             <button id="tab-players" onclick="switchTab('players')">Игроки</button>
             <button id="tab-mechanics" onclick="switchTab('mechanics')">Вики</button>
             <button id="tab-map" onclick="openWorldMap()">Карта</button>
@@ -1749,7 +1829,7 @@
 
                 <div class="cta-group">
                     <button class="btn-primary" onclick="switchTab('join')">Начать выживание →</button>
-                    <button class="btn-secondary" id="server-ip" onclick="copyIp('play.kuromi.tech')">play.kuromi.tech</button>
+                    <button class="btn-secondary" id="server-ip" onclick="copyIp('kuromismp.20tps.ru')">kuromismp.20tps.ru</button>
                 </div>
             </div>
 
@@ -1827,24 +1907,6 @@
                         <h4>Информация о верификации</h4>
                         <p>Для игроков с официальной лицензией Minecraft доступ предоставляется бесплатно после подтверждения подлинности аккаунта. Для пользователей пиратских лаунчеров обязательно приобретение проходки. Это ограничение введено для обеспечения безопасности игрового процесса и защиты сервера от повторных заходов забаненных нарушителей.</p>
                     </div>
-                </div>
-            </div>
-        </div>
-
-        <div id="section-rules" class="content-section">
-            <div class="ux-panel">
-                <div class="panel-title">Регламент сообщества</div>
-                <div class="rule-node">
-                    <h3>01. Имущество и постройки</h3>
-                    <p>Любое несанкционированное изменение ландшафта, присвоение чужих ресурсов из сундуков, гриферство или разрушение чужих строений караются вечным баном. Все действия логируются на сервере.</p>
-                </div>
-                <div class="rule-node">
-                    <h3>02. Модификации игрового процесса</h3>
-                    <p>Запрещено использование чит-клиентов, текстур-паков типа X-Ray, скриптов, макросов или любых сторонних программ, дающих несправедливое превосходство в игровом процессе.</p>
-                </div>
-                <div class="rule-node">
-                    <h3>03. Взаимодействие в чате</h3>
-                    <p>Запрещен намеренный токсичный прессинг участников, деструктивное поведение, разжигание конфликтов и спам. Мы развиваем взрослое и комфортное комьюнити.</p>
                 </div>
             </div>
         </div>
@@ -2020,6 +2082,26 @@
                     <span class="icon-badge b-purple" style="width:32px;height:32px;"><i data-lucide="book-open"></i></span> Вики сервера
                 </div>
                 <div class="eyebrow" style="margin-bottom: 30px; text-align: left; width: 100%;">Разбираем все механики, системы и фишки KuromiSMP</div>
+
+                <div class="panel-title" style="font-size: 1.3rem; text-align: left; width: 100%; color: #fff; border-bottom: 1px solid rgba(138,43,226,0.12); padding-bottom: 10px; margin-bottom: 20px; display:flex; align-items:center; gap:10px;">
+                    <span class="icon-badge b-purple" style="width:28px;height:28px;"><i data-lucide="scroll-text"></i></span> Регламент сообщества
+                </div>
+                <div class="rule-node">
+                    <h3>01. Имущество и постройки</h3>
+                    <p>Любое несанкционированное изменение ландшафта, присвоение чужих ресурсов из сундуков, гриферство или разрушение чужих строений караются вечным баном. Все действия логируются на сервере.</p>
+                </div>
+                <div class="rule-node">
+                    <h3>02. Модификации игрового процесса</h3>
+                    <p>Запрещено использование чит-клиентов, текстур-паков типа X-Ray, скриптов, макросов или любых сторонних программ, дающих несправедливое превосходство в игровом процессе.</p>
+                </div>
+                <div class="rule-node" style="margin-bottom: 36px;">
+                    <h3>03. Взаимодействие в чате</h3>
+                    <p>Запрещен намеренный токсичный прессинг участников, деструктивное поведение, разжигание конфликтов и спам. Мы развиваем взрослое и комфортное комьюнити.</p>
+                </div>
+
+                <div class="panel-title" style="font-size: 1.3rem; text-align: left; width: 100%; color: #fff; border-bottom: 1px solid rgba(138,43,226,0.12); padding-bottom: 10px; margin-bottom: 20px; display:flex; align-items:center; gap:10px;">
+                    <span class="icon-badge b-purple" style="width:28px;height:28px;"><i data-lucide="sparkles"></i></span> Механики сервера
+                </div>
                 <div class="mechanics-grid">
                     <div class="mechanic-card" onclick="openWikiArticle('arrest')">
                         <div class="mechanic-img-box"><div class="mechanic-placeholder-icon"><i data-lucide="link-2"></i></div></div>
@@ -2173,35 +2255,43 @@
                     <div id="map-overlay-layer">
                         <!-- метки/пины/маркер поиска добавляются сюда -->
                     </div>
+                    <div id="map-cursor-tooltip">X: 0 · Z: 0</div>
                 </div>
 
-                <div class="map-hud" id="map-panel-top">
+                <!-- Левая панель: навигация и поиск -->
+                <div class="map-hud map-panel-left">
+                    <div class="map-hud-pattern">
+                        <i data-lucide="map" style="width:16px;height:16px;margin:10px;transform:rotate(-8deg);"></i><i data-lucide="compass" style="width:14px;height:14px;margin:14px;transform:rotate(10deg);"></i><i data-lucide="flag" style="width:15px;height:15px;margin:8px;transform:rotate(-14deg);"></i><i data-lucide="map" style="width:13px;height:13px;margin:16px;transform:rotate(16deg);"></i>
+                    </div>
                     <button class="map-exit-btn" onclick="closeWorldMap()"><i data-lucide="arrow-left"></i> Вернуться на сайт</button>
                     <div id="map-search-row">
                         <input id="map-search-input" type="text" placeholder="X Z, напр. -1203 2051">
                         <button id="map-search-btn"><i data-lucide="search"></i></button>
                     </div>
-                    <div id="map-coords-readout">X: <b id="map-ro-x">—</b>&nbsp; Z: <b id="map-ro-z">—</b></div>
+                    <button class="map-cities-btn" id="map-open-citylist"><i data-lucide="building-2"></i> Список городов</button>
                     <div id="map-legend"></div>
                 </div>
 
-                <div id="map-zoom-controls">
-                    <button class="map-zoom-btn" id="map-zoom-in">+</button>
-                    <button class="map-zoom-btn" id="map-zoom-out">−</button>
+                <!-- Правая панель: масштаб и действие приватизации -->
+                <div class="map-hud map-panel-right">
+                    <div class="map-zoom-controls">
+                        <button class="map-zoom-btn" id="map-zoom-in">+</button>
+                        <button class="map-zoom-btn" id="map-zoom-out">−</button>
+                    </div>
+                    <button id="map-claim-cta"><i data-lucide="flag"></i> Занять территорию</button>
                 </div>
 
                 <div id="map-claim-banner">
                     <span>Растяните область на карте, зажав ЛКМ</span>
                     <button id="map-claim-cancel-drawing">Отмена</button>
                 </div>
-
-                <button id="map-claim-cta"><i data-lucide="flag"></i> Занять территорию</button>
             </div>
 
             <!-- Выбор категории -->
             <div class="map-modal-overlay" id="map-modal-category">
                 <div class="map-modal-card">
-                    <h3>Что вы занимаете?</h3>
+                    <div class="map-modal-pattern"><i data-lucide="flag"></i><i data-lucide="building-2"></i><i data-lucide="tent"></i><i data-lucide="wheat"></i></div>
+                    <h3><i data-lucide="flag" style="width:16px;height:16px;vertical-align:-3px;color:#c6ff3d;"></i> Что вы занимаете?</h3>
                     <p class="map-sub">Выберите категорию территории, затем нарисуйте её на карте.</p>
                     <div class="map-cat-grid" id="map-cat-grid"></div>
                     <div class="map-modal-actions">
@@ -2214,11 +2304,12 @@
             <!-- Название/описание -->
             <div class="map-modal-overlay" id="map-modal-details">
                 <div class="map-modal-card">
-                    <h3>Оформление привата</h3>
+                    <div class="map-modal-pattern"><i data-lucide="pen-line"></i><i data-lucide="scroll-text"></i><i data-lucide="check-check"></i></div>
+                    <h3><i data-lucide="scroll-text" style="width:16px;height:16px;vertical-align:-3px;color:#c6ff3d;"></i> Оформление привата</h3>
                     <p class="map-sub" id="map-details-sub">—</p>
                     <div class="map-field">
                         <label>Название</label>
-                        <input id="map-claim-title" type="text" maxlength="40" placeholder="Например: Город Азорис">
+                        <input id="map-claim-title" type="text" maxlength="40" placeholder="Например: Азорис">
                     </div>
                     <div class="map-field">
                         <label>Описание</label>
@@ -2234,13 +2325,34 @@
             <!-- Просмотр привата -->
             <div class="map-modal-overlay" id="map-modal-info">
                 <div class="map-modal-card">
-                    <h3 id="map-info-title">—</h3>
-                    <p class="map-sub" id="map-info-cat">—</p>
-                    <div class="map-info-row"><span>Владелец</span><b id="map-info-owner">—</b></div>
-                    <div class="map-info-row"><span>Координаты</span><b id="map-info-coords">—</b></div>
-                    <p style="margin-top:14px;font-size:0.85rem;color:#fff;line-height:1.5;" id="map-info-desc"></p>
-                    <div class="map-modal-actions" style="margin-top:20px;">
+                    <div class="map-modal-pattern" id="map-info-pattern"></div>
+                    <div class="map-info-head">
+                        <span class="map-info-cat-badge" id="map-info-cat-badge"><i data-lucide="flag"></i></span>
+                        <div>
+                            <h3 id="map-info-title">—</h3>
+                            <p class="map-sub" id="map-info-cat" style="margin:2px 0 0;">—</p>
+                        </div>
+                    </div>
+                    <div class="map-info-row"><span><i data-lucide="user" style="width:13px;height:13px;"></i> Владелец</span><b id="map-info-owner">—</b></div>
+                    <div class="map-info-row"><span><i data-lucide="crosshair" style="width:13px;height:13px;"></i> Центр</span><b id="map-info-center">—</b></div>
+                    <div class="map-info-row"><span><i data-lucide="ruler" style="width:13px;height:13px;"></i> Размер</span><b id="map-info-size">—</b></div>
+                    <p class="map-info-desc" id="map-info-desc"></p>
+                    <div class="map-modal-actions" style="margin-top:18px;">
+                        <button class="map-btn-danger" id="map-info-remove" style="display:none;"><i data-lucide="trash-2"></i> Снять приват</button>
                         <button class="map-btn-primary" id="map-info-close">Закрыть</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Список городов -->
+            <div class="map-modal-overlay" id="map-modal-citylist">
+                <div class="map-modal-card">
+                    <div class="map-modal-pattern"><i data-lucide="building-2"></i><i data-lucide="landmark"></i><i data-lucide="flag"></i></div>
+                    <h3><i data-lucide="building-2" style="width:16px;height:16px;vertical-align:-3px;color:#c6ff3d;"></i> Города сервера</h3>
+                    <p class="map-sub">Нажмите на город, чтобы переместиться к нему на карте.</p>
+                    <div id="map-city-list"></div>
+                    <div class="map-modal-actions">
+                        <button class="map-btn-primary" id="map-citylist-close">Закрыть</button>
                     </div>
                 </div>
             </div>
@@ -2275,8 +2387,8 @@
                 <div class="admin-subnav">
                     <button id="atab-shop" onclick="switchAdminTab('shop')"><i data-lucide="store" style="width:16px;height:16px;"></i> Магазин</button>
                     <button id="atab-players" onclick="switchAdminTab('players')"><i data-lucide="users" style="width:16px;height:16px;"></i> Игроки</button>
-                    <button id="atab-sections" onclick="switchAdminTab('sections')"><i data-lucide="eye-off" style="width:16px;height:16px;"></i> Разделы</button>
                     <button id="atab-logs" onclick="switchAdminTab('logs')"><i data-lucide="scroll-text" style="width:16px;height:16px;"></i> Журнал</button>
+                    <button id="atab-sections" onclick="switchAdminTab('sections')"><i data-lucide="eye-off" style="width:16px;height:16px;"></i> Разделы</button>
                 </div>
 
                 <div id="admin-tab-content"></div>
@@ -2389,74 +2501,71 @@
         let currentUserSession = null;
         let currentUserLinkedData = null; 
         let isUserModerator = false;
+
         let sectionVisibilityMap = {};
 
-        /* ================= ВИДИМОСТЬ РАЗДЕЛОВ САЙТА ================= */
+const SECTION_LABELS = {
+    join: 'Как попасть на сервер',
+    rules: 'Правила',
+    players: 'Игроки / Статистика',
+    mechanics: 'Вики / Механики',
+    donate: 'Донат / Магазин',
+    forum: 'Форум',
+    map: 'Карта мира',
+    blackmarket: 'Чёрный рынок'
+};
 
-        const SECTION_LABELS = {
-            join: 'Как попасть на сервер',
-            rules: 'Правила',
-            players: 'Игроки / Статистика',
-            mechanics: 'Вики / Механики',
-            donate: 'Донат / Магазин',
-            forum: 'Форум',
-            map: 'Карта мира',
-            blackmarket: 'Чёрный рынок'
-        };
+const SECTION_NAV_MAP = {
+    join: { navId: 'tab-join' },
+    players: { navId: 'tab-players' },
+    mechanics: { navId: 'tab-mechanics' },
+    donate: { navId: 'tab-donate' },
+    forum: { navId: 'forum-fixed-btn' },
+    map: { navId: 'tab-map' },
+    blackmarket: { navId: 'bm-trigger-logo' }
+};
 
-        const SECTION_NAV_MAP = {
-            join: { navId: 'tab-join' },
-            rules: { navId: 'tab-rules' },
-            players: { navId: 'tab-players' },
-            mechanics: { navId: 'tab-mechanics' },
-            donate: { navId: 'tab-donate' },
-            forum: { navId: 'forum-fixed-btn' },
-            map: { navId: 'tab-map' },
-            blackmarket: { navId: 'bm-trigger-logo' }
-        };
+function canAccessSection(key) {
+    const vis = sectionVisibilityMap[key] || 'visible';
+    return vis === 'visible' || !!isUserModerator;
+}
 
-        function canAccessSection(key) {
-            const vis = sectionVisibilityMap[key] || 'visible';
-            return vis === 'visible' || !!isUserModerator;
+function applySectionVisibility() {
+    Object.keys(SECTION_NAV_MAP).forEach(key => {
+        const el = document.getElementById(SECTION_NAV_MAP[key].navId);
+        if (!el) return;
+        const allowed = canAccessSection(key);
+
+        if (key === 'blackmarket') {
+            el.style.display = ''; 
+            el.style.pointerEvents = allowed ? 'auto' : 'none';
+            el.style.cursor = allowed ? 'pointer' : 'default';
+        } else {
+            el.style.display = allowed ? '' : 'none';
         }
 
-        function applySectionVisibility() {
-            Object.keys(SECTION_NAV_MAP).forEach(key => {
-                const el = document.getElementById(SECTION_NAV_MAP[key].navId);
-                if (!el) return;
-                const allowed = canAccessSection(key);
-
-                // Особенность для черного рынка: картинка уха остается видимой, но становится некликабельной
-                if (key === 'blackmarket') {
-                    el.style.display = ''; 
-                    el.style.pointerEvents = allowed ? 'auto' : 'none';
-                    el.style.cursor = allowed ? 'pointer' : 'default';
-                } else {
-                    el.style.display = allowed ? '' : 'none';
-                }
-
-                if (allowed && sectionVisibilityMap[key] === 'moderators_only') {
-                    el.title = 'Скрыто от игроков — сейчас виден только модераторам';
-                    el.style.outline = '1px dashed rgba(255, 0, 127, 0.55)';
-                    el.style.outlineOffset = '3px';
-                } else {
-                    el.title = '';
-                    el.style.outline = '';
-                }
-            });
+        if (allowed && sectionVisibilityMap[key] === 'moderators_only') {
+            el.title = 'Скрыто от игроков — сейчас виден только модераторам';
+            el.style.outline = '1px dashed rgba(255, 0, 127, 0.55)';
+            el.style.outlineOffset = '3px';
+        } else {
+            el.title = '';
+            el.style.outline = '';
         }
+    });
+}
 
-        async function loadSectionVisibility() {
-            try {
-                const { data, error } = await supabaseClient.from('site_sections').select('*');
-                if (error) throw error;
-                sectionVisibilityMap = {};
-                (data || []).forEach(row => { sectionVisibilityMap[row.key] = row.visibility; });
-            } catch (e) {
-                console.error('[SectionVisibility] Не удалось загрузить видимость разделов (проверьте таблицу site_sections):', e);
-            }
-            applySectionVisibility();
-        }
+async function loadSectionVisibility() {
+    try {
+        const { data, error } = await supabaseClient.from('site_sections').select('*');
+        if (error) throw error;
+        sectionVisibilityMap = {};
+        (data || []).forEach(row => { sectionVisibilityMap[row.key] = row.visibility; });
+    } catch (e) {
+        console.error('[SectionVisibility] Не удалось загрузить видимость разделов:', e);
+    }
+    applySectionVisibility();
+}
 
         /* --- УНИВЕРСАЛЬНЫЙ МОДУЛЬ ДИАЛОГОВЫХ ОКОН С ИСПРАВЛЕННЫМ ВЫРАВНИВАНИЕМ И ПЛЕЙСХОЛДЕРОМ --- */
         const EMOJI_ICON_MAP = {
@@ -2739,23 +2848,16 @@
                 return;
             }
 
-            if (!currentUserSession || !currentUserSession.user) {
-                customAlert("🔒 Ошибка авторизации", "Сессия истекла. Пожалуйста, войдите через Discord заново.");
-                return;
-            }
-
             submitBtn.disabled = true;
             submitBtn.innerText = "Отправка...";
             submitBtn.style.opacity = "0.6";
 
             try {
-                const { data: existingApp, error: selectError } = await supabaseClient
+                const { data: existingApp } = await supabaseClient
                     .from('server_applications')
                     .select('id')
                     .eq('user_id', currentUserSession.user.id)
                     .maybeSingle();
-
-                if (selectError) throw selectError;
 
                 if (existingApp) {
                     customAlert("👑 Информация", "Вы уже успешно отправляли анкету ранее. Пожалуйста, ожидайте вердикта администрации в Telegram!");
@@ -2763,7 +2865,7 @@
                     return;
                 }
 
-                const { error: insertError } = await supabaseClient
+                const { error } = await supabaseClient
                     .from('server_applications')
                     .insert({
                         user_id: currentUserSession.user.id,
@@ -2773,36 +2875,14 @@
                         plans: plans
                     });
 
-                if (insertError) throw insertError;
+                if (error) throw error;
 
                 closeApplicationModal();
-
-                openCustomModal({
-                    title: "🎉 Анкета отправлена!",
-                    text: `Ваша заявка успешно сохранена.<br><br>
-                           <b style="color: var(--accent-pink);">ОБЯЗАТЕЛЬНЫЙ ШАГ:</b><br>
-                           Напишите любой текст (например, свой ник) в диалог поддержки, чтобы мы смогли выслать вам решение по заявке.`,
-                    showInput: false,
-                    buttons: [
-                        {
-                            text: "Позже",
-                            className: "btn-secondary",
-                            action: () => true
-                        },
-                        {
-                            text: "Написать в @kuromi_support →",
-                            className: "btn-primary",
-                            action: () => {
-                                window.open('https://t.me/kuromi_support', '_blank');
-                                return true;
-                            }
-                        }
-                    ]
-                });
+                customAlert("🎉 Успешно отправлено!", "Ваша анкета успешно сохранена и передана кураторам KuromiSMP. Мы свяжемся с вами в Telegram после проверки!");
 
             } catch (e) {
-                console.error("Ошибка при отправке анкеты:", e);
-                customAlert("❌ Ошибка отправки", "Не удалось сохранить анкету: " + (e.message || "сбой сети") + ". Проверьте консоль (F12).");
+                console.error(e);
+                customAlert("❌ Ошибка отправки", "Не удалось сохранить анкету из-за сбоя сети. Пожалуйста, попробуйте позже.");
             } finally {
                 submitBtn.disabled = false;
                 submitBtn.innerText = "Отправить анкету";
@@ -3403,12 +3483,11 @@
         const MAP_HALF = MAP_WORLD_SIZE / 2;
 
         const MAP_CATEGORIES = [
-            { key: 'city',      name: 'Город',      color: '#c6ff3d' },
-            { key: 'structure', name: 'Постройка',  color: '#ff007f' },
-            { key: 'base',      name: 'Приват/Дом', color: '#8a2be2' },
-            { key: 'farm',      name: 'Ферма',      color: '#3dd6ff' },
-            { key: 'mine',      name: 'Шахта',      color: '#ffb03d' },
-            { key: 'other',     name: 'Другое',     color: '#ffffff' },
+            { key: 'city',      name: 'Город',        color: '#c6ff3d', limit: 300, maxPerPlayer: 1, icon: 'building-2' },
+            { key: 'structure', name: 'Структура',    color: '#ff007f', limit: 220, maxPerPlayer: 2, icon: 'tent' },
+            { key: 'farm',      name: 'Ферма',        color: '#3dd6ff', limit: 180, maxPerPlayer: 3, icon: 'wheat' },
+            { key: 'base',      name: 'Приват/Дом',   color: '#8a2be2', limit: 80, maxPerPlayer: 1, icon: 'house' },
+            { key: 'other',     name: 'Другое',       color: '#ffffff', limit: 60, maxPerPlayer: 2, icon: 'flag' },
         ];
         const mapCatByKey = Object.fromEntries(MAP_CATEGORIES.map(c => [c.key, c]));
 
@@ -3424,9 +3503,9 @@
 
         function openWorldMap() {
             if (!canAccessSection('map')) {
-                customAlert('🔒 Карта скрыта', 'Карта мира сейчас в разработке и доступна только модераторам сервера.');
-                return;
-            }
+    customAlert('🔒 Карта скрыта', 'Карта мира сейчас в разработке и доступна только модераторам сервера.');
+    return;
+}
             const overlay = document.getElementById('map-fullpage');
             if (!overlay) return;
             overlay.classList.add('active');
@@ -3515,7 +3594,10 @@
             generateMapTerrain();
 
             document.getElementById('map-legend').innerHTML = MAP_CATEGORIES.map(c => `
-                <div class="map-legend-item"><span class="dot" style="background:${c.color}"></span>${c.name}</div>
+                <div class="map-legend-item">
+                    <span class="map-legend-name"><span class="dot" style="background:${c.color}"></span>${c.name}</span>
+                    <span class="map-legend-limit">${c.maxPerPlayer} шт. · до ${c.limit}×${c.limit}</span>
+                </div>
             `).join('');
 
             window.addEventListener('resize', () => { if (document.getElementById('map-fullpage').classList.contains('active')) mapFitToScreen(); });
@@ -3528,6 +3610,7 @@
                 mapPanOrigin = { x: mapPanX, y: mapPanY };
             });
 
+            const mapTooltip = document.getElementById('map-cursor-tooltip');
             window.addEventListener('mousemove', (e) => {
                 if (!document.getElementById('map-fullpage').classList.contains('active')) return;
                 const rect = mapViewportEl.getBoundingClientRect();
@@ -3544,10 +3627,15 @@
                 if (sx >= 0 && sy >= 0 && sx <= rect.width && sy <= rect.height) {
                     const { lx, ly } = mapScreenToLocal(sx, sy);
                     const { wx, wz } = mapLocalToWorld(lx, ly);
-                    document.getElementById('map-ro-x').textContent = Math.round(wx);
-                    document.getElementById('map-ro-z').textContent = Math.round(wz);
+                    mapTooltip.style.display = 'block';
+                    mapTooltip.style.left = sx + 'px';
+                    mapTooltip.style.top = sy + 'px';
+                    mapTooltip.textContent = `X: ${Math.round(wx)} · Z: ${Math.round(wz)}`;
+                } else {
+                    mapTooltip.style.display = 'none';
                 }
             });
+            mapViewportEl.addEventListener('mouseleave', () => { mapTooltip.style.display = 'none'; });
 
             window.addEventListener('mouseup', (e) => {
                 if (mapIsPanning) { mapIsPanning = false; mapViewportEl.classList.remove('map-panning'); }
@@ -3575,7 +3663,8 @@
             const mapCatGrid = document.getElementById('map-cat-grid');
             mapCatGrid.innerHTML = MAP_CATEGORIES.map(c => `
                 <div class="map-cat-option" data-key="${c.key}" style="--cat-color:${c.color}">
-                    <span class="dot"></span><span class="name">${c.name}</span>
+                    <span class="dot"></span><span class="name"><i data-lucide="${c.icon}" style="width:13px;height:13px;vertical-align:-2px;"></i> ${c.name}</span>
+                    <span class="map-cat-limit">до ${c.limit}×${c.limit} · ${c.maxPerPlayer} шт. на игрока</span>
                 </div>
             `).join('');
             mapCatGrid.querySelectorAll('.map-cat-option').forEach(opt => {
@@ -3599,6 +3688,14 @@
             };
             document.getElementById('map-cat-cancel').onclick = () => document.getElementById('map-modal-category').classList.remove('open');
             document.getElementById('map-cat-next').onclick = () => {
+                const cat = mapCatByKey[mapSelectedCategory];
+                if (cat.maxPerPlayer && currentUserLinkedData) {
+                    const count = mapClaims.filter(c => c.category === cat.key && c.owner_uuid === currentUserLinkedData.minecraft_uuid).length;
+                    if (count >= cat.maxPerPlayer) {
+                        customAlert('⛔ Лимит', `Вы уже заняли максимум приватов категории «${cat.name}» (${cat.maxPerPlayer} шт. на игрока).`);
+                        return;
+                    }
+                }
                 document.getElementById('map-modal-category').classList.remove('open');
                 mapEnterDrawingMode(mapSelectedCategory);
             };
@@ -3609,6 +3706,9 @@
             };
             document.getElementById('map-details-confirm').onclick = mapConfirmClaim;
             document.getElementById('map-info-close').onclick = () => document.getElementById('map-modal-info').classList.remove('open');
+
+            document.getElementById('map-open-citylist').onclick = mapOpenCityList;
+            document.getElementById('map-citylist-close').onclick = () => document.getElementById('map-modal-citylist').classList.remove('open');
         }
 
         function mapZoomStep(factor) {
@@ -3710,6 +3810,20 @@
             box.style.width = w + 'px'; box.style.height = h + 'px';
             mapClaimFlow.currentRect = { x, y, w, h };
         }
+        const MAP_ERROR_MESSAGES = {
+            not_linked: 'Авторизуйтесь через Discord и привяжите Minecraft-аккаунт.',
+            title_required: 'Введите название территории.',
+            invalid_category: 'Некорректная категория.',
+            size_limit_exceeded: 'Территория превышает лимит размера для этой категории.',
+            city_limit_reached: 'У вас уже есть свой город — второй занять нельзя.',
+            category_limit_reached: 'Вы уже заняли максимум приватов этой категории.',
+            not_found_or_not_owner: 'Не удалось снять приват (возможно, вы не его владелец).'
+        };
+        function mapFriendlyError(error) {
+            const code = (error?.message || '').trim();
+            return MAP_ERROR_MESSAGES[code] || 'Произошла ошибка. Попробуйте ещё раз.';
+        }
+
         function mapFinishDrawing(e) {
             mapClaimFlow.drawing = false;
             const r = mapClaimFlow.currentRect;
@@ -3717,18 +3831,25 @@
             if (!r || r.w < 8 || r.h < 8) return;
             const p1 = mapLocalToWorld(r.x, r.y);
             const p2 = mapLocalToWorld(r.x + r.w, r.y + r.h);
-            mapOpenDetailsModal({
-                category: mapClaimFlow.category,
-                x1: Math.round(p1.wx), z1: Math.round(p1.wz),
-                x2: Math.round(p2.wx), z2: Math.round(p2.wz),
-            });
+            const x1 = Math.round(p1.wx), z1 = Math.round(p1.wz), x2 = Math.round(p2.wx), z2 = Math.round(p2.wz);
+
+            const cat = mapCatByKey[mapClaimFlow.category];
+            const w = Math.abs(x2 - x1), h = Math.abs(z2 - z1);
+            if (w > cat.limit || h > cat.limit) {
+                customAlert('⛔ Слишком большая территория', `Для категории «${cat.name}» максимум ${cat.limit}×${cat.limit} блоков. Нарисуйте область поменьше.`);
+                return;
+            }
+
+            mapOpenDetailsModal({ category: mapClaimFlow.category, x1, z1, x2, z2 });
         }
 
         function mapOpenDetailsModal(data) {
             mapPendingClaim = data;
             const cat = mapCatByKey[data.category];
+            const cx = Math.round((data.x1 + data.x2) / 2), cz = Math.round((data.z1 + data.z2) / 2);
+            const w = Math.abs(data.x2 - data.x1), h = Math.abs(data.z2 - data.z1);
             document.getElementById('map-details-sub').textContent =
-                `${cat.name} · ${Math.abs(data.x2 - data.x1)}×${Math.abs(data.z2 - data.z1)} блоков · (${data.x1}, ${data.z1}) → (${data.x2}, ${data.z2})`;
+                `${cat.name} · ${w}×${h} блоков · центр (${cx}, ${cz})`;
             document.getElementById('map-claim-title').value = '';
             document.getElementById('map-claim-desc').value = '';
             document.getElementById('map-modal-details').classList.add('open');
@@ -3749,12 +3870,13 @@
             });
             if (error) {
                 console.error('Не удалось создать приват:', error);
-                customAlert('❌ Ошибка', 'Не удалось сохранить территорию. Попробуйте ещё раз.');
+                customAlert('❌ Ошибка', mapFriendlyError(error));
                 return;
             }
 
             const claim = {
                 id: newId,
+                owner_uuid: currentUserLinkedData.minecraft_uuid,
                 owner_name: currentUserLinkedData.minecraft_name,
                 category: mapPendingClaim.category,
                 title, description: desc,
@@ -3793,30 +3915,88 @@
             box.addEventListener('mousedown', ev => ev.stopPropagation());
             box.addEventListener('click', () => mapOpenInfoModal(claim));
             mapWorldEl.appendChild(box);
+            claim._els = { box, label: null };
 
-            const label = document.createElement('div');
-            label.className = 'map-claim-label';
-            label.innerHTML = `<span class="dot" style="--cat-color:${cat.color}"></span>${claim.title}`;
-            label._claim = claim;
-            mapOverlayEl.appendChild(label);
-
-            claim._els = { box, label };
-            mapPositionClaimLabel(claim);
+            // Названия на карте показываем только у городов — чтобы не засорять остальные категории
+            if (claim.category === 'city') {
+                const label = document.createElement('div');
+                label.className = 'map-claim-label';
+                label.innerHTML = `<span class="dot" style="--cat-color:${cat.color}"></span>${claim.title}`;
+                label._claim = claim;
+                mapOverlayEl.appendChild(label);
+                claim._els.label = label;
+                mapPositionClaimLabel(claim);
+            }
         }
         function mapPositionClaimLabel(claim) {
+            if (!claim._els || !claim._els.label) return;
             const { lx, ly } = mapWorldToLocal((claim.x1 + claim.x2) / 2, claim.z1);
             const { sx, sy } = mapLocalToScreen(lx, ly);
             claim._els.label.style.left = sx + 'px';
             claim._els.label.style.top = (sy - 4) + 'px';
         }
+
+        let mapCurrentInfoClaim = null;
         function mapOpenInfoModal(claim) {
             const cat = mapCatByKey[claim.category] || mapCatByKey.other;
+            const cx = Math.round((claim.x1 + claim.x2) / 2), cz = Math.round((claim.z1 + claim.z2) / 2);
+            const w = Math.abs(claim.x2 - claim.x1), h = Math.abs(claim.z2 - claim.z1);
+            mapCurrentInfoClaim = claim;
+
             document.getElementById('map-info-title').textContent = claim.title;
             document.getElementById('map-info-cat').textContent = cat.name;
             document.getElementById('map-info-owner').textContent = claim.owner_name;
-            document.getElementById('map-info-coords').textContent = `(${claim.x1}, ${claim.z1}) → (${claim.x2}, ${claim.z2})`;
+            document.getElementById('map-info-center').textContent = `${cx}, ${cz}`;
+            document.getElementById('map-info-size').textContent = `${w} × ${h} блоков`;
             document.getElementById('map-info-desc').textContent = claim.description || 'Без описания.';
+
+            const badge = document.getElementById('map-info-cat-badge');
+            badge.style.setProperty('--cat-color', cat.color);
+            badge.innerHTML = `<i data-lucide="${cat.icon}"></i>`;
+
+            const removeBtn = document.getElementById('map-info-remove');
+            const isOwner = currentUserLinkedData && claim.owner_uuid === currentUserLinkedData.minecraft_uuid;
+            removeBtn.style.display = isOwner ? 'flex' : 'none';
+            removeBtn.onclick = () => mapRemoveClaim(claim.id);
+
             document.getElementById('map-modal-info').classList.add('open');
+            if (window.lucide) lucide.createIcons();
+        }
+
+        async function mapRemoveClaim(id) {
+            const { error } = await supabaseClient.rpc('territory_claim_remove', { p_id: id });
+            if (error) { customAlert('❌ Ошибка', mapFriendlyError(error)); return; }
+
+            const claim = mapClaims.find(c => c.id === id);
+            if (claim && claim._els) {
+                claim._els.box.remove();
+                if (claim._els.label) claim._els.label.remove();
+            }
+            mapClaims = mapClaims.filter(c => c.id !== id);
+            document.getElementById('map-modal-info').classList.remove('open');
+        }
+
+        function mapOpenCityList() {
+            const cities = mapClaims.filter(c => c.category === 'city');
+            const list = document.getElementById('map-city-list');
+            list.innerHTML = cities.length
+                ? cities.map(c => `
+                    <div class="map-city-item" onclick="mapGoToCity('${c.id}')">
+                        <span class="dot"></span>
+                        <span class="map-city-name">${c.title}</span>
+                        <span class="map-city-owner">${c.owner_name}</span>
+                    </div>
+                `).join('')
+                : `<div id="map-city-empty">Городов пока нет — станьте первым основателем!</div>`;
+            document.getElementById('map-modal-citylist').classList.add('open');
+        }
+        function mapGoToCity(id) {
+            const claim = mapClaims.find(c => c.id === id);
+            if (!claim) return;
+            document.getElementById('map-modal-citylist').classList.remove('open');
+            const cx = Math.round((claim.x1 + claim.x2) / 2), cz = Math.round((claim.z1 + claim.z2) / 2);
+            mapPanToWorld(cx, cz, 6);
+            mapShowSearchMarker(cx, cz);
         }
 
         function mapRenderOverlayPositions() {
@@ -3826,9 +4006,9 @@
 
         function openBlackMarket() {
             if (!canAccessSection('blackmarket')) {
-                customAlert('🔒 Чёрный рынок скрыт', 'Этот раздел сейчас доступен только модераторам сервера.');
-                return;
-            }
+    customAlert('🔒 Чёрный рынок скрыт', 'Этот раздел сейчас доступен только модераторам сервера.');
+    return;
+}
             const overlay = document.getElementById('bm-fullpage');
             if (!overlay) return;
             overlay.classList.add('active');
@@ -3937,7 +4117,7 @@
                                         <div style="background: rgba(138, 43, 226, 0.15); color: #b388ff; font-weight: 700; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">1</div>
                                         <div>
                                             <span style="font-weight: 600; color: #fff; display: block; margin-bottom: 6px;"><i data-lucide="gamepad-2" style="width:14px;height:14px;vertical-align:-2px;"></i> Зайди на сервер</span>
-                                            <button class="btn-secondary" id="server-ip-profile" style="padding: 6px 14px; font-size: 0.78rem; border-radius: 10px;" onclick="copyIp('play.kuromi.tech')">play.kuromi.tech</button>
+                                            <button class="btn-secondary" id="server-ip-profile" style="padding: 6px 14px; font-size: 0.78rem; border-radius: 10px;" onclick="copyIp('play.kuromismp.ru')">play.kuromismp.ru</button>
                                         </div>
                                     </div>
                                     <div style="display: flex; gap: 16px; align-items: flex-start;">
@@ -4916,16 +5096,16 @@
             initSkinViewer('skin-viewer-modal', playerData.minecraft_uuid, playerData.minecraft_name, 150, 220, playerData.skin_texture_url, playerData.skin_model);
             if (window.lucide) lucide.createIcons();
         }
-
         const GATED_TAB_SECTIONS = ['join', 'rules', 'players', 'mechanics', 'donate', 'forum'];
 
-        function switchTab(tabName) {
-            if (GATED_TAB_SECTIONS.includes(tabName) && !canAccessSection(tabName)) {
-                customAlert('🔒 Раздел скрыт', 'Этот раздел сейчас доступен только модераторам сервера. Загляните позже!');
-                return;
-            }
+function switchTab(tabName) {
+    if (GATED_TAB_SECTIONS.includes(tabName) && !canAccessSection(tabName)) {
+        customAlert('🔒 Раздел скрыт', 'Этот раздел сейчас доступен только модераторам сервера.');
+        return;
+    }
 
-            document.querySelectorAll('.content-section').forEach(section => section.classList.remove('active'));
+    document.querySelectorAll('.content-section').forEach(section => section.classList.remove('active'));
+    // ... дальше остальной код switchTab без изменений
             document.querySelectorAll('nav button').forEach(button => button.classList.remove('active'));
             
             const targetSection = document.getElementById(`section-${tabName}`);
@@ -5372,6 +5552,60 @@
             card.style.transform = 'translateY(30px) scale(0.95)';
             card.style.opacity = '0';
             setTimeout(() => { overlay.style.display = 'none'; }, 250);
+        }
+
+        async function submitServerApplication() {
+            const nick = document.getElementById('app-mc-nick').value.trim();
+            const license = document.getElementById('app-has-license').value;
+            const tg = document.getElementById('app-tg-contact').value.trim();
+            const plans = document.getElementById('app-plans').value.trim();
+            const submitBtn = document.getElementById('app-submit-btn');
+
+            if (!nick || !tg || !plans) {
+                customAlert("⚠️ Ошибка заполнения", "Пожалуйста, заполните абсолютно все текстовые поля анкеты куратора!");
+                return;
+            }
+
+            submitBtn.disabled = true;
+            submitBtn.innerText = "Отправка...";
+            submitBtn.style.opacity = "0.6";
+
+            try {
+                const { data: existingApp } = await supabaseClient
+                    .from('server_applications')
+                    .select('id')
+                    .eq('user_id', currentUserSession.user.id)
+                    .maybeSingle();
+
+                if (existingApp) {
+                    customAlert("👑 Информация", "Вы уже успешно отправляли анкету ранее. Пожалуйста, ожидайте вердикта администрации в Telegram!");
+                    closeApplicationModal();
+                    return;
+                }
+
+                const { error } = await supabaseClient
+                    .from('server_applications')
+                    .insert({
+                        user_id: currentUserSession.user.id,
+                        minecraft_name: nick,
+                        has_license: license,
+                        telegram_contact: tg,
+                        plans: plans
+                    });
+
+                if (error) throw error;
+
+                closeApplicationModal();
+                customAlert("🎉 Успешно отправлено!", "Ваша анкета успешно сохранена и передана кураторам KuromiSMP. Мы свяжемся с вами в Telegram после проверки!");
+
+            } catch (e) {
+                console.error(e);
+                customAlert("❌ Ошибка отправки", "Не удалось сохранить анкету из-за сбоя сети. Пожалуйста, попробуйте позже.");
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.innerText = "Отправить анкету";
+                submitBtn.style.opacity = "1";
+            }
         }
 
         /* --- ФУНКЦИОНАЛ ФОРУМА С МИКРО-АНИМАЦИЯМИ И САЛЮТОМ ИСКР --- */
@@ -5858,13 +6092,6 @@
                 if (activeSection && activeSection.classList.contains('active')) switchTab('home');
             }
 
-            applySectionVisibility();
-            const activeGatedTab = GATED_TAB_SECTIONS.find(key => {
-                const sec = document.getElementById(`section-${key}`);
-                return sec && sec.classList.contains('active');
-            });
-            if (activeGatedTab && !canAccessSection(activeGatedTab)) switchTab('home');
-
             const container = document.getElementById('news-admin-container');
             if (!container) return;
 
@@ -6001,7 +6228,7 @@
         loadProfileData().then(() => {
             loadNewsFeed();
         });
-        loadSectionVisibility();
+        loadSectionVisibility(); // <-- ВСТАВИТЬ СЮДА
 
         window.onload = () => {
             if (window.lucide) lucide.createIcons();
@@ -6081,60 +6308,60 @@
 
         /* ================= ВИДИМОСТЬ РАЗДЕЛОВ (АДМИН) ================= */
 
-        async function renderAdminSectionsTab() {
-            const c = document.getElementById('admin-tab-content');
-            c.innerHTML = `
-                <div style="margin-bottom:18px;">
-                    <div class="admin-field-label" style="margin:0 0 8px 0; font-size:0.8rem;">Видимость разделов сайта</div>
-                    <div style="font-size:0.82rem; color:var(--text-muted); line-height:1.55;">
-                        Раздел, помеченный «Только модераторам», полностью скрывается от обычных игроков (кнопка в шапке пропадает, а прямой переход блокируется) и остаётся доступным только пользователям из таблицы <b style="color:#b388ff;">forum_moderators</b>. Удобно, пока раздел в разработке.
-                    </div>
-                </div>
-                <div id="admin-sections-container"><div style="color:var(--text-muted); padding:20px 0;">Загрузка...</div></div>
-            `;
-            if (window.lucide) lucide.createIcons();
-            await loadAdminSectionsList();
-        }
+async function renderAdminSectionsTab() {
+    const c = document.getElementById('admin-tab-content');
+    c.innerHTML = `
+        <div style="margin-bottom:18px;">
+            <div class="admin-field-label" style="margin:0 0 8px 0; font-size:0.8rem;">Видимость разделов сайта</div>
+            <div style="font-size:0.82rem; color:var(--text-muted); line-height:1.55;">
+                Раздел, помеченный «Только модераторам», полностью скрывается от обычных игроков (кнопка в шапке пропадает, а прямой переход блокируется) и остаётся доступным только пользователям из таблицы <b style="color:#b388ff;">forum_moderators</b>. Удобно, пока раздел в разработке.
+            </div>
+        </div>
+        <div id="admin-sections-container"><div style="color:var(--text-muted); padding:20px 0;">Загрузка...</div></div>
+    `;
+    if (window.lucide) lucide.createIcons();
+    await loadAdminSectionsList();
+}
 
-        async function loadAdminSectionsList() {
-            const container = document.getElementById('admin-sections-container');
-            if (!container) return;
-            try {
-                const { data, error } = await supabaseClient.from('site_sections').select('*');
-                if (error) throw error;
-                const rows = data || [];
-                container.innerHTML = Object.keys(SECTION_LABELS).map(key => {
-                    const row = rows.find(r => r.key === key);
-                    const vis = row ? row.visibility : 'visible';
-                    return `
-                    <div style="display:flex; align-items:center; justify-content:space-between; gap:14px; flex-wrap:wrap; padding:14px 18px; border:1px solid rgba(255,255,255,0.06); border-radius:16px; margin-bottom:10px; background: rgba(255,255,255,0.015);">
-                        <div style="font-weight:600; font-size:0.92rem; color:#fff;">${escapeHtml(SECTION_LABELS[key])}</div>
-                        <select class="admin-select" style="min-width:230px;" onchange="saveSectionVisibility('${key}', this.value)">
-                            <option value="visible" ${vis === 'visible' ? 'selected' : ''}>👁️ Виден всем игрокам</option>
-                            <option value="moderators_only" ${vis === 'moderators_only' ? 'selected' : ''}>🔒 Только модераторам</option>
-                        </select>
-                    </div>`;
-                }).join('');
-            } catch (e) {
-                console.error(e);
-                container.innerHTML = '<div style="color:#ff5c7a; padding:20px 0; font-size:0.88rem; line-height:1.5;">Не удалось загрузить таблицу <b>site_sections</b>. Убедитесь, что она создана в Supabase (см. инструкцию schema_sections.sql).</div>';
-            }
-        }
+async function loadAdminSectionsList() {
+    const container = document.getElementById('admin-sections-container');
+    if (!container) return;
+    try {
+        const { data, error } = await supabaseClient.from('site_sections').select('*');
+        if (error) throw error;
+        const rows = data || [];
+        container.innerHTML = Object.keys(SECTION_LABELS).map(key => {
+            const row = rows.find(r => r.key === key);
+            const vis = row ? row.visibility : 'visible';
+            return `
+            <div style="display:flex; align-items:center; justify-content:space-between; gap:14px; flex-wrap:wrap; padding:14px 18px; border:1px solid rgba(255,255,255,0.06); border-radius:16px; margin-bottom:10px; background: rgba(255,255,255,0.015);">
+                <div style="font-weight:600; font-size:0.92rem; color:#fff;">${escapeHtml(SECTION_LABELS[key])}</div>
+                <select class="admin-select" style="min-width:230px;" onchange="saveSectionVisibility('${key}', this.value)">
+                    <option value="visible" ${vis === 'visible' ? 'selected' : ''}>👁️ Виден всем игрокам</option>
+                    <option value="moderators_only" ${vis === 'moderators_only' ? 'selected' : ''}>🔒 Только модераторам</option>
+                </select>
+            </div>`;
+        }).join('');
+    } catch (e) {
+        console.error(e);
+        container.innerHTML = '<div style="color:#ff5c7a; padding:20px 0; font-size:0.88rem; line-height:1.5;">Не удалось загрузить таблицу <b>site_sections</b>. Убедитесь, что она создана в Supabase (см. инструкцию schema_sections.sql).</div>';
+    }
+}
 
-        async function saveSectionVisibility(key, value) {
-            try {
-                const { error } = await supabaseClient.from('site_sections').upsert({ key, visibility: value, updated_at: new Date().toISOString() }, { onConflict: 'key' });
-                if (error) throw error;
-                sectionVisibilityMap[key] = value;
-                applySectionVisibility();
-                logAdminAction({ action_type: 'section_visibility_change', severity: 'medium', target_type: 'site_section', target_label: SECTION_LABELS[key], details: { key, visibility: value } });
-                customAlert('✅ Сохранено', `Раздел «${SECTION_LABELS[key]}» теперь ${value === 'visible' ? 'виден всем игрокам' : 'виден только модераторам'}.`);
-            } catch (e) {
-                console.error(e);
-                customAlert('❌ Ошибка', 'Не удалось сохранить видимость раздела. Проверьте RLS-политику таблицы site_sections.');
-                await loadAdminSectionsList();
-            }
-        }
+async function saveSectionVisibility(key, value) {
+    try {
+        const { error } = await supabaseClient.from('site_sections').upsert({ key, visibility: value, updated_at: new Date().toISOString() }, { onConflict: 'key' });
+        if (error) throw error;
+        sectionVisibilityMap[key] = value;
+        applySectionVisibility();
+        logAdminAction({ action_type: 'section_visibility_change', severity: 'medium', target_type: 'site_section', target_label: SECTION_LABELS[key], details: { key, visibility: value } });
+        customAlert('✅ Сохранено', `Раздел «${SECTION_LABELS[key]}» теперь ${value === 'visible' ? 'виден всем игрокам' : 'виден только модераторам'}.`);
+    } catch (e) {
+        console.error(e);
+        customAlert('❌ Ошибка', 'Не удалось сохранить видимость раздела. Проверьте RLS-политику таблицы site_sections.');
+        await loadAdminSectionsList();
+    }
+}
 
         /* ================= МАГАЗИН (АДМИН) ================= */
 
