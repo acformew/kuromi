@@ -1198,14 +1198,19 @@
         @keyframes mapClaimPop { from { opacity: 0; transform: scale(0.85); } to { opacity: 1; transform: scale(1); } }
 
         #map-border-svg { position: absolute; top: 0; left: 0; pointer-events: none; overflow: visible; z-index: 3; }
-        .map-border-rect {
-            fill: none; stroke: #3dd6ff; stroke-width: 3; stroke-dasharray: 18 10;
+        .map-border-rect-outline {
+            fill: none; stroke: rgba(0,0,0,0.6); stroke-width: 7;
             vector-effect: non-scaling-stroke;
-            filter: drop-shadow(0 0 4px rgba(61,214,255,0.65));
+        }
+        .map-border-rect {
+            fill: none; stroke: #4be6ff; stroke-width: 3.5;
+            vector-effect: non-scaling-stroke;
+            filter: drop-shadow(0 0 6px rgba(75,230,255,0.95)) drop-shadow(0 0 14px rgba(75,230,255,0.55));
         }
         .map-border-tick {
-            stroke: #3dd6ff; stroke-width: 2; opacity: 0.85;
+            stroke: #4be6ff; stroke-width: 2.6; opacity: 0.95;
             vector-effect: non-scaling-stroke;
+            filter: drop-shadow(0 0 2px rgba(0,0,0,0.7));
         }
 
         #map-preview-box {
@@ -2404,9 +2409,9 @@
                 <div class="map-modal-card">
                     <div class="map-modal-pattern"><i data-lucide="shield"></i><i data-lucide="ruler"></i><i data-lucide="octagon-alert"></i></div>
                     <h3><i data-lucide="shield" style="width:16px;height:16px;vertical-align:-3px;color:#3dd6ff;"></i> Граница мира</h3>
-                    <p class="map-sub">Квадрат размером N×N блоков вокруг центра карты (0,0). Игроки увидят его как голубую обводку с засечками. Поставьте 0, чтобы убрать границу с карты.</p>
+                    <p class="map-sub">Расстояние от центра карты (0,0) до границы, по аналогии с игровым world border. Например 2000 — граница пройдёт ровно по координатам ±2000 (по X и по Z). Поставьте 0, чтобы убрать границу с карты.</p>
                     <div class="map-field">
-                        <label>Размер границы (блоков)</label>
+                        <label>Расстояние от центра до границы (блоков)</label>
                         <input id="map-border-input" type="number" min="0" step="50" placeholder="Например: 2000">
                     </div>
                     <div class="map-modal-actions">
@@ -4035,22 +4040,25 @@ async function loadSectionVisibility() {
             const legendSize = document.getElementById('map-legend-border-size');
             if (!svg) return;
 
-            const size = mapWorldBorderSize;
-            if (!size || size <= 0) {
+            const dist = mapWorldBorderSize; // расстояние от центра (0,0) до линии границы по каждой оси
+            if (!dist || dist <= 0) {
                 svg.innerHTML = '';
                 if (legendRow) legendRow.style.display = 'none';
                 return;
             }
 
-            const half = size / 2;
             // Граница центрирована на (0,0) — центре карты/мира.
-            const x1 = MAP_HALF - half, y1 = MAP_HALF - half;
-            const x2 = MAP_HALF + half, y2 = MAP_HALF + half;
+            // ВАЖНО: значение, введённое админом, — это расстояние от центра до
+            // границы (как в игре), а не общая ширина квадрата. Поэтому линия
+            // границы проходит ровно по координате ±dist, а не ±dist/2.
+            const x1 = MAP_HALF - dist, y1 = MAP_HALF - dist;
+            const x2 = MAP_HALF + dist, y2 = MAP_HALF + dist;
+            const edgeLen = dist * 2;
 
             // Кол-во засечек держим в разумных пределах вне зависимости от размера границы.
             const ticksPerEdge = 20;
-            const spacing = size / ticksPerEdge;
-            const tickLen = Math.max(20, Math.round(size / 40));
+            const spacing = edgeLen / ticksPerEdge;
+            const tickLen = Math.max(30, Math.round(edgeLen / 30));
 
             let ticks = '';
             for (let i = 0; i <= ticksPerEdge; i++) {
@@ -4064,10 +4072,10 @@ async function loadSectionVisibility() {
                 ticks += `<line x1="${x2}" y1="${y}" x2="${x2 + tickLen}" y2="${y}" class="map-border-tick"/>`;
             }
 
-            svg.innerHTML = `<rect x="${x1}" y="${y1}" width="${size}" height="${size}" class="map-border-rect"/>${ticks}`;
+            svg.innerHTML = `<rect x="${x1}" y="${y1}" width="${edgeLen}" height="${edgeLen}" class="map-border-rect-outline"/><rect x="${x1}" y="${y1}" width="${edgeLen}" height="${edgeLen}" class="map-border-rect"/>${ticks}`;
 
             if (legendRow) legendRow.style.display = 'flex';
-            if (legendSize) legendSize.textContent = `${size}×${size}`;
+            if (legendSize) legendSize.textContent = `±${dist} от центра`;
         }
 
         async function mapSaveWorldBorder() {
@@ -4097,10 +4105,17 @@ async function loadSectionVisibility() {
                     details: { size }
                 });
 
-                customAlert('✅ Сохранено', size > 0 ? `Граница мира установлена: ${size}×${size} блоков.` : 'Граница мира убрана с карты.');
+                customAlert('✅ Сохранено', size > 0 ? `Граница мира установлена: ±${size} блоков от центра (по X и Z).` : 'Граница мира убрана с карты.');
             } catch (e) {
                 console.error('Не удалось сохранить границу мира:', e);
-                customAlert('❌ Ошибка', 'Не удалось сохранить границу. Проверьте, что таблица world_border создана и у вас есть права модератора.');
+                let msg = 'Не удалось сохранить границу. Проверьте, что таблица world_border создана и у вас есть права модератора.';
+                const raw = (e?.message || '') + ' ' + (e?.details || '') + ' ' + (e?.hint || '');
+                if (e?.code === '42P01' || /does not exist/i.test(raw)) {
+                    msg = 'Таблица world_border не найдена в Supabase. Создайте её по инструкции (SQL из чата).';
+                } else if (e?.code === '42501' || /row-level security|policy/i.test(raw)) {
+                    msg = 'Доступ запрещён политикой RLS: таблица есть, но политика world_border_update_moderators не признаёт вас модератором. Проверьте, что ваш Discord ID реально совпадает со значением discord_id в таблице forum_moderators, и что политика сверяется именно с ним (а не с profiles.discord_id).';
+                }
+                customAlert('❌ Ошибка', msg);
             }
         }
 
