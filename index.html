@@ -1197,6 +1197,17 @@
         .map-claim-box:hover { background: color-mix(in srgb, var(--cat-color, var(--accent-pink)) 34%, transparent); box-shadow: 0 0 0 2px color-mix(in srgb, var(--cat-color) 60%, transparent); }
         @keyframes mapClaimPop { from { opacity: 0; transform: scale(0.85); } to { opacity: 1; transform: scale(1); } }
 
+        #map-border-svg { position: absolute; top: 0; left: 0; pointer-events: none; overflow: visible; z-index: 3; }
+        .map-border-rect {
+            fill: none; stroke: #3dd6ff; stroke-width: 3; stroke-dasharray: 18 10;
+            vector-effect: non-scaling-stroke;
+            filter: drop-shadow(0 0 4px rgba(61,214,255,0.65));
+        }
+        .map-border-tick {
+            stroke: #3dd6ff; stroke-width: 2; opacity: 0.85;
+            vector-effect: non-scaling-stroke;
+        }
+
         #map-preview-box {
             position: absolute; border: 2px dashed var(--accent-acid, #c6ff3d);
             background: rgba(198,255,61,0.12); pointer-events: none; display: none; border-radius: 3px;
@@ -1289,6 +1300,19 @@
         }
         .map-cities-btn:hover { background: rgba(198,255,61,0.14); transform: translateY(-1px); }
         .map-cities-btn [data-lucide] { width: 14px; height: 14px; }
+
+        .map-border-btn {
+            display: flex; align-items: center; justify-content: center; gap: 7px;
+            background: rgba(61,214,255,0.08); border: 1px solid rgba(61,214,255,0.3); color: #a6ecff;
+            padding: 9px 12px; border-radius: 12px; font-family: var(--font-sans); font-size: 0.8rem; font-weight: 600;
+            cursor: pointer; transition: all 0.15s ease;
+        }
+        .map-border-btn:hover { background: rgba(61,214,255,0.16); transform: translateY(-1px); }
+        .map-border-btn [data-lucide] { width: 14px; height: 14px; }
+
+        #map-legend-border { display: flex; align-items: center; justify-content: space-between; font-size: 0.72rem; color: #a6ecff; margin-top: 8px; padding-top: 8px; border-top: 1px dashed rgba(61,214,255,0.2); }
+        #map-legend-border .dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; background: #3dd6ff; box-shadow: 0 0 6px rgba(61,214,255,0.7); }
+        #map-legend-border span.map-legend-name { display: flex; align-items: center; gap: 7px; }
 
         #map-legend { display: flex; flex-direction: column; gap: 6px; margin-top: 2px; padding-top: 10px; border-top: 1px dashed rgba(255,255,255,0.08); }
         .map-legend-item { display: flex; align-items: center; justify-content: space-between; font-size: 0.72rem; color: var(--text-muted); }
@@ -2261,6 +2285,7 @@
                 <div id="map-viewport">
                     <div id="map-world">
                         <canvas id="map-terrain-canvas" width="500" height="500"></canvas>
+                        <svg id="map-border-svg" width="10000" height="10000"></svg>
                         <div id="map-preview-box"><div id="map-preview-size-label"></div></div>
                         <!-- map-claim-box элементы добавляются сюда -->
                     </div>
@@ -2282,6 +2307,10 @@
                     </div>
                     <button class="map-cities-btn" id="map-open-citylist"><i data-lucide="building-2"></i> Список городов</button>
                     <div id="map-legend"></div>
+                    <div id="map-legend-border" style="display:none;">
+                        <span class="map-legend-name"><span class="dot"></span>Граница мира</span>
+                        <span class="map-legend-limit" id="map-legend-border-size">—</span>
+                    </div>
                 </div>
 
                 <!-- Правая панель: масштаб и действие приватизации -->
@@ -2290,6 +2319,7 @@
                         <button class="map-zoom-btn" id="map-zoom-in">+</button>
                         <button class="map-zoom-btn" id="map-zoom-out">−</button>
                     </div>
+                    <button class="map-border-btn" id="map-border-btn" style="display:none;"><i data-lucide="shield"></i> Граница мира</button>
                     <button id="map-claim-cta"><i data-lucide="flag"></i> Занять территорию</button>
                 </div>
 
@@ -2365,6 +2395,23 @@
                     <div id="map-city-list"></div>
                     <div class="map-modal-actions">
                         <button class="map-btn-primary" id="map-citylist-close">Закрыть</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Граница мира (только модераторы) -->
+            <div class="map-modal-overlay" id="map-modal-border">
+                <div class="map-modal-card">
+                    <div class="map-modal-pattern"><i data-lucide="shield"></i><i data-lucide="ruler"></i><i data-lucide="octagon-alert"></i></div>
+                    <h3><i data-lucide="shield" style="width:16px;height:16px;vertical-align:-3px;color:#3dd6ff;"></i> Граница мира</h3>
+                    <p class="map-sub">Квадрат размером N×N блоков вокруг центра карты (0,0). Игроки увидят его как голубую обводку с засечками. Поставьте 0, чтобы убрать границу с карты.</p>
+                    <div class="map-field">
+                        <label>Размер границы (блоков)</label>
+                        <input id="map-border-input" type="number" min="0" step="50" placeholder="Например: 2000">
+                    </div>
+                    <div class="map-modal-actions">
+                        <button class="map-btn-ghost" id="map-border-cancel">Отмена</button>
+                        <button class="map-btn-primary" id="map-border-save">Сохранить</button>
                     </div>
                 </div>
             </div>
@@ -3512,6 +3559,7 @@ async function loadSectionVisibility() {
         let mapMarkerEl = null, mapMarkerTimer = null;
         let mapSelectedCategory = null;
         let mapPendingClaim = null;
+        let mapWorldBorderSize = 0; // 0/null = граница не установлена
 
         function openWorldMap() {
             if (!canAccessSection('map')) {
@@ -3528,7 +3576,14 @@ async function loadSectionVisibility() {
             }
             requestAnimationFrame(mapFitToScreen);
             loadTerritoryClaims();
+            loadWorldBorder();
+            mapUpdateModeratorUI();
             if (window.lucide) lucide.createIcons();
+        }
+
+        function mapUpdateModeratorUI() {
+            const btn = document.getElementById('map-border-btn');
+            if (btn) btn.style.display = isUserModerator ? 'flex' : 'none';
         }
 
         function closeWorldMap() {
@@ -3590,6 +3645,10 @@ async function loadSectionVisibility() {
                 .on('postgres_changes', { event: '*', schema: 'public', table: 'territory_claims' }, () => {
                     // Кто-то занял/снял территорию — перезагружаем приваты у всех, у кого открыта карта
                     loadTerritoryClaims();
+                })
+                .on('postgres_changes', { event: '*', schema: 'public', table: 'world_border' }, () => {
+                    // Модератор изменил границу мира — обновляем у всех, у кого открыта карта
+                    loadWorldBorder();
                 })
                 .subscribe();
         }
@@ -3718,6 +3777,14 @@ async function loadSectionVisibility() {
 
             document.getElementById('map-open-citylist').onclick = mapOpenCityList;
             document.getElementById('map-citylist-close').onclick = () => document.getElementById('map-modal-citylist').classList.remove('open');
+
+            document.getElementById('map-border-btn').onclick = () => {
+                if (!isUserModerator) return;
+                document.getElementById('map-border-input').value = mapWorldBorderSize > 0 ? mapWorldBorderSize : '';
+                document.getElementById('map-modal-border').classList.add('open');
+            };
+            document.getElementById('map-border-cancel').onclick = () => document.getElementById('map-modal-border').classList.remove('open');
+            document.getElementById('map-border-save').onclick = mapSaveWorldBorder;
         }
 
         function mapZoomStep(factor) {
@@ -3941,6 +4008,99 @@ async function loadSectionVisibility() {
                 mapClaims.forEach(mapRenderClaimBox);
             } catch (e) {
                 console.error('Не удалось загрузить приваты территорий:', e);
+            }
+        }
+
+        /* =========================================================================
+           ГРАНИЦА МИРА — квадрат N×N блоков вокруг центра карты (0,0), задаётся
+           модераторами. Хранится в таблице world_border (одна строка, id=1),
+           видна всем игрокам, редактируется только модераторами (см. RLS).
+           ========================================================================= */
+
+        async function loadWorldBorder() {
+            try {
+                const { data, error } = await supabaseClient.from('world_border').select('size').eq('id', 1).maybeSingle();
+                if (error) throw error;
+                mapWorldBorderSize = data?.size || 0;
+            } catch (e) {
+                console.error('Не удалось загрузить границу мира:', e);
+                mapWorldBorderSize = 0;
+            }
+            mapRenderWorldBorder();
+        }
+
+        function mapRenderWorldBorder() {
+            const svg = document.getElementById('map-border-svg');
+            const legendRow = document.getElementById('map-legend-border');
+            const legendSize = document.getElementById('map-legend-border-size');
+            if (!svg) return;
+
+            const size = mapWorldBorderSize;
+            if (!size || size <= 0) {
+                svg.innerHTML = '';
+                if (legendRow) legendRow.style.display = 'none';
+                return;
+            }
+
+            const half = size / 2;
+            // Граница центрирована на (0,0) — центре карты/мира.
+            const x1 = MAP_HALF - half, y1 = MAP_HALF - half;
+            const x2 = MAP_HALF + half, y2 = MAP_HALF + half;
+
+            // Кол-во засечек держим в разумных пределах вне зависимости от размера границы.
+            const ticksPerEdge = 20;
+            const spacing = size / ticksPerEdge;
+            const tickLen = Math.max(20, Math.round(size / 40));
+
+            let ticks = '';
+            for (let i = 0; i <= ticksPerEdge; i++) {
+                const x = Math.min(x1 + i * spacing, x2);
+                ticks += `<line x1="${x}" y1="${y1}" x2="${x}" y2="${y1 - tickLen}" class="map-border-tick"/>`;
+                ticks += `<line x1="${x}" y1="${y2}" x2="${x}" y2="${y2 + tickLen}" class="map-border-tick"/>`;
+            }
+            for (let i = 0; i <= ticksPerEdge; i++) {
+                const y = Math.min(y1 + i * spacing, y2);
+                ticks += `<line x1="${x1}" y1="${y}" x2="${x1 - tickLen}" y2="${y}" class="map-border-tick"/>`;
+                ticks += `<line x1="${x2}" y1="${y}" x2="${x2 + tickLen}" y2="${y}" class="map-border-tick"/>`;
+            }
+
+            svg.innerHTML = `<rect x="${x1}" y="${y1}" width="${size}" height="${size}" class="map-border-rect"/>${ticks}`;
+
+            if (legendRow) legendRow.style.display = 'flex';
+            if (legendSize) legendSize.textContent = `${size}×${size}`;
+        }
+
+        async function mapSaveWorldBorder() {
+            if (!isUserModerator) return;
+            const raw = document.getElementById('map-border-input').value.trim();
+            const size = raw === '' ? 0 : parseInt(raw, 10);
+            if (isNaN(size) || size < 0) {
+                customAlert('❌ Ошибка', 'Введите целое число блоков (0, чтобы убрать границу).');
+                return;
+            }
+
+            try {
+                const { error } = await supabaseClient
+                    .from('world_border')
+                    .upsert({ id: 1, size, updated_by: currentUserLinkedData?.discord_id || null, updated_at: new Date().toISOString() }, { onConflict: 'id' });
+                if (error) throw error;
+
+                mapWorldBorderSize = size;
+                mapRenderWorldBorder();
+                document.getElementById('map-modal-border').classList.remove('open');
+
+                logAdminAction({
+                    action_type: 'world_border_change',
+                    severity: 'high',
+                    target_type: 'map',
+                    target_label: 'Граница мира',
+                    details: { size }
+                });
+
+                customAlert('✅ Сохранено', size > 0 ? `Граница мира установлена: ${size}×${size} блоков.` : 'Граница мира убрана с карты.');
+            } catch (e) {
+                console.error('Не удалось сохранить границу мира:', e);
+                customAlert('❌ Ошибка', 'Не удалось сохранить границу. Проверьте, что таблица world_border создана и у вас есть права модератора.');
             }
         }
 
