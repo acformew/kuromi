@@ -1184,8 +1184,8 @@
         #map-viewport.map-panning { cursor: grabbing; }
         #map-viewport.map-claiming { cursor: crosshair; }
 
-        #map-world { position: absolute; top: 0; left: 0; width: 5000px; height: 5000px; transform-origin: 0 0; will-change: transform; }
-        #map-terrain-canvas { position: absolute; top: 0; left: 0; width: 5000px; height: 5000px; image-rendering: pixelated; image-rendering: crisp-edges; }
+        #map-world { position: absolute; top: 0; left: 0; width: 10000px; height: 10000px; transform-origin: 0 0; will-change: transform; }
+        #map-terrain-canvas { position: absolute; top: 0; left: 0; width: 10000px; height: 10000px; image-rendering: pixelated; image-rendering: crisp-edges; }
 
         .map-claim-box {
             position: absolute; border: 2px solid var(--cat-color, var(--accent-pink));
@@ -3479,7 +3479,7 @@ async function loadSectionVisibility() {
            именно отрисована карта.
            ========================================================================= */
 
-        const MAP_WORLD_SIZE = 5000;
+        const MAP_WORLD_SIZE = 10000;
         const MAP_HALF = MAP_WORLD_SIZE / 2;
 
         const MAP_CATEGORIES = [
@@ -3538,27 +3538,26 @@ async function loadSectionVisibility() {
         }
 
         function generateMapTerrain() {
-            const canvas = document.getElementById('map-terrain-canvas');
-            canvas.width = 10000;
-            canvas.height = 10000;
-            
-            const ctx = canvas.getContext('2d');
-            const mapImage = new Image();
-            
-            // Если сохранил в .png или .jpg — замени расширение здесь
-            mapImage.src = 'map.jpg'; 
+    const canvas = document.getElementById('map-terrain-canvas');
+    canvas.width = 10000;
+    canvas.height = 10000;
+    
+    const ctx = canvas.getContext('2d');
+    const mapImage = new Image();
+    
+    mapImage.src = 'map.jpg'; // Укажи свое имя и расширение файла
 
-            mapImage.onload = () => {
-                ctx.drawImage(mapImage, 0, 0, canvas.width, canvas.height);
-                if (typeof mapApplyTransform === 'function') {
-                    mapApplyTransform();
-                }
-            };
-
-            mapImage.onerror = () => {
-                console.error('Ошибка: файл карты не найден. Проверь путь и расширение файла.');
-            };
+    mapImage.onload = () => {
+        ctx.drawImage(mapImage, 0, 0, canvas.width, canvas.height);
+        if (typeof mapApplyTransform === 'function') {
+            mapApplyTransform();
         }
+    };
+
+    mapImage.onerror = () => {
+        console.error('Ошибка: не удалось найти или загрузить файл карты');
+    };
+}
 
         function mapFitToScreen() {
             const rect = mapViewportEl.getBoundingClientRect();
