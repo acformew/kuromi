@@ -1356,9 +1356,20 @@
 
         .map-modal-overlay {
             position: fixed; inset: 0; background: rgba(2,1,4,0.75); backdrop-filter: blur(6px);
-            display: none; align-items: center; justify-content: flex-start; z-index: 20010; padding: 20px 20px 20px 6vw;
+            display: none; align-items: center; justify-content: center; z-index: 20010; padding: 20px;
         }
         .map-modal-overlay.open { display: flex; }
+        /* Список городов и выбор категории ("Занять территорию") — слева и чуть крупнее,
+           остальные модалки (название/описание, инфо, граница, редактирование) — по центру, как раньше. */
+        #map-modal-citylist, #map-modal-category {
+            justify-content: flex-start; padding: 20px 20px 20px 6vw;
+        }
+        #map-modal-citylist .map-modal-card, #map-modal-category .map-modal-card {
+            width: min(480px, 90vw); padding: 34px;
+        }
+        @media (max-width: 640px) {
+            #map-modal-citylist, #map-modal-category { justify-content: center; padding: 16px; }
+        }
         .map-modal-card {
             background: linear-gradient(160deg, rgba(138,43,226,0.14), rgba(16,11,28,0.99) 55%), rgba(16,11,28,0.98);
             border: 1px solid var(--primary-purple); border-radius: 24px;
