@@ -2383,6 +2383,7 @@
                     <div class="map-info-row"><span><i data-lucide="user" style="width:13px;height:13px;"></i> Владелец</span><b id="map-info-owner">—</b></div>
                     <div class="map-info-row"><span><i data-lucide="crosshair" style="width:13px;height:13px;"></i> Центр</span><b id="map-info-center">—</b></div>
                     <div class="map-info-row"><span><i data-lucide="ruler" style="width:13px;height:13px;"></i> Размер</span><b id="map-info-size">—</b></div>
+                    <div class="map-info-row"><span><i data-lucide="clock" style="width:13px;height:13px;"></i> Занято</span><b id="map-info-created">—</b></div>
                     <p class="map-info-desc" id="map-info-desc"></p>
                     <div class="map-modal-actions" style="margin-top:18px;">
                         <button class="map-btn-danger" id="map-info-remove" style="display:none;"><i data-lucide="trash-2"></i> Снять приват</button>
@@ -3550,7 +3551,7 @@ async function loadSectionVisibility() {
             { key: 'city',      name: 'Город',        color: '#c6ff3d', limit: 300, maxPerPlayer: 1, icon: 'building-2' },
             { key: 'structure', name: 'Структура',    color: '#ff007f', limit: 220, maxPerPlayer: 2, icon: 'tent' },
             { key: 'farm',      name: 'Ферма',        color: '#3dd6ff', limit: 180, maxPerPlayer: 3, icon: 'wheat' },
-            { key: 'base',      name: 'Приват/Дом',   color: '#8a2be2', limit: 80, maxPerPlayer: 1, icon: 'house' },
+            { key: 'base',      name: 'Личные имения', color: '#8a2be2', limit: 200, maxPerPlayer: 1, icon: 'house' },
             { key: 'other',     name: 'Другое',       color: '#ffffff', limit: 60, maxPerPlayer: 2, icon: 'flag' },
         ];
         const mapCatByKey = Object.fromEntries(MAP_CATEGORIES.map(c => [c.key, c]));
@@ -3931,7 +3932,8 @@ async function loadSectionVisibility() {
             size_limit_exceeded: 'Территория превышает лимит размера для этой категории.',
             city_limit_reached: 'У вас уже есть свой город — второй занять нельзя.',
             category_limit_reached: 'Вы уже заняли максимум приватов этой категории.',
-            not_found_or_not_owner: 'Не удалось снять приват (возможно, вы не его владелец).'
+            area_occupied: 'Это место уже занято другим приватом. Выберите свободную область.',
+            not_found_or_not_owner: 'Не удалось снять приват (возможно, вы не его владелец и не модератор).'
         };
         function mapFriendlyError(error) {
             const code = (error?.message || '').trim();
@@ -3954,7 +3956,23 @@ async function loadSectionVisibility() {
                 return;
             }
 
+            const overlap = mapFindOverlappingClaim({ x1, z1, x2, z2 });
+            if (overlap) {
+                customAlert('⛔ Территория занята', `Здесь уже есть приват «${overlap.title}» (владелец: ${overlap.owner_name}). Выберите свободное место.`);
+                return;
+            }
+
             mapOpenDetailsModal({ category: mapClaimFlow.category, x1, z1, x2, z2 });
+        }
+
+        // Проверяет, пересекается ли прямоугольник rect (x1,z1,x2,z2 — уже
+        // нормализованные, x1<=x2 и z1<=z2) с каким-либо из существующих приватов.
+        // Соприкосновение краёв (общая граница) не считается пересечением.
+        function mapFindOverlappingClaim(rect) {
+            return mapClaims.find(c =>
+                rect.x1 < c.x2 && rect.x2 > c.x1 &&
+                rect.z1 < c.z2 && rect.z2 > c.z1
+            );
         }
 
         function mapOpenDetailsModal(data) {
@@ -3974,6 +3992,16 @@ async function loadSectionVisibility() {
             const desc = document.getElementById('map-claim-desc').value.trim();
             if (!title) { customAlert('❌ Ошибка', 'Введите название территории.'); return; }
             if (!currentUserLinkedData) { customAlert('🔒 Авторизация', 'Авторизуйтесь через Discord и привяжите Minecraft-аккаунт.'); return; }
+
+            // Перепроверяем пересечение прямо перед отправкой — вдруг кто-то
+            // другой занял это место, пока открыто окно названия/описания.
+            const overlap = mapFindOverlappingClaim(mapPendingClaim);
+            if (overlap) {
+                customAlert('⛔ Территория занята', `Пока вы оформляли приват, «${overlap.title}» (${overlap.owner_name}) уже занял это место. Нарисуйте область заново.`);
+                document.getElementById('map-modal-details').classList.remove('open');
+                mapExitDrawingMode();
+                return;
+            }
 
             const { data: newId, error } = await supabaseClient.rpc('territory_claim_place', {
                 p_category: mapPendingClaim.category,
@@ -3996,6 +4024,7 @@ async function loadSectionVisibility() {
                 title, description: desc,
                 x1: Math.min(mapPendingClaim.x1, mapPendingClaim.x2), z1: Math.min(mapPendingClaim.z1, mapPendingClaim.z2),
                 x2: Math.max(mapPendingClaim.x1, mapPendingClaim.x2), z2: Math.max(mapPendingClaim.z1, mapPendingClaim.z2),
+                created_at: new Date().toISOString(),
             };
             mapClaims.push(claim);
             mapRenderClaimBox(claim);
@@ -4165,6 +4194,7 @@ async function loadSectionVisibility() {
             document.getElementById('map-info-owner').textContent = claim.owner_name;
             document.getElementById('map-info-center').textContent = `${cx}, ${cz}`;
             document.getElementById('map-info-size').textContent = `${w} × ${h} блоков`;
+            document.getElementById('map-info-created').textContent = formatDate(claim.created_at, true);
             document.getElementById('map-info-desc').textContent = claim.description || 'Без описания.';
 
             const badge = document.getElementById('map-info-cat-badge');
@@ -4173,24 +4203,38 @@ async function loadSectionVisibility() {
 
             const removeBtn = document.getElementById('map-info-remove');
             const isOwner = currentUserLinkedData && claim.owner_uuid === currentUserLinkedData.minecraft_uuid;
-            removeBtn.style.display = isOwner ? 'flex' : 'none';
-            removeBtn.onclick = () => mapRemoveClaim(claim.id);
+            const canRemove = isOwner || isUserModerator;
+            removeBtn.style.display = canRemove ? 'flex' : 'none';
+            removeBtn.innerHTML = isOwner
+                ? '<i data-lucide="trash-2"></i> Снять приват'
+                : '<i data-lucide="shield-alert"></i> Снять приват (модератор)';
+            removeBtn.onclick = () => mapRemoveClaim(claim.id, !isOwner && isUserModerator);
 
             document.getElementById('map-modal-info').classList.add('open');
             if (window.lucide) lucide.createIcons();
         }
 
-        async function mapRemoveClaim(id) {
+        async function mapRemoveClaim(id, asModerator) {
+            const claim = mapClaims.find(c => c.id === id);
             const { error } = await supabaseClient.rpc('territory_claim_remove', { p_id: id });
             if (error) { customAlert('❌ Ошибка', mapFriendlyError(error)); return; }
 
-            const claim = mapClaims.find(c => c.id === id);
             if (claim && claim._els) {
                 claim._els.box.remove();
                 if (claim._els.label) claim._els.label.remove();
             }
             mapClaims = mapClaims.filter(c => c.id !== id);
             document.getElementById('map-modal-info').classList.remove('open');
+
+            if (asModerator && claim) {
+                logAdminAction({
+                    action_type: 'territory_claim_remove',
+                    severity: 'medium',
+                    target_type: 'territory_claim',
+                    target_label: `${claim.title} (владелец: ${claim.owner_name})`,
+                    details: { claim_id: id, category: claim.category }
+                });
+            }
         }
 
         function mapOpenCityList() {
