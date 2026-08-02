@@ -1200,7 +1200,19 @@
         #map-preview-box {
             position: absolute; border: 2px dashed var(--accent-acid, #c6ff3d);
             background: rgba(198,255,61,0.12); pointer-events: none; display: none; border-radius: 3px;
+            transition: border-color 0.15s ease, background 0.15s ease;
         }
+        #map-preview-box.at-limit {
+            border-color: #ff4d4d; background: rgba(255,77,77,0.16);
+        }
+        #map-preview-size-label {
+            position: absolute; left: 50%; top: 50%; transform: translate(-50%,-50%);
+            background: rgba(5,3,8,0.88); border: 1px solid rgba(255,255,255,0.14); border-radius: 8px;
+            padding: 3px 9px; font-size: 0.72rem; font-weight: 700; white-space: nowrap; color: #fff;
+            pointer-events: none; font-variant-numeric: tabular-nums;
+        }
+        #map-preview-size-label.at-limit { color: #ff4d4d; }
+        #map-claim-banner.at-limit span { color: #ff4d4d; }
 
         #map-overlay-layer { position: absolute; inset: 0; pointer-events: none; }
         .map-claim-label {
@@ -2249,7 +2261,7 @@
                 <div id="map-viewport">
                     <div id="map-world">
                         <canvas id="map-terrain-canvas" width="500" height="500"></canvas>
-                        <div id="map-preview-box"></div>
+                        <div id="map-preview-box"><div id="map-preview-size-label"></div></div>
                         <!-- map-claim-box элементы добавляются сюда -->
                     </div>
                     <div id="map-overlay-layer">
@@ -2282,7 +2294,7 @@
                 </div>
 
                 <div id="map-claim-banner">
-                    <span>Растяните область на карте, зажав ЛКМ</span>
+                    <span id="map-claim-banner-text">Растяните область на карте, зажав ЛКМ</span>
                     <button id="map-claim-cancel-drawing">Отмена</button>
                 </div>
             </div>
@@ -3570,12 +3582,25 @@ async function loadSectionVisibility() {
             mapApplyTransform();
         }
 
+        let mapRealtimeChannel = null;
+        function mapSetupRealtimeSync() {
+            if (mapRealtimeChannel) return; // подписываемся только один раз за сессию страницы
+            mapRealtimeChannel = supabaseClient
+                .channel('territory_claims_live')
+                .on('postgres_changes', { event: '*', schema: 'public', table: 'territory_claims' }, () => {
+                    // Кто-то занял/снял территорию — перезагружаем приваты у всех, у кого открыта карта
+                    loadTerritoryClaims();
+                })
+                .subscribe();
+        }
+
         function initWorldMap() {
             mapViewportEl = document.getElementById('map-viewport');
             mapWorldEl = document.getElementById('map-world');
             mapOverlayEl = document.getElementById('map-overlay-layer');
 
             generateMapTerrain();
+            mapSetupRealtimeSync();
 
             document.getElementById('map-legend').innerHTML = MAP_CATEGORIES.map(c => `
                 <div class="map-legend-item">
@@ -3764,13 +3789,21 @@ async function loadSectionVisibility() {
         function mapEnterDrawingMode(categoryKey) {
             mapClaimFlow = { active: true, stage: 'drawing', category: categoryKey, drawing: false, startLocal: null };
             mapViewportEl.classList.add('map-claiming');
-            document.getElementById('map-claim-banner').style.display = 'flex';
+            const banner = document.getElementById('map-claim-banner');
+            banner.style.display = 'flex';
+            banner.classList.remove('at-limit');
+            const cat = mapCatByKey[categoryKey];
+            document.getElementById('map-claim-banner-text').textContent =
+                `Растяните область на карте, зажав ЛКМ (макс. ${cat.limit}×${cat.limit})`;
         }
         function mapExitDrawingMode() {
             mapClaimFlow = { active: false, stage: null, category: null, drawing: false };
             mapViewportEl.classList.remove('map-claiming');
             document.getElementById('map-claim-banner').style.display = 'none';
-            document.getElementById('map-preview-box').style.display = 'none';
+            document.getElementById('map-claim-banner').classList.remove('at-limit');
+            const box = document.getElementById('map-preview-box');
+            box.style.display = 'none';
+            box.classList.remove('at-limit');
         }
 
         function mapStartDrawing(e) {
@@ -3787,11 +3820,36 @@ async function loadSectionVisibility() {
         function mapUpdateDrawing(sx, sy) {
             const { lx, ly } = mapScreenToLocal(sx, sy);
             const s = mapClaimFlow.startLocal;
-            const x = Math.min(s.lx, lx), y = Math.min(s.ly, ly);
-            const w = Math.abs(lx - s.lx), h = Math.abs(ly - s.ly);
+            const cat = mapCatByKey[mapClaimFlow.category];
+            const maxSize = cat ? cat.limit : Infinity;
+
+            // Сырые размеры (до ограничения) — 1 local-единица = 1 блок мира, так как
+            // mapWorldToLocal только сдвигает координаты, не масштабирует их.
+            let rawW = Math.abs(lx - s.lx);
+            let rawH = Math.abs(ly - s.ly);
+
+            // Жёстко ограничиваем ширину/высоту лимитом категории — дальше рамка
+            // просто перестаёт расти в эту сторону, сколько бы ни тянул игрок мышкой.
+            const w = Math.min(rawW, maxSize);
+            const h = Math.min(rawH, maxSize);
+            const atLimit = rawW >= maxSize || rawH >= maxSize;
+
+            // Сохраняем сторону, в которую изначально тянули, чтобы рамка не "прыгала".
+            const x = (lx >= s.lx) ? s.lx : s.lx - w;
+            const y = (ly >= s.ly) ? s.ly : s.ly - h;
+
             const box = document.getElementById('map-preview-box');
             box.style.left = x + 'px'; box.style.top = y + 'px';
             box.style.width = w + 'px'; box.style.height = h + 'px';
+            box.classList.toggle('at-limit', atLimit);
+
+            const label = document.getElementById('map-preview-size-label');
+            if (label) {
+                label.textContent = `${Math.round(w)}×${Math.round(h)} / ${maxSize}`;
+                label.classList.toggle('at-limit', atLimit);
+            }
+            document.getElementById('map-claim-banner').classList.toggle('at-limit', atLimit);
+
             mapClaimFlow.currentRect = { x, y, w, h };
         }
         const MAP_ERROR_MESSAGES = {
