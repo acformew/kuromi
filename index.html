@@ -3115,8 +3115,11 @@ async function loadSectionVisibility() {
             document.getElementById(`bm-tab-${tab}`)?.classList.add('active');
             btnEl?.classList.add('active');
 
-            if (tab === 'market') { supabaseClient.rpc('bm_sweep_market_timeouts').finally(loadBlackMarketListings); }
-            if (tab === 'jobs') { supabaseClient.rpc('bm_sweep_job_timeouts').finally(loadBlackMarketJobs); }
+            // Оборачиваем в Promise.resolve(), т.к. билдер запросов supabase-js — «thenable»,
+            // но не полноценный Promise, и .finally() на нём кидает TypeError, из-за чего
+            // загрузка молча обрывалась и витрина зависала на "Загрузка...".
+            if (tab === 'market') { Promise.resolve(supabaseClient.rpc('bm_sweep_market_timeouts')).catch(() => {}).then(loadBlackMarketListings); }
+            if (tab === 'jobs') { Promise.resolve(supabaseClient.rpc('bm_sweep_job_timeouts')).catch(() => {}).then(loadBlackMarketJobs); }
         }
 
         // Кэш последних загруженных данных — детальная плашка открывается из него мгновенно, без лишнего запроса
@@ -3149,6 +3152,15 @@ async function loadSectionVisibility() {
 
             if (!itemInput.value.trim()) { customAlert('❌ Ошибка', 'Укажите название товара.'); return; }
             if (!price || price <= 0) { customAlert('❌ Ошибка', 'Укажите корректную цену.'); return; }
+
+            // Та же проверка баланса, что и для вакансий — цена лота не может превышать
+            // текущий баланс продавца (окончательно должно проверяться и в bm_create_listing на сервере)
+            const { data: balanceRow } = await supabaseClient
+                .from('player_stats').select('currency_balance').eq('minecraft_uuid', currentUserLinkedData.minecraft_uuid).maybeSingle();
+            if (balanceRow && price > (balanceRow.currency_balance || 0)) {
+                customAlert('❌ Недостаточно средств', `На счету ${balanceRow.currency_balance} валюты — цена лота не может превышать ваш баланс.`);
+                return;
+            }
 
             const { error } = await supabaseClient.rpc('bm_create_listing', {
                 p_item_name: itemInput.value.trim(), p_description: descInput.value.trim() || null, p_price: price
@@ -4368,7 +4380,10 @@ async function loadSectionVisibility() {
             if (!overlay) return;
             overlay.classList.add('active');
             document.body.style.overflow = 'hidden';
-            supabaseClient.rpc('bm_sweep_market_timeouts').finally(loadBlackMarketListings);
+            // Грузим сразу оба раздела (площадку и вакансии), чтобы переключение вкладок было мгновенным
+            // и ничего не «зависало» на заглушке "Загрузка...". Promise.resolve() — см. комментарий в switchBlackMarketTab.
+            Promise.resolve(supabaseClient.rpc('bm_sweep_market_timeouts')).catch(() => {}).then(loadBlackMarketListings);
+            Promise.resolve(supabaseClient.rpc('bm_sweep_job_timeouts')).catch(() => {}).then(loadBlackMarketJobs);
             if (window.lucide) lucide.createIcons();
         }
 
