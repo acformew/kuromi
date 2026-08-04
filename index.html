@@ -955,13 +955,13 @@
             position: relative;
             overflow: hidden;
             border-radius: 28px;
-            border: 1px solid rgba(255, 255, 255, 0.09);
+            border: 1px solid rgba(138, 43, 226, 0.16);
             background:
-                radial-gradient(ellipse 900px 500px at 15% -10%, rgba(255,255,255,0.06), transparent 60%),
-                radial-gradient(ellipse 700px 400px at 100% 110%, rgba(255,255,255,0.03), transparent 60%),
-                linear-gradient(180deg, #0d0d0f 0%, #030304 100%);
-            box-shadow: 0 40px 90px rgba(0,0,0,0.85), inset 0 1px 0 rgba(255,255,255,0.05);
-            padding: 46px 44px 50px;
+                radial-gradient(ellipse 900px 500px at 15% -10%, rgba(138, 43, 226, 0.10), transparent 60%),
+                radial-gradient(ellipse 700px 400px at 100% 110%, rgba(255, 0, 127, 0.05), transparent 60%),
+                linear-gradient(180deg, #100b1c 0%, #050308 100%);
+            box-shadow: 0 40px 90px rgba(0,0,0,0.75), inset 0 1px 0 rgba(255,255,255,0.05);
+            padding: 48px 48px 54px;
             animation: bmPortalIn 0.55s cubic-bezier(0.16, 1, 0.3, 1) forwards;
         }
         @keyframes bmPortalIn {
@@ -1012,12 +1012,26 @@
         }
         .darknet-input::placeholder { color: rgba(255, 255, 255, 0.32); }
         .darknet-input:focus {
-            border-color: rgba(255, 255, 255, 0.4);
-            box-shadow: 0 0 10px rgba(255, 255, 255, 0.08);
+            border-color: rgba(138, 43, 226, 0.55);
+            box-shadow: 0 0 10px rgba(138, 43, 226, 0.18);
         }
         .darknet-input[type="number"] { -moz-appearance: textfield; }
         .darknet-input[type="number"]::-webkit-inner-spin-button,
         .darknet-input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+
+        /* Двухколоночная структура вкладки: форма слева, витрина справа — просторнее и понятнее */
+        .bm-layout {
+            display: grid;
+            grid-template-columns: minmax(260px, 320px) 1fr;
+            gap: 28px;
+            width: 100%;
+            align-items: start;
+        }
+        .bm-layout .bm-form-card { margin-top: 0; }
+        .bm-listing-col { min-width: 0; }
+        @media (max-width: 860px) {
+            .bm-layout { grid-template-columns: 1fr; }
+        }
 
         /* Узкие карточки-объявления в несколько колонок, как на маркетплейсах */
         .bounty-grid {
@@ -1029,13 +1043,13 @@
             align-items: start;
         }
         .bounty-card {
-            background: rgba(255, 255, 255, 0.02);
-            border: 1px solid rgba(255, 255, 255, 0.07);
-            padding: 16px 18px;
+            background: rgba(255, 255, 255, 0.025);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 18px 20px;
             border-radius: 16px;
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 12px;
             position: relative;
             overflow: hidden;
             text-align: left;
@@ -1049,7 +1063,7 @@
         .bounty-card:nth-child(4) { animation-delay: 0.14s; }
         .bounty-card:nth-child(5) { animation-delay: 0.18s; }
         .bounty-card:nth-child(n+6) { animation-delay: 0.2s; }
-        .bounty-card:hover { border-color: rgba(255, 255, 255, 0.2); background: rgba(255, 255, 255, 0.04); transform: translateY(-2px); }
+        .bounty-card:hover { border-color: rgba(138, 43, 226, 0.35); background: rgba(255, 255, 255, 0.045); transform: translateY(-2px); }
         .bounty-card > *:not(.icon-pattern-layer) { position: relative; z-index: 1; }
 
         .bounty-info { display: flex; align-items: center; gap: 12px; text-align: left; min-width: 0; }
@@ -1084,26 +1098,26 @@
             cursor: pointer; transition: all 0.2s ease;
         }
         .bm-tab [data-lucide] { width: 15px; height: 15px; }
-        .bm-tab:hover { border-color: rgba(255, 255, 255, 0.3); color: #fff; }
-        .bm-tab.active { background: rgba(255, 255, 255, 0.12); border-color: #fff; color: #fff; box-shadow: 0 0 16px rgba(255, 255, 255, 0.08); }
+        .bm-tab:hover { border-color: rgba(138, 43, 226, 0.4); color: #fff; }
+        .bm-tab.active { background: rgba(138, 43, 226, 0.18); border-color: #b985f4; color: #fff; box-shadow: 0 0 16px rgba(138, 43, 226, 0.18); }
 
         .bm-hint {
-            display: flex; align-items: center; gap: 10px; margin-top: 18px; padding: 12px 18px;
-            background: rgba(255, 255, 255, 0.025); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 14px;
+            display: flex; align-items: center; gap: 10px; margin-top: 18px; padding: 14px 20px;
+            background: rgba(138, 43, 226, 0.05); border: 1px solid rgba(138, 43, 226, 0.16); border-radius: 14px;
             font-size: 0.82rem; color: var(--text-muted); text-align: left;
         }
-        .bm-hint [data-lucide] { width: 16px; height: 16px; color: rgba(255,255,255,0.55); flex-shrink: 0; }
+        .bm-hint [data-lucide] { width: 16px; height: 16px; color: #b985f4; flex-shrink: 0; }
         .bm-hint code { background: rgba(255, 255, 255, 0.08); color: #fff; padding: 2px 7px; border-radius: 6px; font-family: monospace; }
 
-        .bm-tab-content { display: none; width: 100%; animation: bmFadeUp 0.35s ease; }
+        .bm-tab-content { display: none; width: 100%; margin-top: 28px; animation: bmFadeUp 0.35s ease; }
         .bm-tab-content.active { display: block; }
         @keyframes bmFadeUp { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
 
         .bm-empty, .bm-loading { color: var(--text-muted); padding: 30px 20px; text-align: left; font-size: 0.9rem; grid-column: 1 / -1; }
 
         .bm-form-card {
-            background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: 18px; padding: 20px; margin-top: 20px;
+            background: rgba(255, 255, 255, 0.025); border: 1px solid rgba(138, 43, 226, 0.14);
+            border-radius: 18px; padding: 24px; margin-top: 20px;
         }
         .bm-form-title { display: flex; align-items: center; gap: 8px; font-weight: 700; color: #fff; margin-bottom: 14px; font-size: 0.95rem; }
         .bm-form-title [data-lucide] { width: 16px; height: 16px; color: rgba(255,255,255,0.65); }
@@ -1122,7 +1136,7 @@
         .bm-action-btn.danger { background: rgba(255, 90, 90, 0.08); border-color: rgba(255, 90, 90, 0.3); color: #ff9d9d; }
         .bm-action-btn [data-lucide] { width: 12px; height: 12px; }
 
-        /* ===== Анонимный чат чёрного рынка ===== */
+        /* ===== Анонимный чат торговой гильдии */
 
         #bm-chat-overlay {
             display: none; position: fixed; inset: 0; background: rgba(5,3,8,0.8);
@@ -1874,7 +1888,7 @@
 
                 <div class="cta-group">
                     <button class="btn-primary" onclick="switchTab('join')">Начать выживание →</button>
-                    <button class="btn-secondary" id="server-ip" onclick="copyIp('kuromismp.20tps.ru')">kuromismp.20tps.ru</button>
+                    <button class="btn-secondary" id="server-ip" onclick="copyIp('play.kuromi.tech')">play.kuromi.tech</button>
                 </div>
             </div>
 
@@ -2157,10 +2171,10 @@
                         <div class="mechanic-more">Подробнее <i data-lucide="arrow-right"></i></div>
                     </div>
                     <div class="mechanic-card" onclick="openWikiArticle('blackmarket')">
-                        <div class="mechanic-img-box"><div class="mechanic-placeholder-icon"><i data-lucide="eye-off"></i></div></div>
+                        <div class="mechanic-img-box"><div class="mechanic-placeholder-icon"><i data-lucide="store"></i></div></div>
                         <div class="mechanic-text-block">
-                            <h3>Черный рынок контрабанды</h3>
-                            <p>Скрытый даркнет-раздел. Доска объявлений, где за игровую валюту можно анонимно объявить награду за голову любого игрока. Тот, кто ликвидирует цель первым, мгновенно забирает банк.</p>
+                            <h3>Торговая гильдия</h3>
+                            <p>Внутриигровой рынок сервера с гарантом сделки: площадка для купли-продажи предметов за игровую валюту и биржа разовых вакансий между игроками.</p>
                         </div>
                         <div class="mechanic-more">Подробнее <i data-lucide="arrow-right"></i></div>
                     </div>
@@ -2212,77 +2226,71 @@
                 </div>
             <div class="bm-portal">
                 <div class="icon-pattern-layer pattern-soft" style="color:#fff;">
-                    <i data-lucide="skull" style="width:22px;height:22px;margin:14px;transform:rotate(-10deg);"></i><i data-lucide="package" style="width:18px;height:18px;margin:18px;transform:rotate(8deg);"></i><i data-lucide="hammer" style="width:20px;height:20px;margin:10px;transform:rotate(-16deg);"></i><i data-lucide="crosshair" style="width:16px;height:16px;margin:16px;transform:rotate(14deg);"></i><i data-lucide="banknote" style="width:20px;height:20px;margin:12px;transform:rotate(-6deg);"></i><i data-lucide="skull" style="width:16px;height:16px;margin:20px;transform:rotate(20deg);"></i><i data-lucide="package" style="width:22px;height:22px;margin:10px;transform:rotate(-20deg);"></i><i data-lucide="hammer" style="width:18px;height:18px;margin:14px;transform:rotate(12deg);"></i><i data-lucide="crosshair" style="width:20px;height:20px;margin:8px;transform:rotate(-8deg);"></i><i data-lucide="banknote" style="width:16px;height:16px;margin:18px;transform:rotate(15deg);"></i>
+                    <i data-lucide="package" style="width:18px;height:18px;margin:18px;transform:rotate(8deg);"></i><i data-lucide="hammer" style="width:20px;height:20px;margin:10px;transform:rotate(-16deg);"></i><i data-lucide="handshake" style="width:16px;height:16px;margin:16px;transform:rotate(14deg);"></i><i data-lucide="gem" style="width:20px;height:20px;margin:12px;transform:rotate(-6deg);"></i><i data-lucide="briefcase" style="width:16px;height:16px;margin:20px;transform:rotate(20deg);"></i><i data-lucide="package" style="width:22px;height:22px;margin:10px;transform:rotate(-20deg);"></i><i data-lucide="hammer" style="width:18px;height:18px;margin:14px;transform:rotate(12deg);"></i><i data-lucide="handshake" style="width:20px;height:20px;margin:8px;transform:rotate(-8deg);"></i><i data-lucide="gem" style="width:16px;height:16px;margin:18px;transform:rotate(15deg);"></i>
                 </div>
-                <div class="darknet-title" style="display:flex; align-items:center; gap:10px;"><span class="icon-badge b-mono" style="width:32px;height:32px;"><i data-lucide="skull"></i></span> BLACK MARKET</div>
-                <div class="eyebrow" style="opacity: 0.7;">Охота за головами · Торговая площадка · Биржа вакансий</div>
+                <div class="darknet-title" style="display:flex; align-items:center; gap:10px;"><span class="icon-badge b-purple" style="width:32px;height:32px;"><i data-lucide="store"></i></span> ТОРГОВАЯ ГИЛЬДИЯ</div>
+                <div class="eyebrow" style="opacity: 0.7;">Торговая площадка · Биржа вакансий</div>
 
                 <p style="font-size: 0.9rem; color: var(--text-muted); max-width: 640px; line-height: 1.5; margin-top: 10px;">
-                    Теневой рынок сервера: анонимные контракты на устранение игроков, площадка со встроенным гарантом сделки (escrow) и биржа разовых подрядов. Личность заказчика контракта нигде не раскрывается.
+                    Внутриигровой рынок сервера: площадка для купли-продажи со встроенным гарантом сделки (escrow) и биржа разовых подрядов между игроками. Сделки защищены — деньги замораживаются до подтверждения обеими сторонами.
                 </p>
 
                 <div class="bm-tabs">
-                    <button class="bm-tab active" id="bm-tab-btn-bounty" onclick="switchBlackMarketTab('bounty', this)"><i data-lucide="skull"></i> Охота за головами</button>
-                    <button class="bm-tab" id="bm-tab-btn-market" onclick="switchBlackMarketTab('market', this)"><i data-lucide="package"></i> Торговая площадка</button>
+                    <button class="bm-tab active" id="bm-tab-btn-market" onclick="switchBlackMarketTab('market', this)"><i data-lucide="package"></i> Торговая площадка</button>
                     <button class="bm-tab" id="bm-tab-btn-jobs" onclick="switchBlackMarketTab('jobs', this)"><i data-lucide="hammer"></i> Вакансии</button>
                 </div>
 
                 <div class="bm-hint">
-                    <i data-lucide="shield-alert"></i> Личность заказчика контракта нигде не отображается. Деньги на площадке и в вакансиях замораживаются до подтверждения сделки.
+                    <i data-lucide="shield-check"></i> Все сделки проходят через гарант: деньги замораживаются на балансе площадки и переводятся только после подтверждения обеими сторонами.
                 </div>
 
-                <div id="bm-tab-bounty" class="bm-tab-content active">
-                    <div class="bm-form-card">
-                        <div class="bm-form-title"><i data-lucide="crosshair"></i> Объявить охоту</div>
-                        <div class="bm-form-row">
-                            <select id="bounty-target-select" class="darknet-input"><option value="">Загрузка игроков онлайн...</option></select>
-                            <input type="number" id="bounty-amount-input" class="darknet-input" placeholder="Награда (мин. 64)" min="64">
+                <div id="bm-tab-market" class="bm-tab-content active">
+                    <div class="bm-layout">
+                        <div class="bm-form-card">
+                            <div class="bm-form-title"><i data-lucide="package-plus"></i> Выставить лот</div>
+                            <div class="bm-form-row">
+                                <input type="text" id="market-item-input" class="darknet-input" placeholder="Название товара">
+                            </div>
+                            <div class="bm-form-row" style="margin-top:10px;">
+                                <input type="number" id="market-price-input" class="darknet-input" placeholder="Цена" min="1">
+                            </div>
+                            <input type="text" id="market-desc-input" class="darknet-input" style="width:100%; margin-top:10px;" placeholder="Описание (необязательно)">
+                            <button class="btn-primary" style="background: #fff; color: #0a0a0c; box-shadow: 0 4px 15px rgba(255,255,255,0.12); margin-top: 14px;" onclick="submitListing()">Выставить на продажу</button>
                         </div>
-                        <input type="text" id="bounty-hint-input" class="darknet-input" style="width:100%; margin-top:10px;" placeholder="Ориентир (необязательно): где видели цель...">
-                        <button class="btn-primary" style="background: #fff; color: #0a0a0c; box-shadow: 0 4px 15px rgba(255,255,255,0.12); margin-top: 14px;" onclick="submitBounty()">Объявить охоту</button>
-                    </div>
 
-                    <div class="panel-title" style="font-size: 1.3rem; text-align: left; width: 100%; color: #fff; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 10px; margin: 24px 0 20px;display:flex; align-items:center; gap:10px;">
-                        <span class="icon-badge b-mono" style="width:28px;height:28px;"><i data-lucide="target"></i></span> Активные контракты в розыске
-                    </div>
-                    <div class="bounty-grid" id="bounty-board-container"><div class="bm-loading">Загрузка контрактов...</div></div>
-                </div>
-
-                <div id="bm-tab-market" class="bm-tab-content">
-                    <div class="bm-form-card">
-                        <div class="bm-form-title"><i data-lucide="package-plus"></i> Выставить лот</div>
-                        <div class="bm-form-row">
-                            <input type="text" id="market-item-input" class="darknet-input" placeholder="Название товара">
-                            <input type="number" id="market-price-input" class="darknet-input" placeholder="Цена" min="1">
+                        <div class="bm-listing-col">
+                            <div class="panel-title" style="font-size: 1.3rem; text-align: left; width: 100%; color: #fff; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 10px; margin-bottom: 20px; display:flex; align-items:center; gap:10px;">
+                                <span class="icon-badge b-purple" style="width:28px;height:28px;"><i data-lucide="package"></i></span> Лоты на продажу (под гарантом)
+                            </div>
+                            <div class="bounty-grid" id="market-board-container"><div class="bm-loading">Загрузка лотов...</div></div>
                         </div>
-                        <input type="text" id="market-desc-input" class="darknet-input" style="width:100%; margin-top:10px;" placeholder="Описание (необязательно)">
-                        <button class="btn-primary" style="background: #fff; color: #0a0a0c; box-shadow: 0 4px 15px rgba(255,255,255,0.12); margin-top: 14px;" onclick="submitListing()">Выставить на продажу</button>
                     </div>
-
-                    <div class="panel-title" style="font-size: 1.3rem; text-align: left; width: 100%; color: #fff; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 10px; margin: 24px 0 20px; display:flex; align-items:center; gap:10px;">
-                        <span class="icon-badge b-mono" style="width:28px;height:28px;"><i data-lucide="package"></i></span> Лоты на продажу (под гарантом)
-                    </div>
-                    <div class="bounty-grid" id="market-board-container"><div class="bm-loading">Загрузка лотов...</div></div>
                 </div>
 
                 <div id="bm-tab-jobs" class="bm-tab-content">
-                    <div class="bm-form-card">
-                        <div class="bm-form-title"><i data-lucide="briefcase"></i> Создать вакансию</div>
-                        <div class="bm-form-row">
-                            <input type="text" id="job-title-input" class="darknet-input" placeholder="Название вакансии">
+                    <div class="bm-layout">
+                        <div class="bm-form-card">
+                            <div class="bm-form-title"><i data-lucide="briefcase"></i> Создать вакансию</div>
+                            <div class="bm-form-row">
+                                <input type="text" id="job-title-input" class="darknet-input" placeholder="Название вакансии">
+                            </div>
+                            <div class="bm-form-row" style="margin-top:10px;">
+                                <input type="number" id="job-payment-input" class="darknet-input" placeholder="Оплата" min="1">
+                            </div>
+                            <div class="bm-form-row" style="margin-top:10px;">
+                                <input type="number" id="job-deadline-input" class="darknet-input" placeholder="Срок выполнения, часов" min="1" value="24">
+                            </div>
+                            <input type="text" id="job-desc-input" class="darknet-input" style="width:100%; margin-top:10px;" placeholder="ТЗ / описание (необязательно)">
+                            <button class="btn-primary" style="background: #fff; color: #0a0a0c; box-shadow: 0 4px 15px rgba(255,255,255,0.12); margin-top: 14px;" onclick="submitJob()">Опубликовать вакансию</button>
                         </div>
-                        <div class="bm-form-row" style="margin-top:10px;">
-                            <input type="number" id="job-payment-input" class="darknet-input" placeholder="Оплата" min="1">
-                            <input type="number" id="job-deadline-input" class="darknet-input" placeholder="Срок выполнения, часов" min="1" value="24">
-                        </div>
-                        <input type="text" id="job-desc-input" class="darknet-input" style="width:100%; margin-top:10px;" placeholder="ТЗ / описание (необязательно)">
-                        <button class="btn-primary" style="background: #fff; color: #0a0a0c; box-shadow: 0 4px 15px rgba(255,255,255,0.12); margin-top: 14px;" onclick="submitJob()">Опубликовать вакансию</button>
-                    </div>
 
-                    <div class="panel-title" style="font-size: 1.3rem; text-align: left; width: 100%; color: #fff; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 10px; margin: 24px 0 20px; display:flex; align-items:center; gap:10px;">
-                        <span class="icon-badge b-mono" style="width:28px;height:28px;"><i data-lucide="hammer"></i></span> Открытые вакансии
+                        <div class="bm-listing-col">
+                            <div class="panel-title" style="font-size: 1.3rem; text-align: left; width: 100%; color: #fff; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 10px; margin-bottom: 20px; display:flex; align-items:center; gap:10px;">
+                                <span class="icon-badge b-purple" style="width:28px;height:28px;"><i data-lucide="hammer"></i></span> Открытые вакансии
+                            </div>
+                            <div class="bounty-grid" id="jobs-board-container"><div class="bm-loading">Загрузка вакансий...</div></div>
+                        </div>
                     </div>
-                    <div class="bounty-grid" id="jobs-board-container"><div class="bm-loading">Загрузка вакансий...</div></div>
                 </div>
             </div>
             </div>
@@ -2611,7 +2619,7 @@ const SECTION_LABELS = {
     donate: 'Донат / Магазин',
     forum: 'Форум',
     map: 'Карта мира',
-    blackmarket: 'Чёрный рынок'
+    blackmarket: 'Торговая гильдия'
 };
 
 const SECTION_NAV_MAP = {
@@ -2843,18 +2851,18 @@ async function loadSectionVisibility() {
                 `
             },
             blackmarket: {
-                icon: 'eye-off', color: 'red',
-                title: 'Чёрный рынок контрабанды',
+                icon: 'store', color: 'purple',
+                title: 'Торговая гильдия',
                 body: `
                     <h4><i data-lucide="info"></i> Что это такое</h4>
-                    <p>Анонимный раздел доски объявлений на сайте, где любой игрок может назначить награду за голову другого игрока — за реальные конфликты, ролевую вражду или просто ради азарта.</p>
+                    <p>Внутриигровой рынок сервера с двумя разделами: торговая площадка для купли-продажи предметов между игроками и биржа вакансий для разовых подрядов. Все сделки защищены встроенным гарантом.</p>
                     <h4><i data-lucide="list-ordered"></i> Как это работает</h4>
                     <ul>
-                        <li>Заказчик анонимно указывает ник цели и сумму награды в игровой валюте.</li>
-                        <li>Контракт появляется в общей доске «Активные контракты в розыске» на вкладке «Донат».</li>
-                        <li>Игрок, который ликвидирует цель первым, мгновенно получает всю сумму на баланс.</li>
+                        <li>Продавец выставляет лот с названием, ценой и описанием — либо публикует вакансию с оплатой и сроком выполнения.</li>
+                        <li>Деньги покупателя (или заказчика вакансии) замораживаются на площадке до подтверждения сделки.</li>
+                        <li>После передачи товара или выполнения работы обе стороны подтверждают сделку, и средства переводятся продавцу или исполнителю.</li>
                     </ul>
-                    <div class="wiki-tip"><i data-lucide="lightbulb"></i><div><b>Важно:</b> система полностью анонимна — ни цель, ни другие игроки не видят, кто именно назначил награду.</div></div>
+                    <div class="wiki-tip"><i data-lucide="lightbulb"></i><div><b>Важно:</b> при разногласиях по сделке любая из сторон может открыть спор — тогда решение принимает администрация.</div></div>
                 `
             },
             mask: {
@@ -2862,7 +2870,7 @@ async function loadSectionVisibility() {
                 title: 'Анонимные маски',
                 body: `
                     <h4><i data-lucide="info"></i> Что это такое</h4>
-                    <p>Косметический предмет для тех, кто хочет скрыть свою личность на сервере — например, во время тайных сделок на чёрном рынке или ролевых интриг.</p>
+                    <p>Косметический предмет для тех, кто хочет скрыть свою личность на сервере — например, во время сделок в торговой гильдии или ролевых интриг.</p>
                     <h4><i data-lucide="list-ordered"></i> Как это работает</h4>
                     <ul>
                         <li>Маска приобретается в магазине привилегий или выпадает в Колесе Фортуны.</li>
@@ -3067,70 +3075,11 @@ async function loadSectionVisibility() {
             document.getElementById(`bm-tab-${tab}`)?.classList.add('active');
             btnEl?.classList.add('active');
 
-            if (tab === 'bounty') { loadOnlinePlayersForBounty(); loadBlackMarketBounties(); }
             if (tab === 'market') { supabaseClient.rpc('bm_sweep_market_timeouts').finally(loadBlackMarketListings); }
             if (tab === 'jobs') { supabaseClient.rpc('bm_sweep_job_timeouts').finally(loadBlackMarketJobs); }
         }
 
-        async function loadOnlinePlayersForBounty() {
-            const select = document.getElementById('bounty-target-select');
-            if (!select) return;
-            try {
-                const { data, error } = await supabaseClient
-                    .from('player_stats')
-                    .select('minecraft_uuid, minecraft_name')
-                    .eq('is_online', true);
-                if (error) throw error;
-                const options = (data || []).filter(p => p.minecraft_uuid !== currentUserLinkedData?.minecraft_uuid);
-                select.innerHTML = options.length
-                    ? `<option value="">Выберите цель...</option>` + options.map(p => `<option value="${p.minecraft_uuid}|${p.minecraft_name}">${p.minecraft_name}</option>`).join('')
-                    : `<option value="">Сейчас никто не в сети</option>`;
-            } catch (e) {
-                console.error('Не удалось загрузить онлайн-игроков:', e);
-                select.innerHTML = `<option value="">Ошибка загрузки списка</option>`;
-            }
-        }
-
-        async function submitBounty() {
-            if (!currentUserLinkedData) { customAlert('🔒 Авторизация', 'Авторизуйтесь через Discord и привяжите Minecraft-аккаунт.'); return; }
-            const select = document.getElementById('bounty-target-select');
-            const amountInput = document.getElementById('bounty-amount-input');
-            const hintInput = document.getElementById('bounty-hint-input');
-            const [targetUuid, targetName] = (select.value || '').split('|');
-            const amount = parseInt(amountInput.value);
-
-            if (!targetUuid) { customAlert('❌ Ошибка', 'Выберите цель из списка игроков онлайн.'); return; }
-            if (!amount || amount < 64) { customAlert('❌ Ошибка', 'Минимальная сумма заказа — 64 ед.'); return; }
-
-            const { error } = await supabaseClient.rpc('bm_place_bounty', {
-                p_target_uuid: targetUuid, p_target_name: targetName, p_amount: amount, p_hint: hintInput.value.trim() || null
-            });
-            if (error) { customAlert('❌ Ошибка', bmFriendlyError(error)); return; }
-
-            amountInput.value = ''; hintInput.value = '';
-            customAlert('☠️ Охота объявлена', `Контракт на ${targetName} размещён. Игрок будет предупреждён лично, а в игровой чат придёт анонимный анонс.`);
-            loadBlackMarketBounties();
-        }
-
-        async function loadBlackMarketBounties() {
-            const container = document.getElementById('bounty-board-container');
-            if (!container) return;
-            try {
-                const { data, error } = await supabaseClient
-                    .from('bm_bounties_public')
-                    .select('*')
-                    .eq('status', 'active')
-                    .order('created_at', { ascending: false });
-                if (error) throw error;
-                renderBountyBoard(data || []);
-            } catch (e) {
-                console.error('Не удалось загрузить контракты охоты:', e);
-                container.innerHTML = `<div class="bm-empty">Не удалось загрузить контракты. Возможно, ещё не выполнена миграция БД чёрного рынка.</div>`;
-            }
-        }
-
         // Кэш последних загруженных данных — детальная плашка открывается из него мгновенно, без лишнего запроса
-        let bmBountiesCache = [];
         let bmListingsCache = [];
         let bmJobsCache = [];
 
@@ -3149,53 +3098,6 @@ async function loadSectionVisibility() {
         function bmCloseDetail() {
             const overlay = document.getElementById('bm-detail-overlay');
             if (overlay) overlay.style.display = 'none';
-        }
-
-        function renderBountyBoard(bounties) {
-            bmBountiesCache = bounties;
-            const container = document.getElementById('bounty-board-container');
-            if (!container) return;
-            if (bounties.length === 0) {
-                container.innerHTML = `<div class="bm-empty">Активных контрактов нет. Все цели пока живы.</div>`;
-                return;
-            }
-            container.innerHTML = bounties.map(b => `
-                <div class="bounty-card" onclick="bmOpenBountyDetail('${b.id}')">
-                    ${buildIconPatternLayer(['skull', 'crosshair', 'flame'], { count: 12, size: 15, density: 'soft' })}
-                    <div class="bounty-info">
-                        <img src="https://mc-heads.net/avatar/${b.target_name}/48" alt="${b.target_name}" class="player-head-render" width="48" height="48" style="background: rgba(255,255,255,0.04);">
-                        <div class="bounty-meta">
-                            <h4>${b.target_name}</h4>
-                            <span>Цель в розыске</span>
-                        </div>
-                    </div>
-                    <div class="bounty-footer">
-                        <div class="bounty-price">
-                            <div class="bounty-amount"><i data-lucide="gem" style="width:14px;height:14px;vertical-align:-2px;"></i> ${b.amount}</div>
-                            <div class="bounty-status">В розыске</div>
-                        </div>
-                    </div>
-                </div>
-            `).join('');
-            if (window.lucide) lucide.createIcons();
-        }
-
-        function bmOpenBountyDetail(id) {
-            const b = bmBountiesCache.find(x => x.id === id);
-            if (!b) return;
-            const body = bmDetailShell();
-            body.innerHTML = `
-                <div class="bm-detail-head">
-                    <img src="https://mc-heads.net/avatar/${b.target_name}/64" width="64" height="64" alt="${b.target_name}">
-                    <div><div class="bm-detail-title">${b.target_name}</div><div class="bm-detail-sub">Анонимный контракт на устранение</div></div>
-                </div>
-                <div class="bm-detail-desc ${b.hint ? '' : 'empty'}">${b.hint ? 'Ориентир: ' + b.hint : 'Ориентир не указан'}</div>
-                <div class="bm-detail-stats">
-                    <div class="bm-detail-stat"><div class="label">Награда</div><div class="value">${b.amount}</div></div>
-                    <div class="bm-detail-stat"><div class="label">Статус</div><div class="value">В розыске</div></div>
-                </div>
-            `;
-            if (window.lucide) lucide.createIcons();
         }
 
         async function submitListing() {
@@ -3235,7 +3137,7 @@ async function loadSectionVisibility() {
                 renderMarketBoard(visible);
             } catch (e) {
                 console.error('Не удалось загрузить лоты площадки:', e);
-                container.innerHTML = `<div class="bm-empty">Не удалось загрузить лоты: ${e.message || 'ошибка сети'}. Проверьте, что миграция БД чёрного рынка выполнена (включая GRANT SELECT).</div>`;
+                container.innerHTML = `<div class="bm-empty">Не удалось загрузить лоты: ${e.message || 'ошибка сети'}. Проверьте, что миграция БД торговой гильдии выполнена (включая GRANT SELECT).</div>`;
             }
         }
 
@@ -3374,7 +3276,7 @@ async function loadSectionVisibility() {
                 renderJobsBoard(visible);
             } catch (e) {
                 console.error('Не удалось загрузить вакансии:', e);
-                container.innerHTML = `<div class="bm-empty">Не удалось загрузить вакансии: ${e.message || 'ошибка сети'}. Проверьте, что миграция БД чёрного рынка выполнена (включая GRANT SELECT).</div>`;
+                container.innerHTML = `<div class="bm-empty">Не удалось загрузить вакансии: ${e.message || 'ошибка сети'}. Проверьте, что миграция БД торговой гильдии выполнена (включая GRANT SELECT).</div>`;
             }
         }
 
@@ -3489,7 +3391,7 @@ async function loadSectionVisibility() {
             }
         }
 
-        /* ===== Анонимный чат чёрного рынка ===== */
+        /* ===== Анонимный чат торговой гильдии */
         let bmActiveChatId = null;
         let bmChatPollTimer = null;
 
@@ -4421,15 +4323,14 @@ async function loadSectionVisibility() {
 
         function openBlackMarket() {
             if (!canAccessSection('blackmarket')) {
-    customAlert('🔒 Чёрный рынок скрыт', 'Этот раздел сейчас доступен только модераторам сервера.');
+    customAlert('🔒 Раздел скрыт', 'Торговая гильдия сейчас доступна только модераторам сервера.');
     return;
 }
             const overlay = document.getElementById('bm-fullpage');
             if (!overlay) return;
             overlay.classList.add('active');
             document.body.style.overflow = 'hidden';
-            loadOnlinePlayersForBounty();
-            loadBlackMarketBounties();
+            supabaseClient.rpc('bm_sweep_market_timeouts').finally(loadBlackMarketListings);
             if (window.lucide) lucide.createIcons();
         }
 
@@ -4532,7 +4433,7 @@ async function loadSectionVisibility() {
                                         <div style="background: rgba(138, 43, 226, 0.15); color: #b388ff; font-weight: 700; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">1</div>
                                         <div>
                                             <span style="font-weight: 600; color: #fff; display: block; margin-bottom: 6px;"><i data-lucide="gamepad-2" style="width:14px;height:14px;vertical-align:-2px;"></i> Зайди на сервер</span>
-                                            <button class="btn-secondary" id="server-ip-profile" style="padding: 6px 14px; font-size: 0.78rem; border-radius: 10px;" onclick="copyIp('play.kuromismp.ru')">play.kuromismp.ru</button>
+                                            <button class="btn-secondary" id="server-ip-profile" style="padding: 6px 14px; font-size: 0.78rem; border-radius: 10px;" onclick="copyIp('play.kuromi.tech')">play.kuromi.tech</button>
                                         </div>
                                     </div>
                                     <div style="display: flex; gap: 16px; align-items: flex-start;">
