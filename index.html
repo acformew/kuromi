@@ -199,6 +199,47 @@
             background: rgba(138, 43, 226, 0.08);
             transform: translateY(-1px);
         }
+
+        /* Кнопка-колокольчик уведомлений в шапке сайта */
+        #bm-notif-badge {
+            position: absolute; top: 6px; right: 14px;
+            background: #ff2f7e; color: #fff; font-size: 0.65rem; font-weight: 800;
+            min-width: 17px; height: 17px; padding: 0 4px; border-radius: 100px;
+            display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 0 0 2px var(--bg-card);
+        }
+        #bm-notif-btn.has-unread { border-color: rgba(255, 47, 126, 0.5); }
+
+        /* Панель со списком уведомлений */
+        #bm-notif-overlay {
+            display: none; position: fixed; inset: 0; z-index: 20500;
+            background: rgba(5, 3, 8, 0.75); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+            align-items: flex-start; justify-content: center; padding: 90px 20px 20px;
+        }
+        #bm-notif-card {
+            width: 100%; max-width: 420px; max-height: 74vh; overflow-y: auto;
+            background: rgba(16, 11, 28, 0.98); border: 1px solid rgba(138, 43, 226, 0.25);
+            border-radius: 22px; box-shadow: 0 30px 70px rgba(0,0,0,0.6);
+            padding: 18px;
+        }
+        #bm-notif-card .bm-notif-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; padding: 0 4px; }
+        #bm-notif-card .bm-notif-head h3 { font-size: 1rem; color: #fff; display: flex; align-items: center; gap: 8px; }
+        #bm-notif-card .bm-notif-head span.close { cursor: pointer; color: rgba(255,255,255,0.5); font-size: 1.3rem; line-height: 1; }
+        #bm-notif-card .bm-notif-markall { font-size: 0.72rem; color: #b985f4; cursor: pointer; background: none; border: none; padding: 0; }
+        .bm-notif-item {
+            display: flex; gap: 10px; align-items: flex-start; padding: 12px; border-radius: 14px;
+            margin-bottom: 6px; cursor: pointer; transition: background 0.15s ease;
+            background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05);
+        }
+        .bm-notif-item.unread { background: rgba(138, 43, 226, 0.09); border-color: rgba(138, 43, 226, 0.2); }
+        .bm-notif-item:hover { background: rgba(255,255,255,0.05); }
+        .bm-notif-item .dot { width: 7px; height: 7px; border-radius: 50%; background: #ff2f7e; margin-top: 6px; flex-shrink: 0; }
+        .bm-notif-item .dot.read { background: transparent; }
+        .bm-notif-item .body { min-width: 0; flex: 1; }
+        .bm-notif-item .title { font-size: 0.85rem; font-weight: 700; color: #fff; }
+        .bm-notif-item .msg { font-size: 0.78rem; color: rgba(255,255,255,0.55); margin-top: 2px; line-height: 1.4; }
+        .bm-notif-item .time { font-size: 0.68rem; color: rgba(255,255,255,0.3); margin-top: 4px; }
+        .bm-notif-empty { text-align: center; padding: 30px 10px; color: rgba(255,255,255,0.35); font-size: 0.85rem; }
         .widget-user-card {
             background: var(--bg-card);
             border: 1px solid rgba(255, 255, 255, 0.04);
@@ -1111,6 +1152,39 @@
         }
         .bounty-desc-preview.empty { color: rgba(255,255,255,0.25); font-style: italic; }
 
+        /* Теги категории и времени на карточке лота/вакансии */
+        .bounty-tags { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; margin-top: -4px; }
+        .bounty-tag {
+            font-size: 0.66rem; font-weight: 600; color: rgba(255,255,255,0.55);
+            background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.08);
+            padding: 3px 8px; border-radius: 100px; display: inline-flex; align-items: center; gap: 4px;
+        }
+        .bounty-tag.time { color: rgba(255,255,255,0.35); background: transparent; border-color: transparent; padding-left: 0; }
+        .bounty-tag.time [data-lucide] { width: 11px; height: 11px; }
+
+        /* Панель фильтров над сеткой лотов/вакансий */
+        .bm-filter-bar { display: flex; gap: 10px; margin-bottom: 4px; flex-wrap: wrap; }
+        .bm-filter-bar select.darknet-input { width: auto; flex: 1; min-width: 150px; padding: 10px 14px; font-size: 0.8rem; cursor: pointer; }
+
+        /* Кнопка "Индекс цен" в заголовке колонки */
+        .bm-index-btn {
+            display: inline-flex; align-items: center; gap: 6px; font-size: 0.72rem; font-weight: 700;
+            color: #b985f4; background: rgba(138, 43, 226, 0.1); border: 1px solid rgba(138, 43, 226, 0.25);
+            padding: 7px 12px; border-radius: 100px; cursor: pointer; transition: all 0.15s ease; white-space: nowrap;
+        }
+        .bm-index-btn:hover { background: rgba(138, 43, 226, 0.2); }
+        .bm-index-btn [data-lucide] { width: 13px; height: 13px; }
+
+        /* Подсказка про лимит под кнопкой формы */
+        .bm-form-hint { display: flex; align-items: center; gap: 6px; font-size: 0.7rem; color: rgba(255,255,255,0.3); margin-top: 10px; }
+        .bm-form-hint [data-lucide] { width: 12px; height: 12px; }
+
+        /* Простая таблица индекса цен внутри модалки */
+        .bm-price-table { width: 100%; border-collapse: collapse; font-size: 0.82rem; text-align: left; }
+        .bm-price-table th { color: rgba(255,255,255,0.4); font-weight: 600; font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.04em; padding: 6px 8px; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .bm-price-table td { padding: 8px; border-bottom: 1px solid rgba(255,255,255,0.05); color: #fff; }
+        .bm-price-table td.muted { color: rgba(255,255,255,0.4); }
+
         .bounty-footer { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: auto; padding-top: 4px; }
         .bounty-amount { display: inline-flex; align-items: center; gap: 5px; font-size: 1.05rem; font-weight: 700; color: #fff; flex-shrink: 0; }
         .bounty-amount [data-lucide] { width: 15px; height: 15px; color: #b985f4; flex-shrink: 0; }
@@ -1904,6 +1978,7 @@
     <div class="content-container">
         <div class="header-profile-sidebar">
             <div id="header-profile-auth" style="display: flex; flex-direction: column; gap: 10px; width: 100%;"></div>
+            <button id="bm-notif-btn" class="widget-login-btn" onclick="openNotificationsPanel()" style="display:none; position:relative;"><i data-lucide="bell" style="width:16px;height:16px;"></i> Уведомления<span id="bm-notif-badge" style="display:none;">0</span></button>
             <button id="admin-fixed-btn" class="widget-login-btn" onclick="switchTab('admin')" style="display:none; background: rgba(138, 43, 226, 0.12); border-color: rgba(138, 43, 226, 0.3);"><i data-lucide="shield-check" style="width:16px;height:16px;"></i> Админ</button>
             <button id="forum-fixed-btn" class="widget-login-btn" onclick="switchTab('forum')"><i data-lucide="messages-square" style="width:16px;height:16px;"></i> Форум</button>
         </div>
@@ -2294,13 +2369,26 @@
                             <div class="bm-form-row" style="margin-top:10px;">
                                 <input type="number" id="market-price-input" class="darknet-input" placeholder="Цена" min="1">
                             </div>
+                            <div class="bm-form-row" style="margin-top:10px;">
+                                <select id="market-category-input" class="darknet-input"></select>
+                            </div>
                             <input type="text" id="market-desc-input" class="darknet-input" style="width:100%; margin-top:10px;" placeholder="Описание (необязательно)">
                             <button class="btn-primary" style="background: #fff; color: #0a0a0c; box-shadow: 0 4px 15px rgba(255,255,255,0.12); margin-top: 14px;" onclick="submitListing()">Выставить на продажу</button>
+                            <div class="bm-form-hint"><i data-lucide="timer"></i> Не более 3 лотов в час с одного аккаунта.</div>
                         </div>
 
                         <div class="bm-listing-col">
-                            <div class="panel-title" style="font-size: 1.3rem; text-align: left; width: 100%; color: #fff; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 10px; margin-bottom: 20px; display:flex; align-items:center; gap:10px;">
+                            <div class="panel-title" style="font-size: 1.3rem; text-align: left; width: 100%; color: #fff; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 10px; margin-bottom: 16px; display:flex; align-items:center; gap:10px;">
                                 <span class="icon-badge b-purple" style="width:28px;height:28px;"><i data-lucide="package"></i></span> Лоты на продажу (под гарантом)
+                                <button class="bm-index-btn" onclick="openPriceIndex('market')" style="margin-left:auto;"><i data-lucide="line-chart"></i> Индекс цен</button>
+                            </div>
+                            <div class="bm-filter-bar">
+                                <select id="market-filter-category" class="darknet-input" onchange="bmRenderFilteredMarket()"></select>
+                                <select id="market-filter-sort" class="darknet-input" onchange="bmRenderFilteredMarket()">
+                                    <option value="new">Сначала новые</option>
+                                    <option value="cheap">Сначала дешёвые</option>
+                                    <option value="expensive">Сначала дорогие</option>
+                                </select>
                             </div>
                             <div class="bounty-grid" id="market-board-container"><div class="bm-loading">Загрузка лотов...</div></div>
                         </div>
@@ -2320,13 +2408,25 @@
                             <div class="bm-form-row" style="margin-top:10px;">
                                 <input type="number" id="job-deadline-input" class="darknet-input" placeholder="Срок выполнения, часов" min="1" value="24">
                             </div>
+                            <div class="bm-form-row" style="margin-top:10px;">
+                                <select id="job-category-input" class="darknet-input"></select>
+                            </div>
                             <input type="text" id="job-desc-input" class="darknet-input" style="width:100%; margin-top:10px;" placeholder="ТЗ / описание (необязательно)">
                             <button class="btn-primary" style="background: #fff; color: #0a0a0c; box-shadow: 0 4px 15px rgba(255,255,255,0.12); margin-top: 14px;" onclick="submitJob()">Опубликовать вакансию</button>
                         </div>
 
                         <div class="bm-listing-col">
-                            <div class="panel-title" style="font-size: 1.3rem; text-align: left; width: 100%; color: #fff; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 10px; margin-bottom: 20px; display:flex; align-items:center; gap:10px;">
+                            <div class="panel-title" style="font-size: 1.3rem; text-align: left; width: 100%; color: #fff; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 10px; margin-bottom: 16px; display:flex; align-items:center; gap:10px;">
                                 <span class="icon-badge b-purple" style="width:28px;height:28px;"><i data-lucide="hammer"></i></span> Открытые вакансии
+                                <button class="bm-index-btn" onclick="openPriceIndex('jobs')" style="margin-left:auto;"><i data-lucide="line-chart"></i> Индекс цен</button>
+                            </div>
+                            <div class="bm-filter-bar">
+                                <select id="job-filter-category" class="darknet-input" onchange="bmRenderFilteredJobs()"></select>
+                                <select id="job-filter-sort" class="darknet-input" onchange="bmRenderFilteredJobs()">
+                                    <option value="new">Сначала новые</option>
+                                    <option value="cheap">Сначала дешёвые</option>
+                                    <option value="expensive">Сначала дорогие</option>
+                                </select>
                             </div>
                             <div class="bounty-grid" id="jobs-board-container"><div class="bm-loading">Загрузка вакансий...</div></div>
                         </div>
@@ -3101,7 +3201,8 @@ async function loadSectionVisibility() {
             cannot_submit: 'Не удалось сдать работу.',
             cannot_accept: 'Не удалось принять работу.',
             chat_closed: 'Этот чат уже закрыт.',
-            not_a_party: 'Вы не участник этого чата.'
+            not_a_party: 'Вы не участник этого чата.',
+            listing_rate_limit: 'Не более 3 лотов в час с одного аккаунта — подождите и попробуйте снова.'
         };
 
         function bmFriendlyError(error) {
@@ -3148,6 +3249,7 @@ async function loadSectionVisibility() {
             const itemInput = document.getElementById('market-item-input');
             const priceInput = document.getElementById('market-price-input');
             const descInput = document.getElementById('market-desc-input');
+            const categorySelect = document.getElementById('market-category-input');
             const price = parseInt(priceInput.value);
 
             if (!itemInput.value.trim()) { customAlert('❌ Ошибка', 'Укажите название товара.'); return; }
@@ -3162,19 +3264,126 @@ async function loadSectionVisibility() {
                 return;
             }
 
+            const itemName = itemInput.value.trim();
             const { error } = await supabaseClient.rpc('bm_create_listing', {
-                p_item_name: itemInput.value.trim(), p_description: descInput.value.trim() || null, p_price: price
+                p_item_name: itemName, p_description: descInput.value.trim() || null, p_price: price
             });
             if (error) { customAlert('❌ Ошибка', bmFriendlyError(error)); return; }
+
+            // Категория не входит в параметры существующей bm_create_listing, поэтому проставляем
+            // её отдельным точечным UPDATE на только что созданную запись (безопасно для RLS — свой лот).
+            try {
+                const { data: newRow } = await supabaseClient
+                    .from('bm_listings').select('id')
+                    .eq('seller_uuid', currentUserLinkedData.minecraft_uuid).eq('item_name', itemName)
+                    .order('created_at', { ascending: false }).limit(1).maybeSingle();
+                if (newRow) await supabaseClient.from('bm_listings').update({ category: categorySelect.value }).eq('id', newRow.id);
+            } catch (e) { console.error('Не удалось проставить категорию лота:', e); }
 
             itemInput.value = ''; priceInput.value = ''; descInput.value = '';
             customAlert('📦 Лот выставлен', 'Ваш товар опубликован на площадке.');
             loadBlackMarketListings();
         }
 
+
         // Живые (не завершённые) статусы — всё остальное считается снятым/завершённым и с витрины пропадает
         const BM_LISTING_ALIVE = ['active', 'reserved', 'handed', 'disputed'];
         const BM_JOB_ALIVE = ['open', 'in_progress', 'submitted'];
+
+        // Категории для лотов и вакансий — используются в форме создания и в фильтрах витрины
+        const BM_MARKET_CATEGORIES = {
+            resources: 'Ресурсы',
+            gear: 'Броня и инструменты',
+            enchants: 'Зачарования и книги',
+            building: 'Стройматериалы',
+            cosmetics: 'Косметика',
+            other: 'Разное'
+        };
+        const BM_JOB_CATEGORIES = {
+            building: 'Стройка',
+            farming: 'Фарм ресурсов',
+            escort: 'Эскорт и охрана',
+            redstone: 'Редстоун и дизайн',
+            other: 'Разное'
+        };
+        function bmCategoryOptions(map) {
+            return Object.entries(map).map(([k, v]) => `<option value="${k}">${v}</option>`).join('');
+        }
+        function bmCategoryFilterOptions(map) {
+            return `<option value="">Все категории</option>` + bmCategoryOptions(map);
+        }
+
+        // Текущие значения фильтров/сортировки — храним отдельно от кэша, чтобы кэш
+        // всегда содержал полный набор (нужен для мгновенного открытия детальной плашки по id)
+        let bmMarketFilter = { category: '', sort: 'new' };
+        let bmJobFilter = { category: '', sort: 'new' };
+
+        function bmApplyFilterSort(items, filter, priceField) {
+            let result = filter.category ? items.filter(x => (x.category || 'other') === filter.category) : items.slice();
+            if (filter.sort === 'cheap') result.sort((a, b) => a[priceField] - b[priceField]);
+            else if (filter.sort === 'expensive') result.sort((a, b) => b[priceField] - a[priceField]);
+            else result.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+            return result;
+        }
+
+        function bmRenderFilteredMarket() {
+            const catSelect = document.getElementById('market-filter-category');
+            const sortSelect = document.getElementById('market-filter-sort');
+            if (catSelect) bmMarketFilter.category = catSelect.value;
+            if (sortSelect) bmMarketFilter.sort = sortSelect.value;
+            renderMarketBoard(bmApplyFilterSort(bmListingsCache, bmMarketFilter, 'price'));
+        }
+
+        function bmRenderFilteredJobs() {
+            const catSelect = document.getElementById('job-filter-category');
+            const sortSelect = document.getElementById('job-filter-sort');
+            if (catSelect) bmJobFilter.category = catSelect.value;
+            if (sortSelect) bmJobFilter.sort = sortSelect.value;
+            renderJobsBoard(bmApplyFilterSort(bmJobsCache, bmJobFilter, 'payment'));
+        }
+
+        // Индекс цен — средняя/мин/макс цена по завершённым сделкам площадки и вакансиям в работе/закрытым.
+        // Смотрит на bm_price_index (для лотов) — см. bm_new_features.sql. Для вакансий считаем по кэшу на лету,
+        // так как разброс оплаты по названиям вакансий обычно небольшой и отдельная вьюха не нужна.
+        async function openPriceIndex(type) {
+            const isMarket = type === 'market';
+            const rows = [];
+            try {
+                if (isMarket) {
+                    const { data, error } = await supabaseClient.from('bm_price_index').select('*').order('sales_count', { ascending: false }).limit(25);
+                    if (error) throw error;
+                    (data || []).forEach(r => rows.push({ name: r.item_name, count: r.sales_count, avg: r.avg_price, min: r.min_price, max: r.max_price }));
+                } else {
+                    const byTitle = {};
+                    bmJobsCache.forEach(j => {
+                        if (!byTitle[j.title]) byTitle[j.title] = [];
+                        byTitle[j.title].push(j.payment);
+                    });
+                    Object.entries(byTitle).forEach(([name, prices]) => {
+                        rows.push({ name, count: prices.length, avg: Math.round(prices.reduce((a, b) => a + b, 0) / prices.length), min: Math.min(...prices), max: Math.max(...prices) });
+                    });
+                    rows.sort((a, b) => b.count - a.count);
+                }
+            } catch (e) {
+                console.error('Не удалось загрузить индекс цен:', e);
+                customAlert('❌ Ошибка', 'Не удалось загрузить индекс цен. Проверьте, что миграция bm_new_features.sql выполнена (нужна вьюха bm_price_index).');
+                return;
+            }
+
+            const tableHtml = rows.length === 0
+                ? `<div class="bm-notif-empty">${isMarket ? 'Пока нет завершённых сделок — статистика появится после первых покупок.' : 'Пока нет активных вакансий для сравнения.'}</div>`
+                : `<table class="bm-price-table">
+                    <thead><tr><th>${isMarket ? 'Товар' : 'Вакансия'}</th><th>Сделок</th><th>Средняя</th><th>Мин / Макс</th></tr></thead>
+                    <tbody>${rows.map(r => `<tr><td>${escapeHtml(r.name)}</td><td class="muted">${r.count}</td><td>${r.avg}</td><td class="muted">${r.min} / ${r.max}</td></tr>`).join('')}</tbody>
+                   </table>`;
+
+            openCustomModal({
+                title: isMarket ? '📊 Индекс цен площадки' : '📊 Индекс оплаты по вакансиям',
+                text: `<div style="text-align:left; max-height:50vh; overflow-y:auto;">${tableHtml}</div>`,
+                showInput: false,
+                buttons: [{ text: 'Закрыть', className: 'btn-secondary', action: () => {} }]
+            });
+        }
 
         async function loadBlackMarketListings() {
             const container = document.getElementById('market-board-container');
@@ -3185,8 +3394,8 @@ async function loadSectionVisibility() {
                     .select('*')
                     .order('created_at', { ascending: false });
                 if (error) throw error;
-                const visible = (data || []).filter(l => BM_LISTING_ALIVE.includes(l.status));
-                renderMarketBoard(visible);
+                bmListingsCache = (data || []).filter(l => BM_LISTING_ALIVE.includes(l.status));
+                bmRenderFilteredMarket();
             } catch (e) {
                 console.error('Не удалось загрузить лоты площадки:', e);
                 container.innerHTML = `<div class="bm-empty">Не удалось загрузить лоты: ${e.message || 'ошибка сети'}. Проверьте, что миграция БД торговой федерации выполнена (включая GRANT SELECT).</div>`;
@@ -3194,11 +3403,10 @@ async function loadSectionVisibility() {
         }
 
         function renderMarketBoard(listings) {
-            bmListingsCache = listings;
             const container = document.getElementById('market-board-container');
             if (!container) return;
             if (listings.length === 0) {
-                container.innerHTML = `<div class="bm-empty">На площадке пока пусто. Выставьте первый лот выше.</div>`;
+                container.innerHTML = `<div class="bm-empty">${bmListingsCache.length === 0 ? 'На площадке пока пусто. Выставьте первый лот выше.' : 'Ничего не найдено под выбранный фильтр.'}</div>`;
                 return;
             }
             const statusLabels = { active: 'В продаже', reserved: 'Забронировано', handed: 'Передано', disputed: 'Спор' };
@@ -3212,6 +3420,10 @@ async function loadSectionVisibility() {
                             <h4>${l.item_name}</h4>
                             <span>Продавец: ${l.seller_name}</span>
                         </div>
+                    </div>
+                    <div class="bounty-tags">
+                        <span class="bounty-tag">${BM_MARKET_CATEGORIES[l.category] || BM_MARKET_CATEGORIES.other}</span>
+                        <span class="bounty-tag time"><i data-lucide="clock"></i> ${bmTimeAgo(l.created_at)}</span>
                     </div>
                     <div class="bounty-desc-preview ${l.description ? '' : 'empty'}">${l.description || 'Без описания'}</div>
                     <div class="bounty-footer">
@@ -3288,6 +3500,7 @@ async function loadSectionVisibility() {
             const paymentInput = document.getElementById('job-payment-input');
             const deadlineInput = document.getElementById('job-deadline-input');
             const descInput = document.getElementById('job-desc-input');
+            const categorySelect = document.getElementById('job-category-input');
             const payment = parseInt(paymentInput.value);
             const deadline = parseInt(deadlineInput.value);
 
@@ -3304,10 +3517,20 @@ async function loadSectionVisibility() {
                 return;
             }
 
+            const jobTitle = titleInput.value.trim();
             const { error } = await supabaseClient.rpc('bm_create_job', {
-                p_title: titleInput.value.trim(), p_description: descInput.value.trim() || null, p_payment: payment, p_deadline_hours: deadline
+                p_title: jobTitle, p_description: descInput.value.trim() || null, p_payment: payment, p_deadline_hours: deadline
             });
             if (error) { customAlert('❌ Ошибка', bmFriendlyError(error)); return; }
+
+            // Аналогично лотам — категория проставляется точечным UPDATE после создания записи
+            try {
+                const { data: newRow } = await supabaseClient
+                    .from('bm_jobs').select('id')
+                    .eq('employer_uuid', currentUserLinkedData.minecraft_uuid).eq('title', jobTitle)
+                    .order('created_at', { ascending: false }).limit(1).maybeSingle();
+                if (newRow) await supabaseClient.from('bm_jobs').update({ category: categorySelect.value }).eq('id', newRow.id);
+            } catch (e) { console.error('Не удалось проставить категорию вакансии:', e); }
 
             titleInput.value = ''; paymentInput.value = ''; descInput.value = ''; deadlineInput.value = '24';
             customAlert('📋 Вакансия опубликована', 'Оплата спишется с вашего баланса в момент найма исполнителя.');
@@ -3323,8 +3546,8 @@ async function loadSectionVisibility() {
                     .select('*')
                     .order('created_at', { ascending: false });
                 if (error) throw error;
-                const visible = (data || []).filter(j => BM_JOB_ALIVE.includes(j.status));
-                renderJobsBoard(visible);
+                bmJobsCache = (data || []).filter(j => BM_JOB_ALIVE.includes(j.status));
+                bmRenderFilteredJobs();
             } catch (e) {
                 console.error('Не удалось загрузить вакансии:', e);
                 container.innerHTML = `<div class="bm-empty">Не удалось загрузить вакансии: ${e.message || 'ошибка сети'}. Проверьте, что миграция БД торговой федерации выполнена (включая GRANT SELECT).</div>`;
@@ -3332,11 +3555,10 @@ async function loadSectionVisibility() {
         }
 
         function renderJobsBoard(jobs) {
-            bmJobsCache = jobs;
             const container = document.getElementById('jobs-board-container');
             if (!container) return;
             if (jobs.length === 0) {
-                container.innerHTML = `<div class="bm-empty">Открытых вакансий сейчас нет. Опубликуйте свою выше.</div>`;
+                container.innerHTML = `<div class="bm-empty">${bmJobsCache.length === 0 ? 'Открытых вакансий сейчас нет. Опубликуйте свою выше.' : 'Ничего не найдено под выбранный фильтр.'}</div>`;
                 return;
             }
             const statusLabels = { open: 'Открыто', in_progress: 'В работе', submitted: 'На приёмке' };
@@ -3350,6 +3572,10 @@ async function loadSectionVisibility() {
                             <h4>${j.title}</h4>
                             <span>Заказчик: ${j.employer_name}</span>
                         </div>
+                    </div>
+                    <div class="bounty-tags">
+                        <span class="bounty-tag">${BM_JOB_CATEGORIES[j.category] || BM_JOB_CATEGORIES.other}</span>
+                        <span class="bounty-tag time"><i data-lucide="clock"></i> ${bmTimeAgo(j.created_at)}</span>
                     </div>
                     <div class="bounty-desc-preview ${j.description ? '' : 'empty'}">${j.description || 'Без описания ТЗ'}</div>
                     <div class="bounty-footer">
@@ -3519,8 +3745,159 @@ async function loadSectionVisibility() {
         }
 
         /* =========================================================================
+           УВЕДОМЛЕНИЯ (Торговая федерация): покупка лота, отклик на вакансию, найм,
+           сдача/приём работы, новое сообщение в чате сделки — всё это создаёт
+           запись в таблице bm_notifications (см. bm_new_features.sql) через триггеры
+           на стороне БД, а фронтенд лишь опрашивает непрочитанные раз в 25 секунд.
+        ========================================================================= */
+        let bmNotifPollTimer = null;
+        let bmNotifCache = [];
+
+        function bmInitNotifications() {
+            const btn = document.getElementById('bm-notif-btn');
+            if (!btn || !currentUserLinkedData) return;
+            btn.style.display = 'flex';
+            bmRefreshNotifBadge();
+            if (bmNotifPollTimer) clearInterval(bmNotifPollTimer);
+            bmNotifPollTimer = setInterval(bmRefreshNotifBadge, 25000);
+        }
+
+        async function bmRefreshNotifBadge() {
+            if (!currentUserLinkedData) return;
+            const btn = document.getElementById('bm-notif-btn');
+            const badge = document.getElementById('bm-notif-badge');
+            if (!btn || !badge) return;
+            try {
+                const { count, error } = await supabaseClient
+                    .from('bm_notifications')
+                    .select('id', { count: 'exact', head: true })
+                    .eq('recipient_uuid', currentUserLinkedData.minecraft_uuid)
+                    .eq('is_read', false);
+                if (error) throw error;
+                if (count > 0) {
+                    badge.style.display = 'flex';
+                    badge.innerText = count > 99 ? '99+' : String(count);
+                    btn.classList.add('has-unread');
+                } else {
+                    badge.style.display = 'none';
+                    btn.classList.remove('has-unread');
+                }
+            } catch (e) {
+                console.error('Не удалось обновить счётчик уведомлений:', e);
+            }
+        }
+
+        function bmTimeAgo(iso) {
+            if (!iso) return '';
+            const diffSec = Math.max(0, Math.floor((Date.now() - new Date(iso).getTime()) / 1000));
+            if (diffSec < 60) return 'только что';
+            const diffMin = Math.floor(diffSec / 60);
+            if (diffMin < 60) return `${diffMin} мин. назад`;
+            const diffH = Math.floor(diffMin / 60);
+            if (diffH < 24) return `${diffH} ч. назад`;
+            const diffD = Math.floor(diffH / 24);
+            if (diffD < 30) return `${diffD} дн. назад`;
+            return new Date(iso).toLocaleDateString('ru-RU');
+        }
+
+        async function openNotificationsPanel() {
+            if (!currentUserLinkedData) return;
+            let overlay = document.getElementById('bm-notif-overlay');
+            if (!overlay) {
+                overlay = document.createElement('div');
+                overlay.id = 'bm-notif-overlay';
+                overlay.innerHTML = `
+                    <div id="bm-notif-card">
+                        <div class="bm-notif-head">
+                            <h3><i data-lucide="bell" style="width:16px;height:16px;color:#ffb0d9;"></i> Уведомления</h3>
+                            <div style="display:flex; align-items:center; gap:14px;">
+                                <button class="bm-notif-markall" onclick="bmMarkAllNotifRead()">Прочитать всё</button>
+                                <span class="close" onclick="closeNotifPanel()">&times;</span>
+                            </div>
+                        </div>
+                        <div id="bm-notif-list"><div class="bm-notif-empty">Загрузка...</div></div>
+                    </div>`;
+                document.body.appendChild(overlay);
+                overlay.onclick = (e) => { if (e.target === overlay) closeNotifPanel(); };
+            }
+            overlay.style.display = 'flex';
+            if (window.lucide) lucide.createIcons();
+            await bmLoadNotifications();
+        }
+
+        function closeNotifPanel() {
+            const overlay = document.getElementById('bm-notif-overlay');
+            if (overlay) overlay.style.display = 'none';
+        }
+
+        async function bmLoadNotifications() {
+            const list = document.getElementById('bm-notif-list');
+            if (!list) return;
+            try {
+                const { data, error } = await supabaseClient
+                    .from('bm_notifications')
+                    .select('*')
+                    .eq('recipient_uuid', currentUserLinkedData.minecraft_uuid)
+                    .order('created_at', { ascending: false })
+                    .limit(40);
+                if (error) throw error;
+                bmNotifCache = data || [];
+                if (bmNotifCache.length === 0) {
+                    list.innerHTML = `<div class="bm-notif-empty">Пока нет уведомлений. Здесь появятся отклики, покупки и сообщения по вашим лотам и вакансиям в Торговой федерации.</div>`;
+                    return;
+                }
+                list.innerHTML = bmNotifCache.map(n => `
+                    <div class="bm-notif-item ${n.is_read ? '' : 'unread'}" onclick="bmOpenNotification('${n.id}')">
+                        <div class="dot ${n.is_read ? 'read' : ''}"></div>
+                        <div class="body">
+                            <div class="title">${escapeHtml(n.title || 'Уведомление')}</div>
+                            <div class="msg">${escapeHtml(n.message || '')}</div>
+                            <div class="time">${bmTimeAgo(n.created_at)}</div>
+                        </div>
+                    </div>
+                `).join('');
+            } catch (e) {
+                console.error('Не удалось загрузить уведомления:', e);
+                list.innerHTML = `<div class="bm-notif-empty">Не удалось загрузить уведомления. Проверьте, что миграция bm_new_features.sql выполнена.</div>`;
+            }
+        }
+
+        async function bmMarkAllNotifRead() {
+            try {
+                await supabaseClient.from('bm_notifications').update({ is_read: true })
+                    .eq('recipient_uuid', currentUserLinkedData.minecraft_uuid).eq('is_read', false);
+                await bmLoadNotifications();
+                bmRefreshNotifBadge();
+            } catch (e) { console.error(e); }
+        }
+
+        async function bmOpenNotification(id) {
+            const n = bmNotifCache.find(x => x.id === id);
+            if (!n) return;
+            if (!n.is_read) {
+                await supabaseClient.from('bm_notifications').update({ is_read: true }).eq('id', id);
+                n.is_read = true;
+                bmRefreshNotifBadge();
+                bmLoadNotifications();
+            }
+            // Ведём прямиком к нужному лоту/вакансии в Торговой федерации
+            if (n.context_type === 'marketplace' && n.context_id) {
+                closeNotifPanel();
+                openBlackMarket();
+                document.querySelector('#bm-tab-btn-market')?.click();
+                setTimeout(() => bmOpenListingDetail(n.context_id), 350);
+            } else if (n.context_type === 'job' && n.context_id) {
+                closeNotifPanel();
+                openBlackMarket();
+                document.querySelector('#bm-tab-btn-jobs')?.click();
+                setTimeout(() => bmOpenJobDetail(n.context_id), 350);
+            }
+        }
+
+        /* =========================================================================
            КАРТА МИРА — приваты территорий.
            Чёрно-белая карта-плейсхолдер (суша/чёрный, вода/белый) 5000×5000 блоков,
+
            пан/зум колесом и зажатым ЛКМ, поиск по координатам, рисование приватов.
            Приваты хранятся в Supabase (таблица territory_claims) — видны всем игрокам.
            ЗАМЕНА НА РЕАЛЬНУЮ КАРТУ: когда будет готов рендер из Chunky, вместо
@@ -4371,6 +4748,17 @@ async function loadSectionVisibility() {
             if (mapMarkerEl) mapPositionMarker(mapMarkerEl);
         }
 
+        function bmPopulateCategorySelects() {
+            const mc = document.getElementById('market-category-input');
+            const mf = document.getElementById('market-filter-category');
+            const jc = document.getElementById('job-category-input');
+            const jf = document.getElementById('job-filter-category');
+            if (mc && !mc.options.length) mc.innerHTML = bmCategoryOptions(BM_MARKET_CATEGORIES);
+            if (mf && !mf.options.length) mf.innerHTML = bmCategoryFilterOptions(BM_MARKET_CATEGORIES);
+            if (jc && !jc.options.length) jc.innerHTML = bmCategoryOptions(BM_JOB_CATEGORIES);
+            if (jf && !jf.options.length) jf.innerHTML = bmCategoryFilterOptions(BM_JOB_CATEGORIES);
+        }
+
         function openBlackMarket() {
             if (!canAccessSection('blackmarket')) {
     customAlert('🔒 Раздел скрыт', 'Торговая федерация сейчас доступна только модераторам сервера.');
@@ -4380,6 +4768,7 @@ async function loadSectionVisibility() {
             if (!overlay) return;
             overlay.classList.add('active');
             document.body.style.overflow = 'hidden';
+            bmPopulateCategorySelects();
             // Грузим сразу оба раздела (площадку и вакансии), чтобы переключение вкладок было мгновенным
             // и ничего не «зависало» на заглушке "Загрузка...". Promise.resolve() — см. комментарий в switchBlackMarketTab.
             Promise.resolve(supabaseClient.rpc('bm_sweep_market_timeouts')).catch(() => {}).then(loadBlackMarketListings);
@@ -4519,6 +4908,7 @@ async function loadSectionVisibility() {
                     minecraft_name: linkedData.minecraft_name,
                     discord_id: discordId
                 };
+                bmInitNotifications();
 
                 let { data: stats, error: statsError } = await supabaseClient
                     .from('player_stats')
@@ -5965,7 +6355,8 @@ function switchTab(tabName) {
                 if (error) throw error;
 
                 closeApplicationModal();
-                customAlert("🎉 Успешно отправлено!", "Ваша анкета успешно сохранена и передана кураторам KuromiSMP. Мы свяжемся с вами в Telegram после проверки!");
+                await customAlert("🎉 Успешно отправлено!", "Ваша анкета успешно сохранена и передана кураторам KuromiSMP.");
+                await customTelegramSupportPrompt();
 
             } catch (e) {
                 console.error(e);
@@ -5977,8 +6368,26 @@ function switchTab(tabName) {
             }
         }
 
-        /* --- ФУНКЦИОНАЛ ФОРУМА С МИКРО-АНИМАЦИЯМИ И САЛЮТОМ ИСКР --- */
+        // Telegram-бот не может написать вердикт первым, если пользователь ни разу не писал боту/аккаунту поддержки —
+        // поэтому после анкеты просим самостоятельно отправить любое сообщение в поддержку.
+        function customTelegramSupportPrompt() {
+            return openCustomModal({
+                title: '📮 Остался последний шаг',
+                text: `<div style="text-align:left;">
+                         <p style="margin-bottom:12px;">Чтобы куратор смог написать вам вердикт по анкете (принята или отклонена), напишите <b>любое сообщение</b> нашему аккаунту поддержки в Telegram — это разовое действие, без него мы не сможем вам ответить.</p>
+                         <p style="background: rgba(0,0,0,0.2); padding: 10px 14px; border-radius: 12px; border-left: 3px solid var(--accent-pink); margin: 0;">
+                            Аккаунт поддержки: <strong style="color:#fff;">@kuromi_support</strong>
+                         </p>
+                       </div>`,
+                showInput: false,
+                buttons: [
+                    { text: 'Позже', className: 'btn-secondary', action: () => false },
+                    { text: 'Написать в Telegram', className: 'btn-primary', action: () => { window.open('https://t.me/kuromi_support', '_blank'); return true; } }
+                ]
+            });
+        }
 
+        /* --- ФУНКЦИОНАЛ ФОРУМА С МИКРО-АНИМАЦИЯМИ И САЛЮТОМ ИСКР --- */
         function updateForumForm() {
             const container = document.getElementById('forum-form-container');
             if (!container) return;
