@@ -1332,78 +1332,125 @@
         .bm-action-btn [data-lucide] { width: 12px; height: 12px; }
 
         /* ===== Анонимный чат торговой федерации ===== */
-#bm-chat-overlay {
-    display: none; position: fixed; inset: 0; background: rgba(5,3,8,0.85);
-    backdrop-filter: blur(12px); z-index: 20010; align-items: center; justify-content: center; padding: 20px;
-}
-#bm-chat-card {
-    background: rgba(14, 10, 24, 0.98); border: 1px solid rgba(138, 43, 226, 0.35); border-radius: 26px;
-    max-width: 500px; width: 100%; height: 82vh; max-height: 640px; display: flex; flex-direction: column;
-    padding: 22px; box-shadow: 0 25px 60px rgba(0,0,0,0.7); position: relative;
-}
 
-.bm-chat-head-row {
-    display: flex; align-items: center; gap: 12px; padding-bottom: 12px;
-    border-bottom: 1px solid rgba(255,255,255,0.06); margin-bottom: 12px;
-}
-.bm-chat-head-row img {
-    width: 40px; height: 40px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.12);
-    background: rgba(255,255,255,0.04); flex-shrink: 0;
-}
-.bm-chat-head-info { min-width: 0; flex: 1; }
-.bm-chat-head-info .name { font-size: 1rem; font-weight: 700; color: #fff; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.bm-chat-head-info .role { font-size: 0.75rem; color: var(--text-muted); margin-top: 2px; }
-#bm-chat-close { cursor: pointer; color: var(--text-muted); font-size: 1.4rem; line-height: 1; flex-shrink: 0; transition: color 0.15s; }
-#bm-chat-close:hover { color: #fff; }
+        #bm-chat-overlay {
+            display: none; position: fixed; inset: 0; background: rgba(5,3,8,0.8);
+            backdrop-filter: blur(10px); z-index: 20050; align-items: center; justify-content: center; padding: 20px;
+        }
+        #bm-chat-card {
+            background: rgba(16,11,28,0.98); border: 1px solid rgba(255,0,127,0.3); border-radius: 24px;
+            max-width: 480px; width: 100%; max-height: 82vh; display: flex; flex-direction: column;
+            padding: 18px; box-shadow: 0 20px 50px rgba(0,0,0,0.6);
+        }
+        /* Шапка: аватар и ник собеседника */
+        .bm-chat-head-row { display: flex; align-items: center; gap: 12px; padding: 4px 4px 14px; border-bottom: 1px solid rgba(255,255,255,0.08); margin-bottom: 12px; }
+        .bm-chat-head-row img { width: 40px; height: 40px; border-radius: 11px; border: 1px solid rgba(255,255,255,0.14); background: rgba(255,255,255,0.04); flex-shrink: 0; }
+        .bm-chat-head-info { min-width: 0; flex: 1; }
+        .bm-chat-head-info .name { font-size: 0.98rem; font-weight: 700; color: #fff; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .bm-chat-head-info .role { font-size: 0.72rem; color: var(--text-muted); margin-top: 1px; }
+        #bm-chat-close { cursor: pointer; color: var(--text-muted); font-size: 1.5rem; line-height: 1; flex-shrink: 0; }
+        #bm-chat-close:hover { color: #fff; }
 
-.bm-chat-item-strip {
-    display: flex; align-items: center; gap: 10px; background: rgba(255,255,255,0.025);
-    border: 1px solid rgba(138,43,226,0.18); border-radius: 14px; padding: 10px 12px; margin-bottom: 12px;
-}
-.bm-chat-item-strip .info { min-width: 0; flex: 1; }
-.bm-chat-item-strip .info .name { font-size: 0.86rem; font-weight: 700; color: #fff; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.bm-chat-item-strip .info .status { font-size: 0.72rem; color: var(--text-muted); margin-top: 1px; }
-.bm-chat-item-strip .price { font-size: 0.95rem; font-weight: 800; color: #b985f4; display: flex; align-items: center; gap: 4px; flex-shrink: 0; }
+        /* Полоска с товаром/вакансией сбоку — что именно за сделка */
+        .bm-chat-item-strip {
+            display: flex; align-items: center; gap: 10px; background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(138,43,226,0.2); border-radius: 14px; padding: 10px 12px; margin-bottom: 12px;
+        }
+        .bm-chat-item-strip .icon-badge { width: 34px; height: 34px; flex-shrink: 0; }
+        .bm-chat-item-strip .info { min-width: 0; flex: 1; }
+        .bm-chat-item-strip .info .name { font-size: 0.84rem; font-weight: 700; color: #fff; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .bm-chat-item-strip .info .status { font-size: 0.7rem; color: var(--text-muted); margin-top: 1px; }
+        .bm-chat-item-strip .price { font-size: 0.95rem; font-weight: 800; color: #b985f4; display: flex; align-items: center; gap: 4px; flex-shrink: 0; }
+        .bm-chat-item-strip .price [data-lucide] { width: 14px; height: 14px; }
 
-/* Компактный виджет гаранта */
-.bm-escrow-box {
-    background: rgba(138, 43, 226, 0.06); border: 1px solid rgba(138, 43, 226, 0.22);
-    border-radius: 16px; padding: 12px 14px; margin-bottom: 12px;
-}
-.bm-escrow-head { display: flex; justify-content: space-between; align-items: center; font-size: 0.75rem; color: var(--text-muted); margin-bottom: 6px; }
-.bm-escrow-track { width: 100%; height: 6px; background: rgba(0,0,0,0.4); border-radius: 100px; overflow: hidden; margin-bottom: 8px; }
-.bm-escrow-fill { height: 100%; background: linear-gradient(90deg, #8a2be2, #ff007f); border-radius: 100px; transition: width 0.35s ease; }
-.bm-escrow-status-msg { font-size: 0.75rem; color: rgba(255,255,255,0.7); margin-bottom: 8px; line-height: 1.35; }
-.bm-escrow-btns { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+        /* Блок сделки: карточка товара/вакансии + шкала прогресса + кнопки гаранта — сгруппированы вместе
+           и визуально отделены от переписки, чтобы всё выглядело структурно, а не одной кучей. */
+        .bm-chat-deal-block {
+            background: rgba(255,255,255,0.025); border: 1px solid rgba(255,255,255,0.07);
+            border-radius: 16px; padding: 13px 14px; margin-bottom: 14px;
+        }
+        .bm-chat-deal-block .bm-chat-item-strip { margin-bottom: 12px; }
+        .bm-chat-section-label {
+            font-size: 0.64rem; text-transform: uppercase; letter-spacing: 0.08em; font-weight: 800;
+            color: var(--text-muted); margin: 0 1px 9px;
+        }
 
-#bm-chat-messages {
-    flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 8px;
-    padding-right: 4px; margin-bottom: 12px; min-height: 140px;
-}
-.bm-chat-msg { max-width: 78%; padding: 8px 12px; border-radius: 14px; font-size: 0.85rem; line-height: 1.4; word-break: break-word; }
-.bm-chat-msg.me { align-self: flex-end; background: rgba(255,0,127,0.22); color: #fff; }
-.bm-chat-msg.them { align-self: flex-start; background: rgba(255,255,255,0.06); color: #eee; }
+        /* Шкала прогресса сделки — заполняется по мере продажи товара / выполнения вакансии */
+        .bm-chat-progress { margin-bottom: 12px; }
+        .bm-chat-progress-track {
+            height: 5px; background: rgba(255,255,255,0.08); border-radius: 100px; overflow: hidden; margin-bottom: 9px;
+        }
+        .bm-chat-progress-fill {
+            height: 100%; border-radius: 100px; background: linear-gradient(90deg, var(--primary-purple), var(--accent-pink));
+            transition: width 0.35s ease; min-width: 5px;
+        }
+        .bm-chat-progress-fill.danger { background: linear-gradient(90deg, #ff5a5a, #ff9d5a); }
+        .bm-chat-progress-steps { display: flex; justify-content: space-between; gap: 4px; }
+        .bm-chat-progress-step { display: flex; flex-direction: column; align-items: center; gap: 5px; flex: 1; text-align: center; }
+        .bm-chat-progress-step .dot {
+            width: 8px; height: 8px; border-radius: 50%; background: rgba(255,255,255,0.12);
+            border: 1px solid rgba(255,255,255,0.22); transition: all 0.2s ease;
+        }
+        .bm-chat-progress-step.done .dot { background: var(--primary-purple); border-color: var(--primary-purple); }
+        .bm-chat-progress-step.active .dot { background: var(--accent-pink); border-color: var(--accent-pink); box-shadow: 0 0 0 3px rgba(255,0,127,0.16); }
+        .bm-chat-progress-step.danger .dot { background: #ff5a5a; border-color: #ff5a5a; box-shadow: 0 0 0 3px rgba(255,90,90,0.16); }
+        .bm-chat-progress-step .label { font-size: 0.6rem; line-height: 1.25; color: var(--text-muted); }
+        .bm-chat-progress-step.done .label, .bm-chat-progress-step.active .label, .bm-chat-progress-step.danger .label { color: #fff; }
 
-#bm-chat-input-row { display: flex; gap: 8px; margin-top: auto; }
-#bm-chat-input { flex: 1; background: rgba(0,0,0,0.35); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 10px 14px; color: #fff; font-family: var(--font-sans); font-size: 0.85rem; outline: none; }
-#bm-chat-input:focus { border-color: var(--accent-pink); }
-#bm-chat-send { background: var(--accent-pink); border: none; border-radius: 12px; padding: 0 16px; color: #fff; cursor: pointer; }
+        /* Кнопки действий по сделке — прямо внутри чата */
+        #bm-chat-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+        #bm-chat-actions:empty { display: none; }
 
-/* ===== Плашка "Чаты продаж" слева ===== */
-#bm-chats-tab {
-    position: fixed; left: 0; top: 50%; transform: translateY(-50%);
-    z-index: 18000; display: none; align-items: center; gap: 8px;
-    background: rgba(16, 11, 28, 0.95); border: 1px solid rgba(138, 43, 226, 0.35); border-left: none;
-    color: #fff; cursor: pointer; padding: 16px 12px 16px 8px; border-radius: 0 14px 14px 0;
-    box-shadow: 4px 0 20px rgba(0, 0, 0, 0.6); writing-mode: vertical-rl; text-orientation: mixed;
-    font-family: var(--font-sans); font-weight: 600; font-size: 0.85rem; letter-spacing: 0.04em; transition: all 0.2s ease;
-}
-#bm-chats-tab:hover { padding-left: 14px; border-color: rgba(255, 0, 127, 0.5); background: rgba(24, 16, 42, 0.98); }
-#bm-chats-tab [data-lucide] { width: 16px; height: 16px; transform: rotate(90deg); color: #b985f4; }
-#bm-chats-tab .bm-chats-tab-badge {
-    writing-mode: horizontal-tb; background: var(--accent-pink); color: #fff; font-size: 0.7rem; font-weight: 800;
-    min-width: 18px; height: 18px; padding: 0 4px; border-radius: 100px; display: flex; align-items: center; justify-content: center;
-}
+        #bm-chat-card h3 { display: flex; align-items: center; gap: 8px; font-size: 1.05rem; color: #fff; margin-bottom: 14px; }
+        #bm-chat-messages { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; padding-right: 4px; margin-bottom: 14px; min-height: 120px; }
+        .bm-chat-msg { max-width: 80%; padding: 8px 13px; border-radius: 14px; font-size: 0.85rem; line-height: 1.4; }
+        .bm-chat-msg.me { align-self: flex-end; background: rgba(255,0,127,0.18); color: #fff; }
+        .bm-chat-msg.them { align-self: flex-start; background: rgba(255,255,255,0.06); color: #eee; }
+        #bm-chat-input-row { display: flex; gap: 8px; }
+        #bm-chat-input { flex: 1; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 10px 14px; color: #fff; font-family: var(--font-sans); font-size: 0.85rem; outline: none; }
+        #bm-chat-input:focus { border-color: var(--accent-pink); }
+        #bm-chat-send { background: var(--accent-pink); border: none; border-radius: 12px; padding: 0 16px; color: #fff; cursor: pointer; }
+
+        /* ===== Плавающая вкладка "Чаты продаж" слева экрана ===== */
+        #bm-chats-tab {
+            position: fixed; left: 0; top: 50%; transform: translateY(-50%);
+            z-index: 18000; display: none; align-items: center; gap: 8px;
+            background: rgba(16,11,28,0.92); color: #fff; border: 1px solid rgba(138,43,226,0.28); border-left: none; cursor: pointer;
+            padding: 18px 14px 18px 11px; border-radius: 0 16px 16px 0;
+            box-shadow: 4px 6px 22px rgba(0,0,0,0.35);
+            writing-mode: vertical-rl; text-orientation: mixed; font-family: var(--font-sans); font-weight: 700; font-size: 0.82rem; letter-spacing: 0.03em;
+            transition: padding 0.15s ease, border-color 0.15s ease, background 0.15s ease;
+        }
+        #bm-chats-tab:hover { padding-left: 15px; border-color: rgba(138,43,226,0.55); background: rgba(24,16,40,0.96); }
+        #bm-chats-tab [data-lucide] { width: 16px; height: 16px; transform: rotate(90deg); color: #b985f4; }
+        #bm-chats-tab .bm-chats-tab-badge {
+            writing-mode: horizontal-tb; background: var(--accent-pink); color: #fff; font-size: 0.68rem; font-weight: 800;
+            min-width: 17px; height: 17px; padding: 0 4px; border-radius: 100px; display: flex; align-items: center; justify-content: center;
+        }
+        #bm-chats-drawer-overlay {
+            display: none; position: fixed; inset: 0; z-index: 18500; background: rgba(3,2,6,0.6); backdrop-filter: blur(4px);
+        }
+        #bm-chats-drawer-overlay.open { display: block; }
+        #bm-chats-drawer {
+            position: fixed; left: -380px; top: 0; bottom: 0; width: 360px; z-index: 18600;
+            background: rgba(13,9,22,0.99); border-right: 1px solid rgba(138,43,226,0.3);
+            box-shadow: 10px 0 40px rgba(0,0,0,0.5); padding: 20px 14px; overflow-y: auto;
+            transition: left 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        #bm-chats-drawer.open { left: 0; }
+        #bm-chats-drawer h3 { display: flex; align-items: center; gap: 8px; font-size: 1rem; color: #fff; margin-bottom: 4px; padding: 0 4px; }
+        #bm-chats-drawer .sub { font-size: 0.72rem; color: var(--text-muted); padding: 0 4px; margin-bottom: 14px; }
+        .bm-chat-list-item {
+            display: flex; align-items: center; gap: 13px; padding: 14px; border-radius: 16px; cursor: pointer;
+            margin-bottom: 8px; background: rgba(255,255,255,0.025); border: 1px solid rgba(255,255,255,0.07);
+            transition: background 0.15s ease, border-color 0.15s ease;
+        }
+        .bm-chat-list-item:hover { background: rgba(138,43,226,0.08); border-color: rgba(138,43,226,0.22); }
+        .bm-chat-list-item img { width: 46px; height: 46px; border-radius: 12px; flex-shrink: 0; background: rgba(255,255,255,0.04); }
+        .bm-chat-list-item .info { min-width: 0; flex: 1; }
+        .bm-chat-list-item .name { font-size: 0.88rem; font-weight: 700; color: #fff; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .bm-chat-list-item .item { font-size: 0.76rem; color: var(--text-muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; margin-top: 2px; }
+        .bm-chat-list-item .price { font-size: 0.85rem; font-weight: 700; color: #b985f4; flex-shrink: 0; }
 
         /* ===== Детальная плашка объявления (открывается кликом по карточке) ===== */
         .bounty-card { cursor: pointer; }
@@ -3601,10 +3648,10 @@ async function loadSectionVisibility() {
 
             if (l.status === 'active' && isSeller) actions += `<button class="bm-action-btn danger" onclick="bmCancelListing('${l.id}')"><i data-lucide="x"></i> Снять</button>`;
             if (l.status === 'active' && !isSeller) actions += `<button class="bm-action-btn blue" onclick="bmBuyListing('${l.id}')"><i data-lucide="shopping-cart"></i> Купить</button>`;
-            if (l.status === 'reserved' && isSeller) actions += `<button class="bm-action-btn primary" onclick="bmMarkHanded('${l.id}')"><i data-lucide="package-check"></i> Передал</button>`;
+            if (l.status === 'reserved' && isSeller) actions += `<button class="bm-action-btn primary" onclick="bmMarkHanded('${l.id}')"><i data-lucide="package-check"></i> Подтвердить передачу</button>`;
             if (l.status === 'reserved' && isBuyer) actions += `<button class="bm-action-btn danger" onclick="bmCancelListing('${l.id}')"><i data-lucide="x"></i> Отменить</button>`;
             if (l.status === 'handed' && isBuyer) {
-                actions += `<button class="bm-action-btn green" onclick="bmConfirmListing('${l.id}')"><i data-lucide="check"></i> Подтвердить</button>`;
+                actions += `<button class="bm-action-btn green" onclick="bmConfirmListing('${l.id}')"><i data-lucide="check"></i> Подтвердить покупку</button>`;
                 actions += `<button class="bm-action-btn danger" onclick="bmOpenDispute('${l.id}')"><i data-lucide="flag"></i> Спор</button>`;
             }
             if (l.status === 'disputed' && isUserModerator) {
@@ -3901,6 +3948,8 @@ async function loadSectionVisibility() {
         }
 
         async function bmOpenChatForContext(contextType, contextId, otherName) {
+            // Плашка объявления должна закрываться, а не оставаться под чатом — чат всегда поверх.
+            bmCloseDetail();
             try {
                 const { data, error } = await supabaseClient
                     .from('bm_chats').select('id').eq('context_type', contextType).eq('context_id', contextId).is('closed_at', null).maybeSingle();
@@ -3912,212 +3961,165 @@ async function loadSectionVisibility() {
             }
         }
 
-        // Вспомогательные функции состояния двухстороннего гаранта
-function getEscrowState(contextType, contextId) {
-    try {
-        return JSON.parse(localStorage.getItem(`bm_escrow_${contextType}_${contextId}`)) || { pay: false, transfer: false };
-    } catch (e) {
-        return { pay: false, transfer: false };
-    }
-}
+        function bmOpenChat(chatId, meta) {
+            bmActiveChatId = chatId;
+            bmActiveChatMeta = meta || null;
+            let overlay = document.getElementById('bm-chat-overlay');
+            if (!overlay) {
+                overlay = document.createElement('div');
+                overlay.id = 'bm-chat-overlay';
+                overlay.innerHTML = `
+                    <div id="bm-chat-card">
+                        <div class="bm-chat-head-row">
+                            <img id="bm-chat-avatar" src="" alt="">
+                            <div class="bm-chat-head-info">
+                                <div class="name" id="bm-chat-other-name">Собеседник</div>
+                                <div class="role" id="bm-chat-role-label">Сделка в Торговой федерации</div>
+                            </div>
+                            <span id="bm-chat-close" onclick="bmCloseChat()">&times;</span>
+                        </div>
+                        <div class="bm-chat-deal-block" id="bm-chat-deal-block" style="display:none;">
+                            <div class="bm-chat-section-label">Сделка</div>
+                            <div class="bm-chat-item-strip" id="bm-chat-item-strip">
+                                <span class="icon-badge b-purple" id="bm-chat-item-icon"><i data-lucide="package"></i></span>
+                                <div class="info">
+                                    <div class="name" id="bm-chat-item-name"></div>
+                                    <div class="status" id="bm-chat-item-status"></div>
+                                </div>
+                                <div class="price" id="bm-chat-item-price"><i data-lucide="gem"></i> <span></span></div>
+                            </div>
+                            <div id="bm-chat-progress"></div>
+                            <div id="bm-chat-actions"></div>
+                        </div>
+                        <div class="bm-chat-section-label">Сообщения</div>
+                        <div id="bm-chat-messages"></div>
+                        <div id="bm-chat-input-row">
+                            <input type="text" id="bm-chat-input" placeholder="Сообщение..." onkeydown="if(event.key==='Enter') bmSendChatMessage()">
+                            <button id="bm-chat-send" onclick="bmSendChatMessage()"><i data-lucide="send" style="width:15px;height:15px;"></i></button>
+                        </div>
+                    </div>`;
+                document.body.appendChild(overlay);
+                overlay.onclick = (e) => { if (e.target === overlay) bmCloseChat(); };
+            }
+            overlay.style.display = 'flex';
+            bmRenderChatMeta();
+            if (window.lucide) lucide.createIcons();
+            bmLoadChatMessages();
+            if (bmChatPollTimer) clearInterval(bmChatPollTimer);
+            bmChatPollTimer = setInterval(bmLoadChatMessages, 4000);
+        }
 
-function setEscrowState(contextType, contextId, state) {
-    localStorage.setItem(`bm_escrow_${contextType}_${contextId}`, JSON.stringify(state));
-}
+        // Перерисовывает шапку (аватар/ник), карточку товара и кнопки гаранта — вызывается при открытии
+        // чата и повторно после любого действия (передал/подтвердил/сдал/принял), чтобы кнопки обновились сами.
+        function bmRenderChatMeta() {
+            const meta = bmActiveChatMeta;
+            const otherName = meta?.otherName || 'собеседник';
+            document.getElementById('bm-chat-other-name').textContent = otherName;
+            document.getElementById('bm-chat-avatar').src = `https://mc-heads.net/avatar/${encodeURIComponent(otherName)}/48`;
 
-function bmOpenChat(chatId, meta) {
-    bmActiveChatId = chatId;
-    bmActiveChatMeta = meta || null;
-    let overlay = document.getElementById('bm-chat-overlay');
-    if (!overlay) {
-        overlay = document.createElement('div');
-        overlay.id = 'bm-chat-overlay';
-        overlay.innerHTML = `
-            <div id="bm-chat-card">
-                <div class="bm-chat-head-row">
-                    <img id="bm-chat-avatar" src="" alt="">
-                    <div class="bm-chat-head-info">
-                        <div class="name" id="bm-chat-other-name">Собеседник</div>
-                        <div class="role" id="bm-chat-role-label">Сделка</div>
+            const roleLabels = { seller: 'Вы продавец лота', buyer: 'Вы покупатель лота', employer: 'Вы заказчик вакансии', hired: 'Вы исполнитель вакансии', applicant: 'Вы откликнулись на вакансию' };
+            document.getElementById('bm-chat-role-label').textContent = meta?.myRole ? roleLabels[meta.myRole] : 'Сделка в Торговой федерации';
+
+            const dealBlock = document.getElementById('bm-chat-deal-block');
+            if (meta?.itemName) {
+                dealBlock.style.display = 'block';
+                document.getElementById('bm-chat-item-icon').innerHTML = `<i data-lucide="${meta.icon || 'package'}"></i>`;
+                document.getElementById('bm-chat-item-name').textContent = meta.itemName;
+                document.getElementById('bm-chat-item-status').textContent = meta.statusLabel || '';
+                document.getElementById('bm-chat-item-price').querySelector('span').textContent = meta.price ?? '';
+                document.getElementById('bm-chat-progress').innerHTML = bmChatProgressHtml(meta);
+            } else {
+                dealBlock.style.display = 'none';
+            }
+
+            document.getElementById('bm-chat-actions').innerHTML = bmChatActionsHtml(meta);
+            if (window.lucide) lucide.createIcons();
+        }
+
+        // Данные для шкалы прогресса сделки: этапы зависят от типа сделки (товар/вакансия) и её статуса.
+        function bmChatProgressSteps(meta) {
+            if (!meta || !meta.contextType) return null;
+            if (meta.contextType === 'marketplace') {
+                if (meta.status === 'disputed') {
+                    return {
+                        steps: [
+                            { label: 'Оплата заморожена', done: true },
+                            { label: 'Товар передан', done: true },
+                            { label: 'Спор', danger: true, active: true }
+                        ],
+                        percent: 100, danger: true
+                    };
+                }
+                const order = ['reserved', 'handed', 'completed'];
+                const labels = ['Оплата заморожена', 'Товар передан', 'Сделка завершена'];
+                const idx = Math.max(0, order.indexOf(meta.status));
+                return {
+                    steps: labels.map((label, i) => ({ label, done: i < idx, active: i === idx })),
+                    percent: idx === 0 ? 6 : (idx / (labels.length - 1)) * 100
+                };
+            }
+            if (meta.contextType === 'job') {
+                const order = ['in_progress', 'submitted', 'completed'];
+                const labels = ['Работа начата', 'Сдано на приёмку', 'Работа принята'];
+                const idx = Math.max(0, order.indexOf(meta.status));
+                return {
+                    steps: labels.map((label, i) => ({ label, done: i < idx, active: i === idx })),
+                    percent: idx === 0 ? 6 : (idx / (labels.length - 1)) * 100
+                };
+            }
+            return null;
+        }
+
+        function bmChatProgressHtml(meta) {
+            const data = bmChatProgressSteps(meta);
+            if (!data) return '';
+            return `
+                <div class="bm-chat-progress">
+                    <div class="bm-chat-progress-track"><div class="bm-chat-progress-fill ${data.danger ? 'danger' : ''}" style="width:${data.percent}%;"></div></div>
+                    <div class="bm-chat-progress-steps">
+                        ${data.steps.map(s => `<div class="bm-chat-progress-step ${s.done ? 'done' : ''} ${s.active ? 'active' : ''} ${s.danger ? 'danger' : ''}"><span class="dot"></span><span class="label">${s.label}</span></div>`).join('')}
                     </div>
-                    <span id="bm-chat-close" onclick="bmCloseChat()">&times;</span>
-                </div>
-
-                <div class="bm-chat-item-strip" id="bm-chat-item-strip" style="display:none;">
-                    <span class="icon-badge b-purple" id="bm-chat-item-icon"><i data-lucide="package"></i></span>
-                    <div class="info">
-                        <div class="name" id="bm-chat-item-name"></div>
-                        <div class="status" id="bm-chat-item-status"></div>
-                    </div>
-                    <div class="price" id="bm-chat-item-price"><i data-lucide="gem"></i> <span></span></div>
-                </div>
-
-                <div class="bm-escrow-box" id="bm-escrow-box">
-                    <div class="bm-escrow-head">
-                        <span><i data-lucide="shield-check" style="width:13px;height:13px;display:inline;vertical-align:-2px;color:#4fdc8e;"></i> Ход сделки (Гарант)</span>
-                        <span id="bm-escrow-percent" style="font-weight: 700; color: #fff;">0%</span>
-                    </div>
-                    <div class="bm-escrow-track">
-                        <div class="bm-escrow-fill" id="bm-escrow-progress" style="width: 0%;"></div>
-                    </div>
-                    <div class="bm-escrow-status-msg" id="bm-escrow-msg"></div>
-                    <div class="bm-escrow-btns" id="bm-chat-actions"></div>
-                </div>
-
-                <div id="bm-chat-messages"></div>
-
-                <div id="bm-chat-input-row">
-                    <input type="text" id="bm-chat-input" placeholder="Сообщение..." onkeydown="if(event.key==='Enter') bmSendChatMessage()">
-                    <button id="bm-chat-send" onclick="bmSendChatMessage()"><i data-lucide="send" style="width:15px;height:15px;"></i></button>
-                </div>
-            </div>`;
-        document.body.appendChild(overlay);
-        overlay.onclick = (e) => { if (e.target === overlay) bmCloseChat(); };
-    }
-    overlay.style.display = 'flex';
-    bmRenderChatMeta();
-    bmLoadChatMessages();
-    if (bmChatPollTimer) clearInterval(bmChatPollTimer);
-    bmChatPollTimer = setInterval(bmLoadChatMessages, 4000);
-}
-
-function bmRenderChatMeta() {
-    const meta = bmActiveChatMeta;
-    if (!meta) return;
-
-    const otherName = meta.otherName || 'собеседник';
-    document.getElementById('bm-chat-other-name').textContent = otherName;
-    document.getElementById('bm-chat-avatar').src = `https://mc-heads.net/avatar/${encodeURIComponent(otherName)}/48`;
-
-    const roleLabels = { seller: 'Вы продавец', buyer: 'Вы покупатель', employer: 'Вы заказчик', hired: 'Вы исполнитель', applicant: 'Вы откликнулись' };
-    document.getElementById('bm-chat-role-label').textContent = meta.myRole ? roleLabels[meta.myRole] : 'Сделка';
-
-    const strip = document.getElementById('bm-chat-item-strip');
-    if (meta.itemName) {
-        strip.style.display = 'flex';
-        document.getElementById('bm-chat-item-icon').innerHTML = `<i data-lucide="${meta.icon || 'package'}"></i>`;
-        document.getElementById('bm-chat-item-name').textContent = meta.itemName;
-        document.getElementById('bm-chat-item-status').textContent = meta.statusLabel || '';
-        document.getElementById('bm-chat-item-price').querySelector('span').textContent = meta.price ?? '';
-    } else {
-        strip.style.display = 'none';
-    }
-
-    let percent = 0;
-    let msgText = "Деньги заморожены на балансе гаранта.";
-
-    if (meta.contextType === 'marketplace') {
-        if (meta.status === 'reserved') {
-            percent = 33;
-            msgText = meta.myRole === 'seller' 
-                ? "Покупатель забронировал лот. Передайте предмет в игре и нажмите «Подтвердить передачу»."
-                : "Деньги заморожены. Ожидайте передачи предмета продавцом в игре.";
-        } else if (meta.status === 'handed') {
-            percent = 66;
-            msgText = meta.myRole === 'buyer'
-                ? "Продавец отметил передачу товара. Проверьте инвентарь и подтвердите получение."
-                : "Вы отметили товар как переданный. Ожидайте подтверждения от покупателя.";
-        } else if (meta.status === 'completed') {
-            percent = 100;
-            msgText = "Сделка успешно завершена. Средства зачислены продавцу.";
+                </div>`;
         }
-    } else if (meta.contextType === 'job') {
-        if (meta.status === 'in_progress') {
-            percent = 33;
-            msgText = meta.myRole === 'hired'
-                ? "Вы наняты! Выполняйте работу и нажмите «Сдать работу» после завершения."
-                : "Исполнитель выполняет работу. Оплата заморожена.";
-        } else if (meta.status === 'submitted') {
-            percent = 66;
-            msgText = meta.myRole === 'employer'
-                ? "Исполнитель сдал работу. Проверьте результат и подтвердите оплату."
-                : "Работа сдана. Ожидайте приёмки заказчиком.";
-        } else if (meta.status === 'completed') {
-            percent = 100;
-            msgText = "Работа принята, оплата зачислена исполнителю.";
-        }
-    }
 
-    const progressBar = document.getElementById('bm-escrow-progress');
-    const progressPercent = document.getElementById('bm-escrow-percent');
-    const msgEl = document.getElementById('bm-escrow-msg');
-
-    if (progressBar) progressBar.style.width = percent + '%';
-    if (progressPercent) progressPercent.textContent = percent + '%';
-    if (msgEl) msgEl.textContent = msgText;
-
-    document.getElementById('bm-chat-actions').innerHTML = bmChatActionsHtml(meta);
-    if (window.lucide) lucide.createIcons();
-}
-
-function bmChatActionsHtml(meta) {
-    if (!meta || !meta.contextType) return '';
-    const id = meta.contextId;
-
-    if (meta.contextType === 'marketplace') {
-        if (meta.status === 'reserved') {
-            if (meta.myRole === 'seller') {
-                return `<button class="bm-action-btn primary" onclick="bmChatMarkHanded('${id}')"><i data-lucide="package-check"></i> Подтвердить передачу товара</button>`;
-            } else if (meta.myRole === 'buyer') {
-                return `<button class="bm-action-btn danger" onclick="bmChatCancelListing('${id}')"><i data-lucide="x"></i> Отменить бронь</button>`;
+        // Кнопки гаранта прямо в чате: продавец отмечает передачу, покупатель подтверждает (деньги уходят
+        // продавцу, чат закрывается) или открывает спор — то же самое для вакансий (сдать/принять работу).
+        function bmChatActionsHtml(meta) {
+            if (!meta || !meta.contextType) return '';
+            const id = meta.contextId;
+            if (meta.contextType === 'marketplace') {
+                if (meta.status === 'reserved' && meta.myRole === 'seller') {
+                    return `<button class="bm-action-btn primary" onclick="bmChatMarkHanded('${id}')"><i data-lucide="package-check"></i> Подтвердить передачу</button>`;
+                }
+                if (meta.status === 'reserved' && meta.myRole === 'buyer') {
+                    return `<button class="bm-action-btn danger" onclick="bmChatCancelListing('${id}')"><i data-lucide="x"></i> Отменить бронь</button>`;
+                }
+                if (meta.status === 'handed' && meta.myRole === 'buyer') {
+                    return `<button class="bm-action-btn green" onclick="bmChatConfirmListing('${id}')"><i data-lucide="check"></i> Подтвердить покупку</button>
+                            <button class="bm-action-btn danger" onclick="bmChatOpenDispute('${id}')"><i data-lucide="flag"></i> Открыть спор</button>`;
+                }
+                if (meta.status === 'handed' && meta.myRole === 'seller') {
+                    return `<div class="bm-form-hint" style="margin:0;"><i data-lucide="clock"></i> Ждём подтверждения от покупателя.</div>`;
+                }
+                if (meta.status === 'disputed') {
+                    return `<div class="bm-form-hint" style="margin:0;"><i data-lucide="flag"></i> Спор открыт, ожидайте решения администрации.</div>`;
+                }
+            } else if (meta.contextType === 'job') {
+                if (meta.status === 'in_progress' && meta.myRole === 'hired') {
+                    return `<button class="bm-action-btn primary" onclick="bmChatSubmitWork('${id}')"><i data-lucide="check-check"></i> Сдать работу</button>`;
+                }
+                if (meta.status === 'in_progress' && meta.myRole === 'employer') {
+                    return `<div class="bm-form-hint" style="margin:0;"><i data-lucide="clock"></i> Ждём, пока исполнитель сдаст работу.</div>`;
+                }
+                if (meta.status === 'submitted' && meta.myRole === 'employer') {
+                    return `<button class="bm-action-btn green" onclick="bmChatAcceptWork('${id}')"><i data-lucide="check"></i> Принять работу</button>`;
+                }
+                if (meta.status === 'submitted' && meta.myRole === 'hired') {
+                    return `<div class="bm-form-hint" style="margin:0;"><i data-lucide="clock"></i> Ждём приёмки работы заказчиком.</div>`;
+                }
             }
+            return '';
         }
-        if (meta.status === 'handed') {
-            if (meta.myRole === 'buyer') {
-                return `<button class="bm-action-btn green" onclick="bmChatConfirmListing('${id}')"><i data-lucide="check"></i> Подтвердить получение и перевести деньги</button>
-                        <button class="bm-action-btn danger" onclick="bmChatOpenDispute('${id}')"><i data-lucide="flag"></i> Спор</button>`;
-            }
-        }
-    } else if (meta.contextType === 'job') {
-        if (meta.status === 'in_progress') {
-            if (meta.myRole === 'hired') {
-                return `<button class="bm-action-btn primary" onclick="bmChatSubmitWork('${id}')"><i data-lucide="check-check"></i> Сдать работу</button>`;
-            }
-        }
-        if (meta.status === 'submitted') {
-            if (meta.myRole === 'employer') {
-                return `<button class="bm-action-btn green" onclick="bmChatAcceptWork('${id}')"><i data-lucide="check"></i> Принять работу и перевести деньги</button>`;
-            }
-        }
-    }
-
-    if (meta.status === 'completed') {
-        return `<span style="font-size:0.78rem; color:#4fdc8e; font-weight:700;"><i data-lucide="check-circle-2" style="width:14px;height:14px;display:inline;"></i> Завершено</span>`;
-    }
-
-    return '';
-}
-
-async function bmToggleEscrowStep(contextType, contextId, step) {
-    const state = getEscrowState(contextType, contextId);
-    state[step] = !state[step];
-    setEscrowState(contextType, contextId, state);
-
-    // Если обе кнопки нажаты, выполняем перечисление денег и завершение сделки
-    if (state.pay && state.transfer) {
-        bmRenderChatMeta();
-        if (contextType === 'marketplace') {
-            const { error } = await supabaseClient.rpc('bm_confirm_listing', { p_listing_id: contextId });
-            if (error) {
-                console.error('Ошибка завершения сделки:', error);
-                customAlert('❌ Ошибка', bmFriendlyError(error));
-                return;
-            }
-            customAlert('🎉 Сделка завершена!', 'Обе стороны подтвердили оплату и передачу. Средства успешно переведены продавцу из заморозки.');
-        } else if (contextType === 'job') {
-            const { error } = await supabaseClient.rpc('bm_accept_work', { p_job_id: contextId });
-            if (error) {
-                console.error('Ошибка приёмки работы:', error);
-                customAlert('❌ Ошибка', bmFriendlyError(error));
-                return;
-            }
-            customAlert('🎉 Вакансия закрыта!', 'Оплата переведена исполнителю из состояния заморозки.');
-        }
-        await bmChatRefreshOrClose(true);
-    } else {
-        bmRenderChatMeta();
-    }
-}
 
         // Обёртки над обычными bm-действиями: выполняют RPC, потом либо обновляют статус в чате (промежуточный
         // шаг), либо закрывают чат целиком, если сделка завершена (деньги переданы или бронь/работа снята).
@@ -4140,7 +4142,7 @@ async function bmToggleEscrowStep(contextType, contextId, step) {
         async function bmChatConfirmListing(id) {
             const { error } = await supabaseClient.rpc('bm_confirm_listing', { p_listing_id: id });
             if (error) { console.error('bm_confirm_listing error:', error); customAlert('❌ Ошибка', bmFriendlyError(error)); return; }
-            customAlert('✅ Сделка завершена', 'Вы подтвердили получение товара — деньги переведены продавцу. Чат закрыт.');
+            customAlert('✅ Сделка завершена', 'Вы подтвердили получение товара — деньги переведены продавцу. Чат сделки удалён.');
             await bmChatRefreshOrClose(true);
         }
         async function bmChatOpenDispute(id) {
@@ -4151,7 +4153,7 @@ async function bmToggleEscrowStep(contextType, contextId, step) {
         async function bmChatCancelListing(id) {
             const { error } = await supabaseClient.rpc('bm_cancel_listing', { p_listing_id: id });
             if (error) { console.error('bm_cancel_listing error:', error); customAlert('❌ Ошибка', bmFriendlyError(error)); return; }
-            customAlert('↩️ Бронь отменена', 'Средства возвращены на баланс. Чат закрыт.');
+            customAlert('↩️ Бронь отменена', 'Средства возвращены на баланс. Чат сделки удалён.');
             await bmChatRefreshOrClose(true);
         }
         async function bmChatSubmitWork(id) {
@@ -4162,7 +4164,7 @@ async function bmToggleEscrowStep(contextType, contextId, step) {
         async function bmChatAcceptWork(id) {
             const { error } = await supabaseClient.rpc('bm_accept_work', { p_job_id: id });
             if (error) { console.error('bm_accept_work error:', error); customAlert('❌ Ошибка', bmFriendlyError(error)); return; }
-            customAlert('✅ Работа принята', 'Оплата переведена исполнителю. Чат закрыт.');
+            customAlert('✅ Работа принята', 'Оплата переведена исполнителю. Чат сделки удалён.');
             await bmChatRefreshOrClose(true);
         }
 
