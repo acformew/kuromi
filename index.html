@@ -1331,7 +1331,7 @@
         .bm-action-btn.danger { background: rgba(255, 90, 90, 0.08); border-color: rgba(255, 90, 90, 0.3); color: #ff9d9d; }
         .bm-action-btn [data-lucide] { width: 12px; height: 12px; }
 
-        /* ===== Анонимный чат торговой федерации */
+        /* ===== Анонимный чат торговой федерации ===== */
 
         #bm-chat-overlay {
             display: none; position: fixed; inset: 0; background: rgba(5,3,8,0.8);
@@ -1339,12 +1339,35 @@
         }
         #bm-chat-card {
             background: rgba(16,11,28,0.98); border: 1px solid rgba(255,0,127,0.3); border-radius: 24px;
-            max-width: 480px; width: 100%; max-height: 78vh; display: flex; flex-direction: column;
-            padding: 22px; box-shadow: 0 20px 50px rgba(0,0,0,0.6);
+            max-width: 480px; width: 100%; max-height: 82vh; display: flex; flex-direction: column;
+            padding: 18px; box-shadow: 0 20px 50px rgba(0,0,0,0.6);
         }
-        #bm-chat-card h3 { display: flex; align-items: center; gap: 8px; font-size: 1.05rem; color: #fff; margin-bottom: 14px; }
-        #bm-chat-close { margin-left: auto; cursor: pointer; color: var(--text-muted); font-size: 1.3rem; }
+        /* Шапка: аватар и ник собеседника */
+        .bm-chat-head-row { display: flex; align-items: center; gap: 12px; padding: 4px 4px 14px; border-bottom: 1px solid rgba(255,255,255,0.08); margin-bottom: 12px; }
+        .bm-chat-head-row img { width: 40px; height: 40px; border-radius: 11px; border: 1px solid rgba(255,255,255,0.14); background: rgba(255,255,255,0.04); flex-shrink: 0; }
+        .bm-chat-head-info { min-width: 0; flex: 1; }
+        .bm-chat-head-info .name { font-size: 0.98rem; font-weight: 700; color: #fff; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .bm-chat-head-info .role { font-size: 0.72rem; color: var(--text-muted); margin-top: 1px; }
+        #bm-chat-close { cursor: pointer; color: var(--text-muted); font-size: 1.5rem; line-height: 1; flex-shrink: 0; }
         #bm-chat-close:hover { color: #fff; }
+
+        /* Полоска с товаром/вакансией сбоку — что именно за сделка */
+        .bm-chat-item-strip {
+            display: flex; align-items: center; gap: 10px; background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(138,43,226,0.2); border-radius: 14px; padding: 10px 12px; margin-bottom: 12px;
+        }
+        .bm-chat-item-strip .icon-badge { width: 34px; height: 34px; flex-shrink: 0; }
+        .bm-chat-item-strip .info { min-width: 0; flex: 1; }
+        .bm-chat-item-strip .info .name { font-size: 0.84rem; font-weight: 700; color: #fff; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .bm-chat-item-strip .info .status { font-size: 0.7rem; color: var(--text-muted); margin-top: 1px; }
+        .bm-chat-item-strip .price { font-size: 0.95rem; font-weight: 800; color: #b985f4; display: flex; align-items: center; gap: 4px; flex-shrink: 0; }
+        .bm-chat-item-strip .price [data-lucide] { width: 14px; height: 14px; }
+
+        /* Кнопки действий по сделке — прямо внутри чата */
+        #bm-chat-actions { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; }
+        #bm-chat-actions:empty { display: none; }
+
+        #bm-chat-card h3 { display: flex; align-items: center; gap: 8px; font-size: 1.05rem; color: #fff; margin-bottom: 14px; }
         #bm-chat-messages { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; padding-right: 4px; margin-bottom: 14px; min-height: 120px; }
         .bm-chat-msg { max-width: 80%; padding: 8px 13px; border-radius: 14px; font-size: 0.85rem; line-height: 1.4; }
         .bm-chat-msg.me { align-self: flex-end; background: rgba(255,0,127,0.18); color: #fff; }
@@ -1353,6 +1376,47 @@
         #bm-chat-input { flex: 1; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 10px 14px; color: #fff; font-family: var(--font-sans); font-size: 0.85rem; outline: none; }
         #bm-chat-input:focus { border-color: var(--accent-pink); }
         #bm-chat-send { background: var(--accent-pink); border: none; border-radius: 12px; padding: 0 16px; color: #fff; cursor: pointer; }
+
+        /* ===== Плавающая вкладка "Чаты продаж" слева экрана ===== */
+        #bm-chats-tab {
+            position: fixed; left: 0; top: 50%; transform: translateY(-50%);
+            z-index: 18000; display: none; align-items: center; gap: 6px;
+            background: linear-gradient(135deg, #8a2be2, #ff007f); color: #fff; border: none; cursor: pointer;
+            padding: 12px 10px 12px 8px; border-radius: 0 14px 14px 0;
+            box-shadow: 4px 6px 20px rgba(138,43,226,0.4);
+            writing-mode: vertical-rl; text-orientation: mixed; font-family: var(--font-sans); font-weight: 700; font-size: 0.78rem; letter-spacing: 0.03em;
+            transition: padding 0.15s ease;
+        }
+        #bm-chats-tab:hover { padding-left: 12px; }
+        #bm-chats-tab [data-lucide] { width: 15px; height: 15px; transform: rotate(90deg); }
+        #bm-chats-tab .bm-chats-tab-badge {
+            writing-mode: horizontal-tb; background: #fff; color: #8a2be2; font-size: 0.68rem; font-weight: 800;
+            min-width: 16px; height: 16px; padding: 0 4px; border-radius: 100px; display: flex; align-items: center; justify-content: center;
+        }
+        #bm-chats-drawer-overlay {
+            display: none; position: fixed; inset: 0; z-index: 18500; background: rgba(3,2,6,0.6); backdrop-filter: blur(4px);
+        }
+        #bm-chats-drawer-overlay.open { display: block; }
+        #bm-chats-drawer {
+            position: fixed; left: -360px; top: 0; bottom: 0; width: 340px; z-index: 18600;
+            background: rgba(13,9,22,0.99); border-right: 1px solid rgba(138,43,226,0.3);
+            box-shadow: 10px 0 40px rgba(0,0,0,0.5); padding: 20px 14px; overflow-y: auto;
+            transition: left 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        #bm-chats-drawer.open { left: 0; }
+        #bm-chats-drawer h3 { display: flex; align-items: center; gap: 8px; font-size: 1rem; color: #fff; margin-bottom: 4px; padding: 0 4px; }
+        #bm-chats-drawer .sub { font-size: 0.72rem; color: var(--text-muted); padding: 0 4px; margin-bottom: 14px; }
+        .bm-chat-list-item {
+            display: flex; align-items: center; gap: 10px; padding: 10px; border-radius: 14px; cursor: pointer;
+            margin-bottom: 6px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.06);
+            transition: background 0.15s ease;
+        }
+        .bm-chat-list-item:hover { background: rgba(138,43,226,0.1); border-color: rgba(138,43,226,0.25); }
+        .bm-chat-list-item img { width: 38px; height: 38px; border-radius: 10px; flex-shrink: 0; background: rgba(255,255,255,0.04); }
+        .bm-chat-list-item .info { min-width: 0; flex: 1; }
+        .bm-chat-list-item .name { font-size: 0.82rem; font-weight: 700; color: #fff; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .bm-chat-list-item .item { font-size: 0.72rem; color: var(--text-muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .bm-chat-list-item .price { font-size: 0.78rem; font-weight: 700; color: #b985f4; flex-shrink: 0; }
 
         /* ===== Детальная плашка объявления (открывается кликом по карточке) ===== */
         .bounty-card { cursor: pointer; }
@@ -3590,14 +3654,17 @@ async function loadSectionVisibility() {
             if (window.lucide) lucide.createIcons();
         }
 
-        async function bmCancelListing(id) { const { error } = await supabaseClient.rpc('bm_cancel_listing', { p_listing_id: id }); if (error) customAlert('❌ Ошибка', bmFriendlyError(error)); bmCloseDetail(); loadBlackMarketListings(); }
+        async function bmCancelListing(id) { const { error } = await supabaseClient.rpc('bm_cancel_listing', { p_listing_id: id }); if (error) { console.error('bm_cancel_listing error:', error); customAlert('❌ Ошибка', bmFriendlyError(error)); } bmCloseDetail(); loadBlackMarketListings(); }
         async function bmBuyListing(id) {
             const { data, error } = await supabaseClient.rpc('bm_buy_listing', { p_listing_id: id });
             if (error) { console.error('bm_buy_listing error:', error); customAlert('❌ Ошибка', bmFriendlyError(error)); return; }
             customAlert('✅ Куплено', 'Товар забронирован, деньги заморожены до подтверждения. Договоритесь о встрече в чате.');
             bmCloseDetail();
             loadBlackMarketListings();
-            if (data) bmOpenChat(data, 'продавцом');
+            if (data) {
+                const meta = await bmBuildChatMeta('marketplace', id);
+                bmOpenChat(data, meta);
+            }
         }
         async function bmMarkHanded(id) { const { error } = await supabaseClient.rpc('bm_mark_handed', { p_listing_id: id }); if (error) { console.error('bm_mark_handed error:', error); customAlert('❌ Ошибка', bmFriendlyError(error)); } bmCloseDetail(); loadBlackMarketListings(); }
         async function bmConfirmListing(id) { const { error } = await supabaseClient.rpc('bm_confirm_listing', { p_listing_id: id }); if (error) { console.error('bm_confirm_listing error:', error); customAlert('❌ Ошибка', bmFriendlyError(error)); } bmCloseDetail(); loadBlackMarketListings(); }
@@ -3772,11 +3839,14 @@ async function loadSectionVisibility() {
             customAlert('📨 Отклик отправлен', 'Заказчик увидит ваш отклик и сможет написать вам в чате.');
             bmCloseDetail();
             loadBlackMarketJobs();
-            if (data) bmOpenChat(data, 'заказчиком');
+            if (data) {
+                const meta = await bmBuildChatMeta('job', id);
+                bmOpenChat(data, meta);
+            }
         }
-        async function bmCancelJob(id) { const { error } = await supabaseClient.rpc('bm_cancel_job', { p_job_id: id }); if (error) customAlert('❌ Ошибка', bmFriendlyError(error)); bmCloseDetail(); loadBlackMarketJobs(); }
-        async function bmSubmitWork(id) { const { error } = await supabaseClient.rpc('bm_submit_work', { p_job_id: id }); if (error) customAlert('❌ Ошибка', bmFriendlyError(error)); bmCloseDetail(); loadBlackMarketJobs(); }
-        async function bmAcceptWork(id) { const { error } = await supabaseClient.rpc('bm_accept_work', { p_job_id: id }); if (error) customAlert('❌ Ошибка', bmFriendlyError(error)); bmCloseDetail(); loadBlackMarketJobs(); }
+        async function bmCancelJob(id) { const { error } = await supabaseClient.rpc('bm_cancel_job', { p_job_id: id }); if (error) { console.error('bm_cancel_job error:', error); customAlert('❌ Ошибка', bmFriendlyError(error)); } bmCloseDetail(); loadBlackMarketJobs(); }
+        async function bmSubmitWork(id) { const { error } = await supabaseClient.rpc('bm_submit_work', { p_job_id: id }); if (error) { console.error('bm_submit_work error:', error); customAlert('❌ Ошибка', bmFriendlyError(error)); } bmCloseDetail(); loadBlackMarketJobs(); }
+        async function bmAcceptWork(id) { const { error } = await supabaseClient.rpc('bm_accept_work', { p_job_id: id }); if (error) { console.error('bm_accept_work error:', error); customAlert('❌ Ошибка', bmFriendlyError(error)); } bmCloseDetail(); loadBlackMarketJobs(); }
 
         async function bmViewApplications(jobId) {
             try {
@@ -3805,33 +3875,82 @@ async function loadSectionVisibility() {
             }
         }
 
-        /* ===== Анонимный чат торговой федерации */
+        /* ===== Чат по сделке торговой федерации (с аватаром, карточкой товара и кнопками гаранта) ===== */
         let bmActiveChatId = null;
         let bmChatPollTimer = null;
+        let bmActiveChatMeta = null; // { contextType, contextId, otherName, itemName, price, status, isMe1(seller/employer), myRole }
+
+        // Собирает мета-данные сделки (кто есть кто, что за товар/вакансия, текущий статус) — используется и
+        // при открытии чата с карточки объявления, и из бокового списка "Чаты продаж", и сразу после покупки.
+        async function bmBuildChatMeta(contextType, contextId) {
+            const myUuid = currentUserLinkedData?.minecraft_uuid;
+            if (contextType === 'marketplace') {
+                const { data: l } = await supabaseClient.from('bm_listings').select('*').eq('id', contextId).maybeSingle();
+                if (!l) return null;
+                const isSeller = l.seller_uuid === myUuid;
+                return {
+                    contextType, contextId,
+                    itemName: l.item_name, price: l.price, status: l.status,
+                    statusLabel: ({ active: 'В продаже', reserved: 'Забронировано', handed: 'Передано', disputed: 'Спор' })[l.status] || l.status,
+                    otherName: isSeller ? (l.buyer_name || 'покупатель') : l.seller_name,
+                    myRole: isSeller ? 'seller' : 'buyer',
+                    icon: 'package'
+                };
+            } else if (contextType === 'job') {
+                const { data: j } = await supabaseClient.from('bm_jobs').select('*').eq('id', contextId).maybeSingle();
+                if (!j) return null;
+                const isEmployer = j.employer_uuid === myUuid;
+                const isHired = j.hired_uuid === myUuid;
+                return {
+                    contextType, contextId,
+                    itemName: j.title, price: j.payment, status: j.status,
+                    statusLabel: ({ open: 'Открыто', in_progress: 'В работе', submitted: 'На приёмке' })[j.status] || j.status,
+                    otherName: isEmployer ? (j.hired_name || 'соискатель') : j.employer_name,
+                    myRole: isEmployer ? 'employer' : (isHired ? 'hired' : 'applicant'),
+                    icon: 'hammer'
+                };
+            }
+            return null;
+        }
 
         async function bmOpenChatForContext(contextType, contextId, otherName) {
             try {
                 const { data, error } = await supabaseClient
                     .from('bm_chats').select('id').eq('context_type', contextType).eq('context_id', contextId).is('closed_at', null).maybeSingle();
                 if (error || !data) { customAlert('❌ Ошибка', 'Чат не найден или уже закрыт.'); return; }
-                bmOpenChat(data.id, otherName);
+                const meta = await bmBuildChatMeta(contextType, contextId);
+                bmOpenChat(data.id, meta || { otherName });
             } catch (e) {
                 console.error('Не удалось открыть чат:', e);
             }
         }
 
-        function bmOpenChat(chatId, otherName) {
+        function bmOpenChat(chatId, meta) {
             bmActiveChatId = chatId;
+            bmActiveChatMeta = meta || null;
             let overlay = document.getElementById('bm-chat-overlay');
             if (!overlay) {
                 overlay = document.createElement('div');
                 overlay.id = 'bm-chat-overlay';
                 overlay.innerHTML = `
                     <div id="bm-chat-card">
-                        <div style="display:flex; align-items:center;">
-                            <h3><i data-lucide="message-square" style="width:17px;height:17px;color:#ffb0d9;"></i> Анонимный чат</h3>
+                        <div class="bm-chat-head-row">
+                            <img id="bm-chat-avatar" src="" alt="">
+                            <div class="bm-chat-head-info">
+                                <div class="name" id="bm-chat-other-name">Собеседник</div>
+                                <div class="role" id="bm-chat-role-label">Сделка в Торговой федерации</div>
+                            </div>
                             <span id="bm-chat-close" onclick="bmCloseChat()">&times;</span>
                         </div>
+                        <div class="bm-chat-item-strip" id="bm-chat-item-strip" style="display:none;">
+                            <span class="icon-badge b-purple" id="bm-chat-item-icon"><i data-lucide="package"></i></span>
+                            <div class="info">
+                                <div class="name" id="bm-chat-item-name"></div>
+                                <div class="status" id="bm-chat-item-status"></div>
+                            </div>
+                            <div class="price" id="bm-chat-item-price"><i data-lucide="gem"></i> <span></span></div>
+                        </div>
+                        <div id="bm-chat-actions"></div>
                         <div id="bm-chat-messages"></div>
                         <div id="bm-chat-input-row">
                             <input type="text" id="bm-chat-input" placeholder="Сообщение..." onkeydown="if(event.key==='Enter') bmSendChatMessage()">
@@ -3842,11 +3961,123 @@ async function loadSectionVisibility() {
                 overlay.onclick = (e) => { if (e.target === overlay) bmCloseChat(); };
             }
             overlay.style.display = 'flex';
-            overlay.querySelector('h3').innerHTML = `<i data-lucide="message-square" style="width:17px;height:17px;color:#ffb0d9;"></i> Чат с ${otherName || 'собеседником'}`;
+            bmRenderChatMeta();
             if (window.lucide) lucide.createIcons();
             bmLoadChatMessages();
             if (bmChatPollTimer) clearInterval(bmChatPollTimer);
             bmChatPollTimer = setInterval(bmLoadChatMessages, 4000);
+        }
+
+        // Перерисовывает шапку (аватар/ник), карточку товара и кнопки гаранта — вызывается при открытии
+        // чата и повторно после любого действия (передал/подтвердил/сдал/принял), чтобы кнопки обновились сами.
+        function bmRenderChatMeta() {
+            const meta = bmActiveChatMeta;
+            const otherName = meta?.otherName || 'собеседник';
+            document.getElementById('bm-chat-other-name').textContent = otherName;
+            document.getElementById('bm-chat-avatar').src = `https://mc-heads.net/avatar/${encodeURIComponent(otherName)}/48`;
+
+            const roleLabels = { seller: 'Вы продавец лота', buyer: 'Вы покупатель лота', employer: 'Вы заказчик вакансии', hired: 'Вы исполнитель вакансии', applicant: 'Вы откликнулись на вакансию' };
+            document.getElementById('bm-chat-role-label').textContent = meta?.myRole ? roleLabels[meta.myRole] : 'Сделка в Торговой федерации';
+
+            const strip = document.getElementById('bm-chat-item-strip');
+            if (meta?.itemName) {
+                strip.style.display = 'flex';
+                document.getElementById('bm-chat-item-icon').innerHTML = `<i data-lucide="${meta.icon || 'package'}"></i>`;
+                document.getElementById('bm-chat-item-name').textContent = meta.itemName;
+                document.getElementById('bm-chat-item-status').textContent = meta.statusLabel || '';
+                document.getElementById('bm-chat-item-price').querySelector('span').textContent = meta.price ?? '';
+            } else {
+                strip.style.display = 'none';
+            }
+
+            document.getElementById('bm-chat-actions').innerHTML = bmChatActionsHtml(meta);
+            if (window.lucide) lucide.createIcons();
+        }
+
+        // Кнопки гаранта прямо в чате: продавец отмечает передачу, покупатель подтверждает (деньги уходят
+        // продавцу, чат закрывается) или открывает спор — то же самое для вакансий (сдать/принять работу).
+        function bmChatActionsHtml(meta) {
+            if (!meta || !meta.contextType) return '';
+            const id = meta.contextId;
+            if (meta.contextType === 'marketplace') {
+                if (meta.status === 'reserved' && meta.myRole === 'seller') {
+                    return `<button class="bm-action-btn primary" onclick="bmChatMarkHanded('${id}')"><i data-lucide="package-check"></i> Передал товар</button>`;
+                }
+                if (meta.status === 'reserved' && meta.myRole === 'buyer') {
+                    return `<button class="bm-action-btn danger" onclick="bmChatCancelListing('${id}')"><i data-lucide="x"></i> Отменить бронь</button>`;
+                }
+                if (meta.status === 'handed' && meta.myRole === 'buyer') {
+                    return `<button class="bm-action-btn green" onclick="bmChatConfirmListing('${id}')"><i data-lucide="check"></i> Подтвердить передачу</button>
+                            <button class="bm-action-btn danger" onclick="bmChatOpenDispute('${id}')"><i data-lucide="flag"></i> Открыть спор</button>`;
+                }
+                if (meta.status === 'handed' && meta.myRole === 'seller') {
+                    return `<div class="bm-form-hint" style="margin:0;"><i data-lucide="clock"></i> Ждём подтверждения от покупателя.</div>`;
+                }
+                if (meta.status === 'disputed') {
+                    return `<div class="bm-form-hint" style="margin:0;"><i data-lucide="flag"></i> Спор открыт, ожидайте решения администрации.</div>`;
+                }
+            } else if (meta.contextType === 'job') {
+                if (meta.status === 'in_progress' && meta.myRole === 'hired') {
+                    return `<button class="bm-action-btn primary" onclick="bmChatSubmitWork('${id}')"><i data-lucide="check-check"></i> Сдать работу</button>`;
+                }
+                if (meta.status === 'in_progress' && meta.myRole === 'employer') {
+                    return `<div class="bm-form-hint" style="margin:0;"><i data-lucide="clock"></i> Ждём, пока исполнитель сдаст работу.</div>`;
+                }
+                if (meta.status === 'submitted' && meta.myRole === 'employer') {
+                    return `<button class="bm-action-btn green" onclick="bmChatAcceptWork('${id}')"><i data-lucide="check"></i> Принять работу</button>`;
+                }
+                if (meta.status === 'submitted' && meta.myRole === 'hired') {
+                    return `<div class="bm-form-hint" style="margin:0;"><i data-lucide="clock"></i> Ждём приёмки работы заказчиком.</div>`;
+                }
+            }
+            return '';
+        }
+
+        // Обёртки над обычными bm-действиями: выполняют RPC, потом либо обновляют статус в чате (промежуточный
+        // шаг), либо закрывают чат целиком, если сделка завершена (деньги переданы или бронь/работа снята).
+        async function bmChatRefreshOrClose(closeIfDone) {
+            if (!bmActiveChatMeta) return;
+            const meta = await bmBuildChatMeta(bmActiveChatMeta.contextType, bmActiveChatMeta.contextId);
+            if (!meta || closeIfDone) {
+                bmCloseChat();
+            } else {
+                bmActiveChatMeta = meta;
+                bmRenderChatMeta();
+            }
+            if (bmActiveChatMeta?.contextType === 'marketplace') loadBlackMarketListings(); else loadBlackMarketJobs();
+        }
+        async function bmChatMarkHanded(id) {
+            const { error } = await supabaseClient.rpc('bm_mark_handed', { p_listing_id: id });
+            if (error) { console.error('bm_mark_handed error:', error); customAlert('❌ Ошибка', bmFriendlyError(error)); return; }
+            await bmChatRefreshOrClose(false);
+        }
+        async function bmChatConfirmListing(id) {
+            const { error } = await supabaseClient.rpc('bm_confirm_listing', { p_listing_id: id });
+            if (error) { console.error('bm_confirm_listing error:', error); customAlert('❌ Ошибка', bmFriendlyError(error)); return; }
+            customAlert('✅ Сделка завершена', 'Вы подтвердили получение товара — деньги переведены продавцу. Чат закрыт.');
+            await bmChatRefreshOrClose(true);
+        }
+        async function bmChatOpenDispute(id) {
+            const { error } = await supabaseClient.rpc('bm_open_dispute', { p_listing_id: id });
+            if (error) { console.error('bm_open_dispute error:', error); customAlert('❌ Ошибка', bmFriendlyError(error)); return; }
+            await bmChatRefreshOrClose(false);
+        }
+        async function bmChatCancelListing(id) {
+            const { error } = await supabaseClient.rpc('bm_cancel_listing', { p_listing_id: id });
+            if (error) { console.error('bm_cancel_listing error:', error); customAlert('❌ Ошибка', bmFriendlyError(error)); return; }
+            customAlert('↩️ Бронь отменена', 'Средства возвращены на баланс. Чат закрыт.');
+            await bmChatRefreshOrClose(true);
+        }
+        async function bmChatSubmitWork(id) {
+            const { error } = await supabaseClient.rpc('bm_submit_work', { p_job_id: id });
+            if (error) { console.error('bm_submit_work error:', error); customAlert('❌ Ошибка', bmFriendlyError(error)); return; }
+            await bmChatRefreshOrClose(false);
+        }
+        async function bmChatAcceptWork(id) {
+            const { error } = await supabaseClient.rpc('bm_accept_work', { p_job_id: id });
+            if (error) { console.error('bm_accept_work error:', error); customAlert('❌ Ошибка', bmFriendlyError(error)); return; }
+            customAlert('✅ Работа принята', 'Оплата переведена исполнителю. Чат закрыт.');
+            await bmChatRefreshOrClose(true);
         }
 
         function bmCloseChat() {
@@ -3854,6 +4085,7 @@ async function loadSectionVisibility() {
             if (overlay) overlay.style.display = 'none';
             if (bmChatPollTimer) { clearInterval(bmChatPollTimer); bmChatPollTimer = null; }
             bmActiveChatId = null;
+            bmActiveChatMeta = null;
         }
 
         async function bmLoadChatMessages() {
@@ -3865,7 +4097,7 @@ async function loadSectionVisibility() {
                     .from('bm_chat_messages').select('*').eq('chat_id', bmActiveChatId).order('sent_at', { ascending: true });
                 if (error) throw error;
                 const myUuid = currentUserLinkedData?.minecraft_uuid;
-                box.innerHTML = (data || []).map(m => `<div class="bm-chat-msg ${m.sender_uuid === myUuid ? 'me' : 'them'}">${m.message}</div>`).join('') || `<div class="bm-empty">Сообщений пока нет. Напишите первым.</div>`;
+                box.innerHTML = (data || []).map(m => `<div class="bm-chat-msg ${m.sender_uuid === myUuid ? 'me' : 'them'}">${escapeHtml(m.message)}</div>`).join('') || `<div class="bm-empty">Сообщений пока нет. Напишите первым.</div>`;
                 box.scrollTop = box.scrollHeight;
             } catch (e) {
                 console.error('Не удалось загрузить сообщения чата:', e);
@@ -3881,6 +4113,101 @@ async function loadSectionVisibility() {
             if (error) { customAlert('❌ Ошибка', bmFriendlyError(error)); return; }
             bmLoadChatMessages();
         }
+
+        /* ===== "Чаты продаж" — плавающая вкладка слева экрана, доступна с любой страницы сайта,
+           без необходимости заходить в Торговую федерацию ===== */
+        async function bmLoadMyChats() {
+            if (!currentUserLinkedData) return [];
+            const myUuid = currentUserLinkedData.minecraft_uuid;
+            const results = [];
+            try {
+                const { data: listings } = await supabaseClient
+                    .from('bm_listings').select('*')
+                    .in('status', ['reserved', 'handed', 'disputed'])
+                    .or(`seller_uuid.eq.${myUuid},buyer_uuid.eq.${myUuid}`);
+                (listings || []).forEach(l => {
+                    const isSeller = l.seller_uuid === myUuid;
+                    results.push({
+                        contextType: 'marketplace', contextId: l.id,
+                        itemName: l.item_name, price: l.price,
+                        otherName: isSeller ? (l.buyer_name || 'покупатель') : l.seller_name
+                    });
+                });
+            } catch (e) { console.error('Не удалось загрузить чаты по лотам:', e); }
+            try {
+                const { data: jobs } = await supabaseClient
+                    .from('bm_jobs').select('*')
+                    .in('status', ['in_progress', 'submitted'])
+                    .or(`employer_uuid.eq.${myUuid},hired_uuid.eq.${myUuid}`);
+                (jobs || []).forEach(j => {
+                    const isEmployer = j.employer_uuid === myUuid;
+                    results.push({
+                        contextType: 'job', contextId: j.id,
+                        itemName: j.title, price: j.payment,
+                        otherName: isEmployer ? (j.hired_name || 'исполнитель') : j.employer_name
+                    });
+                });
+            } catch (e) { console.error('Не удалось загрузить чаты по вакансиям:', e); }
+            return results;
+        }
+
+        function bmInitChatsTab() {
+            const tab = document.getElementById('bm-chats-tab');
+            if (!tab || !currentUserLinkedData) return;
+            tab.style.display = 'flex';
+        }
+
+        async function openChatsDrawer() {
+            if (!currentUserLinkedData) return;
+            let overlay = document.getElementById('bm-chats-drawer-overlay');
+            let drawer = document.getElementById('bm-chats-drawer');
+            if (!drawer) {
+                overlay = document.createElement('div');
+                overlay.id = 'bm-chats-drawer-overlay';
+                overlay.onclick = closeChatsDrawer;
+                document.body.appendChild(overlay);
+
+                drawer = document.createElement('div');
+                drawer.id = 'bm-chats-drawer';
+                drawer.innerHTML = `
+                    <h3><i data-lucide="message-square" style="width:16px;height:16px;color:#ffb0d9;"></i> Чаты продаж</h3>
+                    <div class="sub">Активные сделки на площадке и по вакансиям</div>
+                    <div id="bm-chats-list"><div class="bm-notif-empty">Загрузка...</div></div>`;
+                document.body.appendChild(drawer);
+            }
+            overlay.classList.add('open');
+            drawer.classList.add('open');
+            if (window.lucide) lucide.createIcons();
+
+            const list = document.getElementById('bm-chats-list');
+            const chats = await bmLoadMyChats();
+            if (chats.length === 0) {
+                list.innerHTML = `<div class="bm-notif-empty">Активных сделок пока нет. Купите или продайте что-нибудь в Торговой федерации.</div>`;
+                return;
+            }
+            list.innerHTML = chats.map(c => `
+                <div class="bm-chat-list-item" onclick="bmOpenChatFromDrawer('${c.contextType}','${c.contextId}','${escapeHtml(c.otherName)}')">
+                    <img src="https://mc-heads.net/avatar/${encodeURIComponent(c.otherName)}/40" alt="${escapeHtml(c.otherName)}">
+                    <div class="info">
+                        <div class="name">${escapeHtml(c.otherName)}</div>
+                        <div class="item">${escapeHtml(c.itemName)}</div>
+                    </div>
+                    <div class="price">${c.price}</div>
+                </div>
+            `).join('');
+        }
+
+        function closeChatsDrawer() {
+            document.getElementById('bm-chats-drawer-overlay')?.classList.remove('open');
+            document.getElementById('bm-chats-drawer')?.classList.remove('open');
+        }
+
+        async function bmOpenChatFromDrawer(contextType, contextId, otherName) {
+            closeChatsDrawer();
+            await bmOpenChatForContext(contextType, contextId, otherName);
+        }
+
+
 
         /* =========================================================================
            УВЕДОМЛЕНИЯ (Торговая федерация): покупка лота, отклик на вакансию, найм,
@@ -5151,6 +5478,7 @@ async function loadSectionVisibility() {
                     discord_id: discordId
                 };
                 bmInitNotifications();
+                bmInitChatsTab();
 
                 let { data: stats, error: statsError } = await supabaseClient
                     .from('player_stats')
@@ -8288,5 +8616,10 @@ async function saveSectionVisibility(key, value) {
         <i data-lucide="bell"></i><span id="bm-notif-badge" style="display:none;">0</span>
     </button>
     <div id="bm-toast-container"></div>
+
+    <!-- Плавающая вкладка "Чаты продаж" слева экрана — доступна с любой страницы, без захода в ТФ -->
+    <button id="bm-chats-tab" onclick="openChatsDrawer()" style="display:none;">
+        <i data-lucide="message-square"></i> Чаты продаж
+    </button>
 </body>
 </html>
