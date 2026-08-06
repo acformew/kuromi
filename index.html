@@ -3935,113 +3935,172 @@ async function loadSectionVisibility() {
             }
         }
 
-        function bmOpenChat(chatId, meta) {
-            bmActiveChatId = chatId;
-            bmActiveChatMeta = meta || null;
-            let overlay = document.getElementById('bm-chat-overlay');
-            if (!overlay) {
-                overlay = document.createElement('div');
-                overlay.id = 'bm-chat-overlay';
-                overlay.innerHTML = `
-                    <div id="bm-chat-card">
-                        <div class="bm-chat-head-row">
-                            <img id="bm-chat-avatar" src="" alt="">
-                            <div class="bm-chat-head-info">
-                                <div class="name" id="bm-chat-other-name">Собеседник</div>
-                                <div class="role" id="bm-chat-role-label">Сделка в Торговой федерации</div>
-                            </div>
-                            <span id="bm-chat-close" onclick="bmCloseChat()">&times;</span>
-                        </div>
-                        <div class="bm-chat-item-strip" id="bm-chat-item-strip" style="display:none;">
-                            <span class="icon-badge b-purple" id="bm-chat-item-icon"><i data-lucide="package"></i></span>
-                            <div class="info">
-                                <div class="name" id="bm-chat-item-name"></div>
-                                <div class="status" id="bm-chat-item-status"></div>
-                            </div>
-                            <div class="price" id="bm-chat-item-price"><i data-lucide="gem"></i> <span></span></div>
-                        </div>
-                        <div id="bm-chat-actions"></div>
-                        <div id="bm-chat-messages"></div>
-                        <div id="bm-chat-input-row">
-                            <input type="text" id="bm-chat-input" placeholder="Сообщение..." onkeydown="if(event.key==='Enter') bmSendChatMessage()">
-                            <button id="bm-chat-send" onclick="bmSendChatMessage()"><i data-lucide="send" style="width:15px;height:15px;"></i></button>
-                        </div>
-                    </div>`;
-                document.body.appendChild(overlay);
-                overlay.onclick = (e) => { if (e.target === overlay) bmCloseChat(); };
+        // Вспомогательные функции состояния двухстороннего гаранта
+function getEscrowState(contextType, contextId) {
+    try {
+        return JSON.parse(localStorage.getItem(`bm_escrow_${contextType}_${contextId}`)) || { pay: false, transfer: false };
+    } catch (e) {
+        return { pay: false, transfer: false };
+    }
+}
+
+function setEscrowState(contextType, contextId, state) {
+    localStorage.setItem(`bm_escrow_${contextType}_${contextId}`, JSON.stringify(state));
+}
+
+function bmOpenChat(chatId, meta) {
+    bmActiveChatId = chatId;
+    bmActiveChatMeta = meta || null;
+    let overlay = document.getElementById('bm-chat-overlay');
+    if (!overlay) {
+        overlay = document.createElement('div');
+        overlay.id = 'bm-chat-overlay';
+        overlay.innerHTML = `
+            <div id="bm-chat-card">
+                <div class="bm-chat-head-row">
+                    <img id="bm-chat-avatar" src="" alt="">
+                    <div class="bm-chat-head-info">
+                        <div class="name" id="bm-chat-other-name">Собеседник</div>
+                        <div class="role" id="bm-chat-role-label">Сделка в Торговой федерации</div>
+                    </div>
+                    <span id="bm-chat-close" onclick="bmCloseChat()">&times;</span>
+                </div>
+                <div class="bm-chat-item-strip" id="bm-chat-item-strip" style="display:none;">
+                    <span class="icon-badge b-purple" id="bm-chat-item-icon"><i data-lucide="package"></i></span>
+                    <div class="info">
+                        <div class="name" id="bm-chat-item-name"></div>
+                        <div class="status" id="bm-chat-item-status"></div>
+                    </div>
+                    <div class="price" id="bm-chat-item-price"><i data-lucide="gem"></i> <span></span></div>
+                </div>
+
+                <!-- Интерактивная шкала гаранта -->
+                <div id="bm-escrow-bar-wrap" style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 14px; padding: 10px 14px; margin-bottom: 12px;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; font-size: 0.76rem; color: var(--text-muted); margin-bottom: 6px;">
+                        <span><i data-lucide="shield-check" style="width:13px;height:13px;display:inline;vertical-align:-2px;color:#4fdc8e;"></i> Ход выполнения сделки</span>
+                        <span id="bm-escrow-percent" style="font-weight: 700; color: #fff;">0%</span>
+                    </div>
+                    <div style="width: 100%; height: 8px; background: rgba(0,0,0,0.4); border-radius: 100px; overflow: hidden; position: relative;">
+                        <div id="bm-escrow-progress" style="width: 0%; height: 100%; background: linear-gradient(90deg, #8a2be2, #4fdc8e); border-radius: 100px; transition: width 0.35s ease;"></div>
+                    </div>
+                    <div id="bm-escrow-status-text" style="font-size: 0.72rem; color: rgba(255,255,255,0.5); margin-top: 6px; text-align: center;">Деньги заморожены на счету гаранта</div>
+                </div>
+
+                <div id="bm-chat-actions"></div>
+                <div id="bm-chat-messages"></div>
+                <div id="bm-chat-input-row">
+                    <input type="text" id="bm-chat-input" placeholder="Сообщение..." onkeydown="if(event.key==='Enter') bmSendChatMessage()">
+                    <button id="bm-chat-send" onclick="bmSendChatMessage()"><i data-lucide="send" style="width:15px;height:15px;"></i></button>
+                </div>
+            </div>`;
+        document.body.appendChild(overlay);
+        overlay.onclick = (e) => { if (e.target === overlay) bmCloseChat(); };
+    }
+    overlay.style.display = 'flex';
+    bmRenderChatMeta();
+    if (window.lucide) lucide.createIcons();
+    bmLoadChatMessages();
+    if (bmChatPollTimer) clearInterval(bmChatPollTimer);
+    bmChatPollTimer = setInterval(bmLoadChatMessages, 4000);
+}
+
+function bmRenderChatMeta() {
+    const meta = bmActiveChatMeta;
+    const otherName = meta?.otherName || 'собеседник';
+    document.getElementById('bm-chat-other-name').textContent = otherName;
+    document.getElementById('bm-chat-avatar').src = `https://mc-heads.net/avatar/${encodeURIComponent(otherName)}/48`;
+
+    const roleLabels = { seller: 'Вы продавец', buyer: 'Вы покупатель', employer: 'Вы заказчик', hired: 'Вы исполнитель', applicant: 'Вы откликнулись' };
+    document.getElementById('bm-chat-role-label').textContent = meta?.myRole ? roleLabels[meta.myRole] : 'Сделка в Торговой федерации';
+
+    const strip = document.getElementById('bm-chat-item-strip');
+    if (meta?.itemName) {
+        strip.style.display = 'flex';
+        document.getElementById('bm-chat-item-icon').innerHTML = `<i data-lucide="${meta.icon || 'package'}"></i>`;
+        document.getElementById('bm-chat-item-name').textContent = meta.itemName;
+        document.getElementById('bm-chat-item-status').textContent = meta.statusLabel || '';
+        document.getElementById('bm-chat-item-price').querySelector('span').textContent = meta.price ?? '';
+    } else {
+        strip.style.display = 'none';
+    }
+
+    // Расчет прогресса шкалы
+    const state = meta ? getEscrowState(meta.contextType, meta.contextId) : { pay: false, transfer: false };
+    let percent = 0;
+    let statusText = "Деньги заморожены на балансе гаранта";
+
+    if (state.pay && state.transfer) {
+        percent = 100;
+        statusText = "Все условия выполнены! Средства переведены.";
+    } else if (state.pay || state.transfer) {
+        percent = 50;
+        statusText = state.pay ? "Оплата подтверждена. Ожидание подтверждения передачи." : "Передача подтверждена. Ожидание подтверждения оплаты.";
+    }
+
+    const progressBar = document.getElementById('bm-escrow-progress');
+    const progressPercent = document.getElementById('bm-escrow-percent');
+    const progressStatus = document.getElementById('bm-escrow-status-text');
+
+    if (progressBar) progressBar.style.width = percent + '%';
+    if (progressPercent) progressPercent.textContent = percent + '%';
+    if (progressStatus) progressStatus.textContent = statusText;
+
+    document.getElementById('bm-chat-actions').innerHTML = bmChatActionsHtml(meta, state);
+    if (window.lucide) lucide.createIcons();
+}
+
+function bmChatActionsHtml(meta, state) {
+    if (!meta || !meta.contextType) return '';
+    const id = meta.contextId;
+    const type = meta.contextType;
+    const payClass = state.pay ? 'green' : 'primary';
+    const transferClass = state.transfer ? 'green' : 'primary';
+
+    return `
+        <button class="bm-action-btn ${payClass}" onclick="bmToggleEscrowStep('${type}', '${id}', 'pay')">
+            <i data-lucide="${state.pay ? 'check-circle-2' : 'credit-card'}"></i> 
+            ${state.pay ? 'Оплата подтверждена ✓' : 'Подтвердить оплату'}
+        </button>
+        <button class="bm-action-btn ${transferClass}" onclick="bmToggleEscrowStep('${type}', '${id}', 'transfer')">
+            <i data-lucide="${state.transfer ? 'check-circle-2' : 'package-check'}"></i> 
+            ${state.transfer ? 'Передача подтверждена ✓' : 'Подтвердить передачу'}
+        </button>
+        <button class="bm-action-btn danger" onclick="bmChatCancelListing('${id}')">
+            <i data-lucide="x"></i> Отменить
+        </button>
+    `;
+}
+
+async function bmToggleEscrowStep(contextType, contextId, step) {
+    const state = getEscrowState(contextType, contextId);
+    state[step] = !state[step];
+    setEscrowState(contextType, contextId, state);
+
+    // Если обе кнопки нажаты, выполняем перечисление денег и завершение сделки
+    if (state.pay && state.transfer) {
+        bmRenderChatMeta();
+        if (contextType === 'marketplace') {
+            const { error } = await supabaseClient.rpc('bm_confirm_listing', { p_listing_id: contextId });
+            if (error) {
+                console.error('Ошибка завершения сделки:', error);
+                customAlert('❌ Ошибка', bmFriendlyError(error));
+                return;
             }
-            overlay.style.display = 'flex';
-            bmRenderChatMeta();
-            if (window.lucide) lucide.createIcons();
-            bmLoadChatMessages();
-            if (bmChatPollTimer) clearInterval(bmChatPollTimer);
-            bmChatPollTimer = setInterval(bmLoadChatMessages, 4000);
-        }
-
-        // Перерисовывает шапку (аватар/ник), карточку товара и кнопки гаранта — вызывается при открытии
-        // чата и повторно после любого действия (передал/подтвердил/сдал/принял), чтобы кнопки обновились сами.
-        function bmRenderChatMeta() {
-            const meta = bmActiveChatMeta;
-            const otherName = meta?.otherName || 'собеседник';
-            document.getElementById('bm-chat-other-name').textContent = otherName;
-            document.getElementById('bm-chat-avatar').src = `https://mc-heads.net/avatar/${encodeURIComponent(otherName)}/48`;
-
-            const roleLabels = { seller: 'Вы продавец лота', buyer: 'Вы покупатель лота', employer: 'Вы заказчик вакансии', hired: 'Вы исполнитель вакансии', applicant: 'Вы откликнулись на вакансию' };
-            document.getElementById('bm-chat-role-label').textContent = meta?.myRole ? roleLabels[meta.myRole] : 'Сделка в Торговой федерации';
-
-            const strip = document.getElementById('bm-chat-item-strip');
-            if (meta?.itemName) {
-                strip.style.display = 'flex';
-                document.getElementById('bm-chat-item-icon').innerHTML = `<i data-lucide="${meta.icon || 'package'}"></i>`;
-                document.getElementById('bm-chat-item-name').textContent = meta.itemName;
-                document.getElementById('bm-chat-item-status').textContent = meta.statusLabel || '';
-                document.getElementById('bm-chat-item-price').querySelector('span').textContent = meta.price ?? '';
-            } else {
-                strip.style.display = 'none';
+            customAlert('🎉 Сделка завершена!', 'Обе стороны подтвердили оплату и передачу. Средства успешно переведены продавцу из заморозки.');
+        } else if (contextType === 'job') {
+            const { error } = await supabaseClient.rpc('bm_accept_work', { p_job_id: contextId });
+            if (error) {
+                console.error('Ошибка приёмки работы:', error);
+                customAlert('❌ Ошибка', bmFriendlyError(error));
+                return;
             }
-
-            document.getElementById('bm-chat-actions').innerHTML = bmChatActionsHtml(meta);
-            if (window.lucide) lucide.createIcons();
+            customAlert('🎉 Вакансия закрыта!', 'Оплата переведена исполнителю из состояния заморозки.');
         }
-
-        // Кнопки гаранта прямо в чате: продавец отмечает передачу, покупатель подтверждает (деньги уходят
-        // продавцу, чат закрывается) или открывает спор — то же самое для вакансий (сдать/принять работу).
-        function bmChatActionsHtml(meta) {
-            if (!meta || !meta.contextType) return '';
-            const id = meta.contextId;
-            if (meta.contextType === 'marketplace') {
-                if (meta.status === 'reserved' && meta.myRole === 'seller') {
-                    return `<button class="bm-action-btn primary" onclick="bmChatMarkHanded('${id}')"><i data-lucide="package-check"></i> Передал товар</button>`;
-                }
-                if (meta.status === 'reserved' && meta.myRole === 'buyer') {
-                    return `<button class="bm-action-btn danger" onclick="bmChatCancelListing('${id}')"><i data-lucide="x"></i> Отменить бронь</button>`;
-                }
-                if (meta.status === 'handed' && meta.myRole === 'buyer') {
-                    return `<button class="bm-action-btn green" onclick="bmChatConfirmListing('${id}')"><i data-lucide="check"></i> Подтвердить передачу</button>
-                            <button class="bm-action-btn danger" onclick="bmChatOpenDispute('${id}')"><i data-lucide="flag"></i> Открыть спор</button>`;
-                }
-                if (meta.status === 'handed' && meta.myRole === 'seller') {
-                    return `<div class="bm-form-hint" style="margin:0;"><i data-lucide="clock"></i> Ждём подтверждения от покупателя.</div>`;
-                }
-                if (meta.status === 'disputed') {
-                    return `<div class="bm-form-hint" style="margin:0;"><i data-lucide="flag"></i> Спор открыт, ожидайте решения администрации.</div>`;
-                }
-            } else if (meta.contextType === 'job') {
-                if (meta.status === 'in_progress' && meta.myRole === 'hired') {
-                    return `<button class="bm-action-btn primary" onclick="bmChatSubmitWork('${id}')"><i data-lucide="check-check"></i> Сдать работу</button>`;
-                }
-                if (meta.status === 'in_progress' && meta.myRole === 'employer') {
-                    return `<div class="bm-form-hint" style="margin:0;"><i data-lucide="clock"></i> Ждём, пока исполнитель сдаст работу.</div>`;
-                }
-                if (meta.status === 'submitted' && meta.myRole === 'employer') {
-                    return `<button class="bm-action-btn green" onclick="bmChatAcceptWork('${id}')"><i data-lucide="check"></i> Принять работу</button>`;
-                }
-                if (meta.status === 'submitted' && meta.myRole === 'hired') {
-                    return `<div class="bm-form-hint" style="margin:0;"><i data-lucide="clock"></i> Ждём приёмки работы заказчиком.</div>`;
-                }
-            }
-            return '';
-        }
+        await bmChatRefreshOrClose(true);
+    } else {
+        bmRenderChatMeta();
+    }
+}
 
         // Обёртки над обычными bm-действиями: выполняют RPC, потом либо обновляют статус в чате (промежуточный
         // шаг), либо закрывают чат целиком, если сделка завершена (деньги переданы или бронь/работа снята).
