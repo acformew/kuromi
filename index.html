@@ -200,24 +200,59 @@
             transform: translateY(-1px);
         }
 
-        /* Кнопка-колокольчик уведомлений в шапке сайта */
-        #bm-notif-badge {
-            position: absolute; top: 6px; right: 14px;
-            background: #ff2f7e; color: #fff; font-size: 0.65rem; font-weight: 800;
-            min-width: 17px; height: 17px; padding: 0 4px; border-radius: 100px;
+        /* Плавающая круглая кнопка-колокольчик уведомлений — справа снизу поверх всего сайта */
+        #bm-notif-btn {
+            position: fixed; right: 24px; bottom: 24px; z-index: 19000;
+            width: 56px; height: 56px; border-radius: 50%; border: none; cursor: pointer;
+            background: linear-gradient(145deg, #8a2be2, #ff007f);
             display: flex; align-items: center; justify-content: center;
-            box-shadow: 0 0 0 2px var(--bg-card);
+            box-shadow: 0 10px 30px rgba(138, 43, 226, 0.45), 0 4px 12px rgba(0,0,0,0.4);
+            transition: transform 0.18s ease, box-shadow 0.18s ease;
         }
-        #bm-notif-btn.has-unread { border-color: rgba(255, 47, 126, 0.5); }
+        #bm-notif-btn:hover { transform: translateY(-3px) scale(1.05); box-shadow: 0 14px 36px rgba(138, 43, 226, 0.55), 0 4px 14px rgba(0,0,0,0.4); }
+        #bm-notif-btn [data-lucide] { width: 24px; height: 24px; color: #fff; }
+        #bm-notif-btn.has-unread { animation: bmBellRing 3s ease-in-out infinite; }
+        @keyframes bmBellRing { 0%, 88%, 100% { transform: rotate(0); } 90% { transform: rotate(-12deg); } 92% { transform: rotate(10deg); } 94% { transform: rotate(-8deg); } 96% { transform: rotate(4deg); } }
+        #bm-notif-badge {
+            position: absolute; top: -3px; right: -3px;
+            background: #ff2f7e; color: #fff; font-size: 0.68rem; font-weight: 800;
+            min-width: 20px; height: 20px; padding: 0 5px; border-radius: 100px;
+            display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 0 0 3px #0a0710;
+        }
+        @media (max-width: 640px) { #bm-notif-btn { right: 16px; bottom: 16px; width: 50px; height: 50px; } }
+
+        /* Всплывающие тосты о новых уведомлениях — растут вверх над кнопкой-колокольчиком */
+        #bm-toast-container {
+            position: fixed; right: 24px; bottom: 92px; z-index: 19000;
+            display: flex; flex-direction: column-reverse; gap: 10px; width: 320px; max-width: calc(100vw - 32px);
+            pointer-events: none;
+        }
+        @media (max-width: 640px) { #bm-toast-container { right: 16px; bottom: 78px; } }
+        .bm-toast {
+            pointer-events: auto; cursor: pointer;
+            background: rgba(16, 11, 28, 0.98); border: 1px solid rgba(138, 43, 226, 0.35);
+            border-radius: 16px; padding: 14px 16px; box-shadow: 0 16px 40px rgba(0,0,0,0.5);
+            display: flex; gap: 10px; align-items: flex-start;
+            animation: bmToastIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .bm-toast.leaving { animation: bmToastOut 0.25s ease forwards; }
+        @keyframes bmToastIn { from { opacity: 0; transform: translateX(30px); } to { opacity: 1; transform: none; } }
+        @keyframes bmToastOut { to { opacity: 0; transform: translateX(30px); } }
+        .bm-toast .icon { width: 32px; height: 32px; border-radius: 50%; background: rgba(138, 43, 226, 0.18); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+        .bm-toast .icon [data-lucide] { width: 16px; height: 16px; color: #b985f4; }
+        .bm-toast .body { min-width: 0; flex: 1; }
+        .bm-toast .title { font-size: 0.82rem; font-weight: 700; color: #fff; }
+        .bm-toast .msg { font-size: 0.75rem; color: rgba(255,255,255,0.55); margin-top: 2px; line-height: 1.35; }
 
         /* Панель со списком уведомлений */
         #bm-notif-overlay {
             display: none; position: fixed; inset: 0; z-index: 20500;
             background: rgba(5, 3, 8, 0.75); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
-            align-items: flex-start; justify-content: center; padding: 90px 20px 20px;
+            align-items: flex-end; justify-content: flex-end; padding: 20px 20px 100px;
         }
         #bm-notif-card {
-            width: 100%; max-width: 420px; max-height: 74vh; overflow-y: auto;
+            width: 100%; max-width: 380px; max-height: 60vh; overflow-y: auto;
             background: rgba(16, 11, 28, 0.98); border: 1px solid rgba(138, 43, 226, 0.25);
             border-radius: 22px; box-shadow: 0 30px 70px rgba(0,0,0,0.6);
             padding: 18px;
@@ -984,15 +1019,16 @@
         }
         @keyframes bmPageIn { from { opacity: 0; } to { opacity: 1; } }
 
-        /* Плавающие цветные ауры + звёздная пыль на фоне портала — просто красивый живой фон */
-        .bm-aura { position: fixed; border-radius: 50%; filter: blur(90px); pointer-events: none; z-index: 0; opacity: 0.5; animation: bmAuraFloat 16s ease-in-out infinite; }
-        .bm-aura-1 { width: 480px; height: 480px; top: -140px; left: 6%; background: radial-gradient(circle, rgba(138,43,226,0.55), transparent 70%); }
-        .bm-aura-2 { width: 420px; height: 420px; bottom: -120px; right: 8%; background: radial-gradient(circle, rgba(255,0,127,0.38), transparent 70%); animation-delay: -6s; animation-duration: 20s; }
-        .bm-aura-3 { width: 340px; height: 340px; top: 45%; left: 48%; background: radial-gradient(circle, rgba(94,232,154,0.16), transparent 70%); animation-delay: -10s; animation-duration: 24s; }
+        /* Плавающие цветные ауры + звёздная пыль + частицы на фоне портала — заметный "живой" фон */
+        .bm-aura { position: fixed; border-radius: 50%; filter: blur(85px); pointer-events: none; z-index: 0; opacity: 0.65; animation: bmAuraFloat 16s ease-in-out infinite; }
+        .bm-aura-1 { width: 560px; height: 560px; top: -160px; left: 4%; background: radial-gradient(circle, rgba(138,43,226,0.7), transparent 70%); }
+        .bm-aura-2 { width: 500px; height: 500px; bottom: -140px; right: 4%; background: radial-gradient(circle, rgba(255,0,127,0.55), transparent 70%); animation-delay: -6s; animation-duration: 20s; }
+        .bm-aura-3 { width: 420px; height: 420px; top: 40%; left: 46%; background: radial-gradient(circle, rgba(94,232,154,0.28), transparent 70%); animation-delay: -10s; animation-duration: 24s; }
+        .bm-aura-4 { width: 380px; height: 380px; top: 5%; right: 20%; background: radial-gradient(circle, rgba(255,183,3,0.22), transparent 70%); animation-delay: -3s; animation-duration: 18s; }
         @keyframes bmAuraFloat {
             0%, 100% { transform: translate(0, 0) scale(1); }
-            33% { transform: translate(34px, -28px) scale(1.08); }
-            66% { transform: translate(-28px, 22px) scale(0.94); }
+            33% { transform: translate(44px, -36px) scale(1.12); }
+            66% { transform: translate(-36px, 28px) scale(0.92); }
         }
         .bm-starfield {
             position: fixed; inset: 0; z-index: 0; pointer-events: none;
@@ -1008,6 +1044,23 @@
             animation: bmTwinkle 4.5s ease-in-out infinite alternate;
         }
         @keyframes bmTwinkle { from { opacity: 0.35; } to { opacity: 0.85; } }
+
+        /* Дрейфующие вверх светящиеся частицы — заметный, но лёгкий эффект поверх аур */
+        .bm-particles { position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }
+        .bm-particles span {
+            position: absolute; bottom: -30px; width: 4px; height: 4px; border-radius: 50%;
+            background: #b985f4; box-shadow: 0 0 10px 3px rgba(185,133,244,0.6);
+            animation: bmParticleRise linear infinite;
+        }
+        .bm-particles span:nth-child(3n) { background: #ff5fa8; box-shadow: 0 0 10px 3px rgba(255,95,168,0.6); }
+        .bm-particles span:nth-child(4n) { width: 2.5px; height: 2.5px; }
+        .bm-particles span:nth-child(5n) { width: 6px; height: 6px; background: #ffd76a; box-shadow: 0 0 12px 3px rgba(255,215,106,0.5); }
+        @keyframes bmParticleRise {
+            0% { transform: translateY(0) translateX(0); opacity: 0; }
+            8% { opacity: 0.9; }
+            92% { opacity: 0.6; }
+            100% { transform: translateY(-100vh) translateX(24px); opacity: 0; }
+        }
 
         .bm-fullpage-overlay .bm-portal-wrap { position: relative; z-index: 1; width: 100%; max-width: 1320px; }
         .bm-exit-bar { display: flex; align-items: center; gap: 12px; margin-bottom: 18px; width: 100%; }
@@ -1164,7 +1217,42 @@
 
         /* Панель фильтров над сеткой лотов/вакансий */
         .bm-filter-bar { display: flex; gap: 10px; margin-bottom: 4px; flex-wrap: wrap; }
-        .bm-filter-bar select.darknet-input { width: auto; flex: 1; min-width: 150px; padding: 10px 14px; font-size: 0.8rem; cursor: pointer; }
+        .bm-filter-bar .bm-select-wrap { flex: 1; min-width: 150px; }
+
+        /* Кастомный select под стиль сайта — нативный select скрыт, но остаётся
+           в DOM для .value/onchange, поверх рисуем свой попап-список */
+        .bm-select-wrap { position: relative; width: 100%; }
+        .bm-select-wrap select.bm-select-native-hidden {
+            position: absolute; inset: 0; width: 100%; height: 100%;
+            opacity: 0; pointer-events: none; z-index: -1;
+        }
+        .bm-select-display {
+            width: 100%; display: flex; align-items: center; justify-content: space-between; gap: 8px;
+            background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.12);
+            color: #fff; font-family: var(--font-sans); font-size: 0.85rem;
+            padding: 12px 16px; border-radius: 14px; cursor: pointer; transition: all 0.15s ease;
+        }
+        .bm-filter-bar .bm-select-display { padding: 10px 14px; font-size: 0.8rem; }
+        .bm-select-display:hover { border-color: rgba(138, 43, 226, 0.4); }
+        .bm-select-wrap.open .bm-select-display { border-color: #b985f4; box-shadow: 0 0 10px rgba(138, 43, 226, 0.18); }
+        .bm-select-display .bm-select-label { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .bm-select-display [data-lucide] { width: 15px; height: 15px; color: rgba(255,255,255,0.4); flex-shrink: 0; transition: transform 0.15s ease; }
+        .bm-select-wrap.open .bm-select-display [data-lucide] { transform: rotate(180deg); color: #b985f4; }
+
+        .bm-select-menu {
+            display: none; position: absolute; top: calc(100% + 6px); left: 0; right: 0; z-index: 50;
+            background: rgba(16, 11, 28, 0.98); border: 1px solid rgba(138, 43, 226, 0.3);
+            border-radius: 14px; box-shadow: 0 20px 50px rgba(0,0,0,0.55); padding: 6px;
+            max-height: 240px; overflow-y: auto;
+        }
+        .bm-select-wrap.open .bm-select-menu { display: block; animation: bmSelectMenuIn 0.15s ease; }
+        @keyframes bmSelectMenuIn { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: none; } }
+        .bm-select-option {
+            padding: 9px 12px; border-radius: 9px; font-size: 0.83rem; color: rgba(255,255,255,0.75);
+            cursor: pointer; transition: background 0.12s ease;
+        }
+        .bm-select-option:hover { background: rgba(138, 43, 226, 0.16); color: #fff; }
+        .bm-select-option.active { background: rgba(138, 43, 226, 0.22); color: #fff; font-weight: 600; }
 
         /* Кнопка "Индекс цен" в заголовке колонки */
         .bm-index-btn {
@@ -1978,7 +2066,6 @@
     <div class="content-container">
         <div class="header-profile-sidebar">
             <div id="header-profile-auth" style="display: flex; flex-direction: column; gap: 10px; width: 100%;"></div>
-            <button id="bm-notif-btn" class="widget-login-btn" onclick="openNotificationsPanel()" style="display:none; position:relative;"><i data-lucide="bell" style="width:16px;height:16px;"></i> Уведомления<span id="bm-notif-badge" style="display:none;">0</span></button>
             <button id="admin-fixed-btn" class="widget-login-btn" onclick="switchTab('admin')" style="display:none; background: rgba(138, 43, 226, 0.12); border-color: rgba(138, 43, 226, 0.3);"><i data-lucide="shield-check" style="width:16px;height:16px;"></i> Админ</button>
             <button id="forum-fixed-btn" class="widget-login-btn" onclick="switchTab('forum')"><i data-lucide="messages-square" style="width:16px;height:16px;"></i> Форум</button>
         </div>
@@ -2334,7 +2421,26 @@
             <div class="bm-aura bm-aura-1"></div>
             <div class="bm-aura bm-aura-2"></div>
             <div class="bm-aura bm-aura-3"></div>
+            <div class="bm-aura bm-aura-4"></div>
             <div class="bm-starfield"></div>
+            <div class="bm-particles">
+                <span style="left:4%; animation-duration:9s; animation-delay:0s;"></span>
+                <span style="left:11%; animation-duration:13s; animation-delay:1.4s;"></span>
+                <span style="left:18%; animation-duration:10.5s; animation-delay:3.1s;"></span>
+                <span style="left:26%; animation-duration:14s; animation-delay:0.6s;"></span>
+                <span style="left:34%; animation-duration:11s; animation-delay:4.2s;"></span>
+                <span style="left:42%; animation-duration:12.5s; animation-delay:2s;"></span>
+                <span style="left:50%; animation-duration:9.5s; animation-delay:5s;"></span>
+                <span style="left:58%; animation-duration:13.5s; animation-delay:1s;"></span>
+                <span style="left:66%; animation-duration:10s; animation-delay:3.6s;"></span>
+                <span style="left:74%; animation-duration:14.5s; animation-delay:0.2s;"></span>
+                <span style="left:82%; animation-duration:11.5s; animation-delay:2.8s;"></span>
+                <span style="left:90%; animation-duration:9s; animation-delay:4.6s;"></span>
+                <span style="left:96%; animation-duration:12s; animation-delay:1.8s;"></span>
+                <span style="left:8%; animation-duration:15s; animation-delay:6s;"></span>
+                <span style="left:47%; animation-duration:16s; animation-delay:7s;"></span>
+                <span style="left:70%; animation-duration:13s; animation-delay:5.5s;"></span>
+            </div>
             <div class="bm-portal-wrap">
                 <div class="bm-exit-bar">
                     <button class="bm-exit-btn" onclick="closeBlackMarket()"><i data-lucide="arrow-left"></i> Вернуться на сайт</button>
@@ -3202,7 +3308,8 @@ async function loadSectionVisibility() {
             cannot_accept: 'Не удалось принять работу.',
             chat_closed: 'Этот чат уже закрыт.',
             not_a_party: 'Вы не участник этого чата.',
-            listing_rate_limit: 'Не более 3 лотов в час с одного аккаунта — подождите и попробуйте снова.'
+            listing_rate_limit: 'Не более 3 лотов в час с одного аккаунта — подождите и попробуйте снова.',
+            not_moderator: 'Действие доступно только модераторам сервера.'
         };
 
         function bmFriendlyError(error) {
@@ -3456,6 +3563,9 @@ async function loadSectionVisibility() {
             if ((isSeller || isBuyer) && ['reserved', 'handed', 'disputed'].includes(l.status)) {
                 actions += `<button class="bm-action-btn" onclick="bmOpenChatForContext('marketplace','${l.id}','${(isSeller ? l.buyer_name : l.seller_name) || 'собеседник'}')"><i data-lucide="message-square"></i> Чат</button>`;
             }
+            if (isUserModerator) {
+                actions += `<button class="bm-action-btn danger" onclick="bmModDelete('listing','${l.id}','${escapeHtml(l.item_name)}')"><i data-lucide="trash-2"></i> Удалить (модератор)</button>`;
+            }
             return actions;
         }
 
@@ -3483,16 +3593,41 @@ async function loadSectionVisibility() {
         async function bmCancelListing(id) { const { error } = await supabaseClient.rpc('bm_cancel_listing', { p_listing_id: id }); if (error) customAlert('❌ Ошибка', bmFriendlyError(error)); bmCloseDetail(); loadBlackMarketListings(); }
         async function bmBuyListing(id) {
             const { data, error } = await supabaseClient.rpc('bm_buy_listing', { p_listing_id: id });
-            if (error) { customAlert('❌ Ошибка', bmFriendlyError(error)); return; }
+            if (error) { console.error('bm_buy_listing error:', error); customAlert('❌ Ошибка', bmFriendlyError(error)); return; }
             customAlert('✅ Куплено', 'Товар забронирован, деньги заморожены до подтверждения. Договоритесь о встрече в чате.');
             bmCloseDetail();
             loadBlackMarketListings();
             if (data) bmOpenChat(data, 'продавцом');
         }
-        async function bmMarkHanded(id) { const { error } = await supabaseClient.rpc('bm_mark_handed', { p_listing_id: id }); if (error) customAlert('❌ Ошибка', bmFriendlyError(error)); bmCloseDetail(); loadBlackMarketListings(); }
-        async function bmConfirmListing(id) { const { error } = await supabaseClient.rpc('bm_confirm_listing', { p_listing_id: id }); if (error) customAlert('❌ Ошибка', bmFriendlyError(error)); bmCloseDetail(); loadBlackMarketListings(); }
-        async function bmOpenDispute(id) { const { error } = await supabaseClient.rpc('bm_open_dispute', { p_listing_id: id }); if (error) customAlert('❌ Ошибка', bmFriendlyError(error)); bmCloseDetail(); loadBlackMarketListings(); }
-        async function bmResolveDispute(id, winner) { const { error } = await supabaseClient.rpc('bm_resolve_dispute', { p_listing_id: id, p_winner: winner }); if (error) customAlert('❌ Ошибка', bmFriendlyError(error)); bmCloseDetail(); loadBlackMarketListings(); }
+        async function bmMarkHanded(id) { const { error } = await supabaseClient.rpc('bm_mark_handed', { p_listing_id: id }); if (error) { console.error('bm_mark_handed error:', error); customAlert('❌ Ошибка', bmFriendlyError(error)); } bmCloseDetail(); loadBlackMarketListings(); }
+        async function bmConfirmListing(id) { const { error } = await supabaseClient.rpc('bm_confirm_listing', { p_listing_id: id }); if (error) { console.error('bm_confirm_listing error:', error); customAlert('❌ Ошибка', bmFriendlyError(error)); } bmCloseDetail(); loadBlackMarketListings(); }
+        async function bmOpenDispute(id) { const { error } = await supabaseClient.rpc('bm_open_dispute', { p_listing_id: id }); if (error) { console.error('bm_open_dispute error:', error); customAlert('❌ Ошибка', bmFriendlyError(error)); } bmCloseDetail(); loadBlackMarketListings(); }
+        async function bmResolveDispute(id, winner) { const { error } = await supabaseClient.rpc('bm_resolve_dispute', { p_listing_id: id, p_winner: winner }); if (error) { console.error('bm_resolve_dispute error:', error); customAlert('❌ Ошибка', bmFriendlyError(error)); } bmCloseDetail(); loadBlackMarketListings(); }
+
+        // Удаление лота/вакансии модератором — мягкое (статус 'removed', запись не стирается),
+        // проверка прав дублируется на сервере в bm_admin_delete_listing/bm_admin_delete_job.
+        async function bmModDelete(type, id, label) {
+            const ok = await customConfirm(
+                '🗑️ Удалить объявление?',
+                `Вы (модератор) собираетесь удалить «${label}» с витрины Торговой федерации. Действие будет записано в журнал администратора.`,
+                'Удалить'
+            );
+            if (!ok) return;
+            const rpcName = type === 'listing' ? 'bm_admin_delete_listing' : 'bm_admin_delete_job';
+            const paramName = type === 'listing' ? 'p_id' : 'p_id';
+            const { error } = await supabaseClient.rpc(rpcName, { [paramName]: id });
+            if (error) { console.error(rpcName + ' error:', error); customAlert('❌ Ошибка', bmFriendlyError(error)); return; }
+            logAdminAction({
+                action_type: type === 'listing' ? 'bm_delete_listing' : 'bm_delete_job',
+                severity: 'medium',
+                target_type: type === 'listing' ? 'Лот ТФ' : 'Вакансия ТФ',
+                target_label: label,
+                reason: 'Удалено модератором из Торговой федерации'
+            });
+            bmCloseDetail();
+            if (type === 'listing') loadBlackMarketListings(); else loadBlackMarketJobs();
+            customAlert('✅ Удалено', 'Объявление скрыто с витрины.');
+        }
 
         async function submitJob() {
             if (!currentUserLinkedData) { customAlert('🔒 Авторизация', 'Авторизуйтесь через Discord и привяжите Minecraft-аккаунт.'); return; }
@@ -3603,6 +3738,9 @@ async function loadSectionVisibility() {
             }
             if (j.status === 'open' && isEmployer) {
                 actions += `<button class="bm-action-btn" onclick="bmViewApplications('${j.id}')"><i data-lucide="users"></i> Отклики</button>`;
+            }
+            if (isUserModerator) {
+                actions += `<button class="bm-action-btn danger" onclick="bmModDelete('job','${j.id}','${escapeHtml(j.title)}')"><i data-lucide="trash-2"></i> Удалить (модератор)</button>`;
             }
             return actions;
         }
@@ -3753,10 +3891,13 @@ async function loadSectionVisibility() {
         let bmNotifPollTimer = null;
         let bmNotifCache = [];
 
+        let bmLastNotifCheckAt = null;
+
         function bmInitNotifications() {
             const btn = document.getElementById('bm-notif-btn');
             if (!btn || !currentUserLinkedData) return;
             btn.style.display = 'flex';
+            bmLastNotifCheckAt = new Date().toISOString(); // не показываем тостами всё, что накопилось до открытия сайта
             bmRefreshNotifBadge();
             if (bmNotifPollTimer) clearInterval(bmNotifPollTimer);
             bmNotifPollTimer = setInterval(bmRefreshNotifBadge, 25000);
@@ -3782,9 +3923,45 @@ async function loadSectionVisibility() {
                     badge.style.display = 'none';
                     btn.classList.remove('has-unread');
                 }
+
+                // Проверяем, не появилось ли новых уведомлений с прошлого опроса — если да, всплывающий тост
+                if (bmLastNotifCheckAt) {
+                    const { data: freshRows } = await supabaseClient
+                        .from('bm_notifications')
+                        .select('*')
+                        .eq('recipient_uuid', currentUserLinkedData.minecraft_uuid)
+                        .gt('created_at', bmLastNotifCheckAt)
+                        .order('created_at', { ascending: true })
+                        .limit(5);
+                    (freshRows || []).forEach(bmShowToast);
+                }
+                bmLastNotifCheckAt = new Date().toISOString();
             } catch (e) {
                 console.error('Не удалось обновить счётчик уведомлений:', e);
             }
+        }
+
+        // Всплывающий тост в правом нижнем углу — растёт над колокольчиком, кликабелен, сам исчезает через 7 сек
+        function bmShowToast(notif) {
+            const container = document.getElementById('bm-toast-container');
+            if (!container) return;
+            const el = document.createElement('div');
+            el.className = 'bm-toast';
+            el.innerHTML = `
+                <div class="icon"><i data-lucide="bell"></i></div>
+                <div class="body">
+                    <div class="title">${escapeHtml(notif.title || 'Уведомление')}</div>
+                    <div class="msg">${escapeHtml(notif.message || '')}</div>
+                </div>`;
+            el.onclick = () => { bmDismissToast(el); bmOpenNotification(notif.id); };
+            container.appendChild(el);
+            if (window.lucide) lucide.createIcons();
+            setTimeout(() => bmDismissToast(el), 7000);
+        }
+        function bmDismissToast(el) {
+            if (!el || !el.parentNode) return;
+            el.classList.add('leaving');
+            setTimeout(() => el.remove(), 260);
         }
 
         function bmTimeAgo(iso) {
@@ -3872,7 +4049,12 @@ async function loadSectionVisibility() {
         }
 
         async function bmOpenNotification(id) {
-            const n = bmNotifCache.find(x => x.id === id);
+            let n = bmNotifCache.find(x => x.id === id);
+            if (!n) {
+                // Уведомление могло прийти через тост до открытия панели — кэш ещё пуст, подгружаем точечно
+                const { data } = await supabaseClient.from('bm_notifications').select('*').eq('id', id).maybeSingle();
+                n = data;
+            }
             if (!n) return;
             if (!n.is_read) {
                 await supabaseClient.from('bm_notifications').update({ is_read: true }).eq('id', id);
@@ -4759,6 +4941,65 @@ async function loadSectionVisibility() {
             if (jf && !jf.options.length) jf.innerHTML = bmCategoryFilterOptions(BM_JOB_CATEGORIES);
         }
 
+        // Кастомная развёртка для всех <select class="darknet-input"> внутри Торговой федерации:
+        // нативный select остаётся в DOM (скрытый) ради .value/onchange — всё существующее
+        // JS-подключение (bmRenderFilteredMarket и т.д.) продолжает работать без изменений.
+        let bmSelectGlobalListenerAdded = false;
+        function bmEnhanceSelects(root) {
+            const scope = root || document;
+            scope.querySelectorAll('select.darknet-input:not(.bm-select-enhanced)').forEach(sel => {
+                sel.classList.add('bm-select-enhanced', 'bm-select-native-hidden');
+
+                const wrap = document.createElement('div');
+                wrap.className = 'bm-select-wrap';
+                sel.parentNode.insertBefore(wrap, sel);
+                wrap.appendChild(sel);
+
+                const display = document.createElement('button');
+                display.type = 'button';
+                display.className = 'bm-select-display';
+                display.innerHTML = `<span class="bm-select-label"></span><i data-lucide="chevron-down"></i>`;
+                wrap.appendChild(display);
+
+                const menu = document.createElement('div');
+                menu.className = 'bm-select-menu';
+                wrap.appendChild(menu);
+
+                function sync() {
+                    menu.innerHTML = Array.from(sel.options).map(o =>
+                        `<div class="bm-select-option ${o.value === sel.value ? 'active' : ''}" data-value="${escapeHtml(o.value)}">${escapeHtml(o.textContent)}</div>`
+                    ).join('');
+                    const current = sel.options[sel.selectedIndex];
+                    display.querySelector('.bm-select-label').textContent = current ? current.textContent : '';
+                }
+                sync();
+                sel._bmResync = sync;
+
+                display.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    document.querySelectorAll('.bm-select-wrap.open').forEach(w => { if (w !== wrap) w.classList.remove('open'); });
+                    wrap.classList.toggle('open');
+                });
+
+                menu.addEventListener('click', (e) => {
+                    const opt = e.target.closest('.bm-select-option');
+                    if (!opt) return;
+                    sel.value = opt.dataset.value;
+                    sel.dispatchEvent(new Event('change', { bubbles: true }));
+                    sync();
+                    wrap.classList.remove('open');
+                });
+            });
+            if (window.lucide) lucide.createIcons();
+
+            if (!bmSelectGlobalListenerAdded) {
+                bmSelectGlobalListenerAdded = true;
+                document.addEventListener('click', () => {
+                    document.querySelectorAll('.bm-select-wrap.open').forEach(w => w.classList.remove('open'));
+                });
+            }
+        }
+
         function openBlackMarket() {
             if (!canAccessSection('blackmarket')) {
     customAlert('🔒 Раздел скрыт', 'Торговая федерация сейчас доступна только модераторам сервера.');
@@ -4769,6 +5010,7 @@ async function loadSectionVisibility() {
             overlay.classList.add('active');
             document.body.style.overflow = 'hidden';
             bmPopulateCategorySelects();
+            bmEnhanceSelects(overlay);
             // Грузим сразу оба раздела (площадку и вакансии), чтобы переключение вкладок было мгновенным
             // и ничего не «зависало» на заглушке "Загрузка...". Promise.resolve() — см. комментарий в switchBlackMarketTab.
             Promise.resolve(supabaseClient.rpc('bm_sweep_market_timeouts')).catch(() => {}).then(loadBlackMarketListings);
@@ -8040,5 +8282,11 @@ async function saveSectionVisibility(key, value) {
         renderJoinPrices();
         loadTopLeaderboards('public');
     </script>
+
+    <!-- Плавающая кнопка уведомлений (справа снизу) + всплывающие тосты -->
+    <button id="bm-notif-btn" onclick="openNotificationsPanel()" style="display:none;">
+        <i data-lucide="bell"></i><span id="bm-notif-badge" style="display:none;">0</span>
+    </button>
+    <div id="bm-toast-container"></div>
 </body>
 </html>
