@@ -2549,7 +2549,7 @@
                 </div>
             <div class="bm-portal">
                 <div class="icon-pattern-layer pattern-soft" style="color:#fff;">
-                    <i data-lucide="package" style="width:18px;height:18px;margin:18px;transform:rotate(8deg);"></i><i data-lucide="hammer" style="width:20px;height:20px;margin:10px;transform:rotate(-16deg);"></i><i data-lucide="handshake" style="width:16px;height:16px;margin:16px;transform:rotate(14deg);"></i><i data-lucide="gem" style="width:20px;height:20px;margin:12px;transform:rotate(-6deg);"></i><i data-lucide="briefcase" style="width:16px;height:16px;margin:20px;transform:rotate(20deg);"></i><i data-lucide="package" style="width:22px;height:22px;margin:10px;transform:rotate(-20deg);"></i><i data-lucide="hammer" style="width:18px;height:18px;margin:14px;transform:rotate(12deg);"></i><i data-lucide="handshake" style="width:20px;height:20px;margin:8px;transform:rotate(-8deg);"></i><i data-lucide="gem" style="width:16px;height:16px;margin:18px;transform:rotate(15deg);"></i>
+                    <i data-lucide="package" style="width:18px;height:18px;margin:18px;transform:rotate(8deg);"></i><i data-lucide="hammer" style="width:20px;height:20px;margin:10px;transform:rotate(-16deg);"></i><i data-lucide="handshake" style="width:16px;height:16px;margin:16px;transform:rotate(14deg);"></i><i data-lucide="gem" style="width:20px;height:20px;margin:12px;transform:rotate(-6deg);"></i><i data-lucide="briefcase" style="width:16px;height:16px;margin:20px;transform:rotate(20deg);"></i><i data-lucide="package" style="width:22px;height:22px;margin:10px;transform:rotate(-20deg);"></i><i data-lucide="hammer" style="width:18px;height:18px;margin:14px;transform:rotate(12deg);"></i><i data-lucide="handshake" style="width:20px;height:20px;margin:8px;transform:rotate(-8deg);"></i><i data-lucide="gem" style="width:16px;height:16px;margin:18px;transform:rotate(15deg);"></i><i data-lucide="briefcase" style="width:18px;height:18px;margin:16px;transform:rotate(-14deg);"></i><i data-lucide="package" style="width:16px;height:16px;margin:12px;transform:rotate(18deg);"></i><i data-lucide="hammer" style="width:20px;height:20px;margin:20px;transform:rotate(-10deg);"></i><i data-lucide="handshake" style="width:18px;height:18px;margin:10px;transform:rotate(6deg);"></i><i data-lucide="gem" style="width:22px;height:22px;margin:14px;transform:rotate(-18deg);"></i><i data-lucide="briefcase" style="width:16px;height:16px;margin:18px;transform:rotate(10deg);"></i><i data-lucide="package" style="width:20px;height:20px;margin:8px;transform:rotate(-12deg);"></i><i data-lucide="hammer" style="width:16px;height:16px;margin:16px;transform:rotate(16deg);"></i><i data-lucide="handshake" style="width:22px;height:22px;margin:12px;transform:rotate(-4deg);"></i><i data-lucide="gem" style="width:18px;height:18px;margin:20px;transform:rotate(8deg);"></i><i data-lucide="briefcase" style="width:20px;height:20px;margin:10px;transform:rotate(-16deg);"></i><i data-lucide="package" style="width:16px;height:16px;margin:14px;transform:rotate(14deg);"></i><i data-lucide="hammer" style="width:18px;height:18px;margin:18px;transform:rotate(-6deg);"></i><i data-lucide="handshake" style="width:20px;height:20px;margin:16px;transform:rotate(20deg);"></i><i data-lucide="gem" style="width:16px;height:16px;margin:12px;transform:rotate(-20deg);"></i><i data-lucide="briefcase" style="width:22px;height:22px;margin:10px;transform:rotate(12deg);"></i><i data-lucide="package" style="width:18px;height:18px;margin:20px;transform:rotate(-8deg);"></i><i data-lucide="hammer" style="width:16px;height:16px;margin:8px;transform:rotate(15deg);"></i><i data-lucide="handshake" style="width:20px;height:20px;margin:18px;transform:rotate(-14deg);"></i><i data-lucide="gem" style="width:18px;height:18px;margin:14px;transform:rotate(18deg);"></i><i data-lucide="briefcase" style="width:16px;height:16px;margin:16px;transform:rotate(-10deg);"></i>
                 </div>
                 <div class="darknet-title" style="display:flex; align-items:center; gap:10px;"><span class="icon-badge b-purple" style="width:32px;height:32px;"><i data-lucide="store"></i></span> ТОРГОВАЯ ФЕДЕРАЦИЯ <span style="font-size:0.55em; opacity:0.45; font-weight:700; letter-spacing:0.08em;">· ТФ</span></div>
                 <div class="eyebrow" style="opacity: 0.7;">Торговая площадка · Биржа вакансий</div>
@@ -3401,7 +3401,7 @@ async function loadSectionVisibility() {
             not_staff: 'Только модератор может решать споры.',
             not_disputed: 'Эта сделка не находится в статусе спора.',
             invalid_winner: 'Некорректный результат спора.',
-            cannot_cancel: 'Отменить пока нельзя.',
+            cannot_cancel: 'Не удалось отменить: похоже, продавец уже отметил товар переданным — обновите страницу и проверьте статус сделки.',
             not_found: 'Запись не найдена.',
             not_open: 'Вакансия уже закрыта.',
             own_job: 'Нельзя откликнуться на собственную вакансию.',
@@ -3635,6 +3635,13 @@ async function loadSectionVisibility() {
             if (window.lucide) lucide.createIcons();
         }
 
+        // Пока продавец не отметил товар переданным, покупатель может отменить бронь
+        // и мгновенно вернуть деньги — без ожидания (см. bm_cancel_listing).
+        function bmCancelListingBtnHtml(id, handlerFn) {
+            const fn = handlerFn || 'bmCancelListing';
+            return `<button class="bm-action-btn danger" onclick="${fn}('${id}')"><i data-lucide="x"></i> Отменить и вернуть деньги</button>`;
+        }
+
         function bmBuildListingActions(l) {
             const myUuid = currentUserLinkedData?.minecraft_uuid;
             const isSeller = l.seller_uuid === myUuid;
@@ -3644,7 +3651,7 @@ async function loadSectionVisibility() {
             if (l.status === 'active' && isSeller) actions += `<button class="bm-action-btn danger" onclick="bmCancelListing('${l.id}')"><i data-lucide="x"></i> Снять</button>`;
             if (l.status === 'active' && !isSeller) actions += `<button class="bm-action-btn blue" onclick="bmBuyListing('${l.id}')"><i data-lucide="shopping-cart"></i> Купить</button>`;
             if (l.status === 'reserved' && isSeller) actions += `<button class="bm-action-btn primary" onclick="bmMarkHanded('${l.id}')"><i data-lucide="package-check"></i> Подтвердить передачу</button>`;
-            if (l.status === 'reserved' && isBuyer) actions += `<button class="bm-action-btn danger" onclick="bmCancelListing('${l.id}')"><i data-lucide="x"></i> Отменить</button>`;
+            if (l.status === 'reserved' && isBuyer) actions += bmCancelListingBtnHtml(l.id);
             if (l.status === 'handed' && isBuyer) {
                 actions += `<button class="bm-action-btn green" onclick="bmConfirmListing('${l.id}')"><i data-lucide="check"></i> Подтвердить покупку</button>`;
                 actions += `<button class="bm-action-btn danger" onclick="bmOpenDispute('${l.id}')"><i data-lucide="flag"></i> Спор</button>`;
@@ -3919,7 +3926,7 @@ async function loadSectionVisibility() {
                 const isSeller = l.seller_uuid === myUuid;
                 return {
                     contextType, contextId,
-                    itemName: l.item_name, price: l.price, status: l.status,
+                    itemName: l.item_name, price: l.price, status: l.status, reservedAt: l.reserved_at,
                     statusLabel: ({ active: 'В продаже', reserved: 'Забронировано', handed: 'Передано', disputed: 'Спор' })[l.status] || l.status,
                     otherName: isSeller ? (l.buyer_name || 'покупатель') : l.seller_name,
                     myRole: isSeller ? 'seller' : 'buyer',
@@ -4087,8 +4094,8 @@ async function loadSectionVisibility() {
                     return `<button class="bm-action-btn primary" onclick="bmChatMarkHanded('${id}')"><i data-lucide="package-check"></i> Подтвердить передачу</button>`;
                 }
                 if (meta.status === 'reserved' && meta.myRole === 'buyer') {
-                    return `<div class="bm-form-hint" style="margin:0 0 8px;"><i data-lucide="clock"></i> Дождитесь подтверждения продавца — как только он отметит товар переданным, вы сможете подтвердить покупку.</div>
-                            <button class="bm-action-btn danger" onclick="bmChatCancelListing('${id}')"><i data-lucide="x"></i> Отменить бронь</button>`;
+                    return `<div class="bm-form-hint" style="margin:0 0 8px;"><i data-lucide="clock"></i> Дождитесь подтверждения продавца — как только он отметит товар переданным, вы сможете подтвердить покупку. Передумали? Можно отменить бронь прямо сейчас.</div>
+                            ${bmCancelListingBtnHtml(id, 'bmChatCancelListing')}`;
                 }
                 if (meta.status === 'handed' && meta.myRole === 'buyer') {
                     return `<button class="bm-action-btn green" onclick="bmChatConfirmListing('${id}')"><i data-lucide="check"></i> Подтвердить покупку</button>
