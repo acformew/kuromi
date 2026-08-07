@@ -3464,15 +3464,6 @@ async function loadSectionVisibility() {
             if (!itemInput.value.trim()) { customAlert('❌ Ошибка', 'Укажите название товара.'); return; }
             if (!price || price <= 0) { customAlert('❌ Ошибка', 'Укажите корректную цену.'); return; }
 
-            // Та же проверка баланса, что и для вакансий — цена лота не может превышать
-            // текущий баланс продавца (окончательно должно проверяться и в bm_create_listing на сервере)
-            const { data: balanceRow } = await supabaseClient
-                .from('player_stats').select('currency_balance').eq('minecraft_uuid', currentUserLinkedData.minecraft_uuid).maybeSingle();
-            if (balanceRow && price > (balanceRow.currency_balance || 0)) {
-                customAlert('❌ Недостаточно средств', `На счету ${balanceRow.currency_balance} валюты — цена лота не может превышать ваш баланс.`);
-                return;
-            }
-
             const itemName = itemInput.value.trim();
             const { error } = await supabaseClient.rpc('bm_create_listing', {
                 p_item_name: itemName, p_description: descInput.value.trim() || null, p_price: price
