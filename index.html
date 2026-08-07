@@ -1406,6 +1406,10 @@
         .bm-chat-msg { max-width: 80%; padding: 8px 13px; border-radius: 14px; font-size: 0.85rem; line-height: 1.4; }
         .bm-chat-msg.me { align-self: flex-end; background: rgba(255,0,127,0.18); color: #fff; }
         .bm-chat-msg.them { align-self: flex-start; background: rgba(255,255,255,0.06); color: #eee; }
+        .bm-chat-msg.system {
+            align-self: center; max-width: 92%; background: rgba(138,43,226,0.1); border: 1px solid rgba(138,43,226,0.25);
+            color: #d7bdf7; font-size: 0.78rem; text-align: center; border-radius: 10px; padding: 7px 12px;
+        }
         #bm-chat-input-row { display: flex; gap: 8px; }
         #bm-chat-input { flex: 1; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 10px 14px; color: #fff; font-family: var(--font-sans); font-size: 0.85rem; outline: none; }
         #bm-chat-input:focus { border-color: var(--accent-pink); }
@@ -4092,7 +4096,8 @@ async function loadSectionVisibility() {
                     return `<button class="bm-action-btn primary" onclick="bmChatMarkHanded('${id}')"><i data-lucide="package-check"></i> Подтвердить передачу</button>`;
                 }
                 if (meta.status === 'reserved' && meta.myRole === 'buyer') {
-                    return `<button class="bm-action-btn danger" onclick="bmChatCancelListing('${id}')"><i data-lucide="x"></i> Отменить бронь</button>`;
+                    return `<div class="bm-form-hint" style="margin:0 0 8px;"><i data-lucide="clock"></i> Дождитесь подтверждения продавца — как только он отметит товар переданным, вы сможете подтвердить покупку.</div>
+                            <button class="bm-action-btn danger" onclick="bmChatCancelListing('${id}')"><i data-lucide="x"></i> Отменить бронь</button>`;
                 }
                 if (meta.status === 'handed' && meta.myRole === 'buyer') {
                     return `<button class="bm-action-btn green" onclick="bmChatConfirmListing('${id}')"><i data-lucide="check"></i> Подтвердить покупку</button>
@@ -4185,7 +4190,12 @@ async function loadSectionVisibility() {
                     .from('bm_chat_messages').select('*').eq('chat_id', bmActiveChatId).order('sent_at', { ascending: true });
                 if (error) throw error;
                 const myUuid = currentUserLinkedData?.minecraft_uuid;
-                box.innerHTML = (data || []).map(m => `<div class="bm-chat-msg ${m.sender_uuid === myUuid ? 'me' : 'them'}">${escapeHtml(m.message)}</div>`).join('') || `<div class="bm-empty">Сообщений пока нет. Напишите первым.</div>`;
+                box.innerHTML = (data || []).map(m => {
+                    if (m.sender_uuid === 'system') {
+                        return `<div class="bm-chat-msg system">${escapeHtml(m.message)}</div>`;
+                    }
+                    return `<div class="bm-chat-msg ${m.sender_uuid === myUuid ? 'me' : 'them'}">${escapeHtml(m.message)}</div>`;
+                }).join('') || `<div class="bm-empty">Сообщений пока нет. Напишите первым.</div>`;
                 box.scrollTop = box.scrollHeight;
             } catch (e) {
                 console.error('Не удалось загрузить сообщения чата:', e);
@@ -4305,6 +4315,7 @@ async function loadSectionVisibility() {
         ========================================================================= */
         let bmNotifPollTimer = null;
         let bmNotifCache = [];
+        let bmNotifPollCount = 0;
 
         let bmLastNotifCheckAt = null;
 
@@ -4314,8 +4325,19 @@ async function loadSectionVisibility() {
             btn.style.display = 'flex';
             bmLastNotifCheckAt = new Date().toISOString(); // не показываем тостами всё, что накопилось до открытия сайта
             bmRefreshNotifBadge();
+            bmSweepReadNotifications(); // подчистить старые прочитанные уведомления сразу при заходе на сайт
             if (bmNotifPollTimer) clearInterval(bmNotifPollTimer);
             bmNotifPollTimer = setInterval(bmRefreshNotifBadge, 25000);
+        }
+
+        // Прочитанные уведомления сами удаляются спустя некоторое время, чтобы не копиться в истории вечно.
+        // Дергаем не на каждый опрос (раз в 25с), а примерно раз в ~4 минуты — этого достаточно.
+        async function bmSweepReadNotifications() {
+            try {
+                await supabaseClient.rpc('bm_sweep_read_notifications');
+            } catch (e) {
+                console.error('Не удалось очистить старые уведомления:', e);
+            }
         }
 
         async function bmRefreshNotifBadge() {
@@ -4351,6 +4373,9 @@ async function loadSectionVisibility() {
                     (freshRows || []).forEach(bmShowToast);
                 }
                 bmLastNotifCheckAt = new Date().toISOString();
+
+                bmNotifPollCount++;
+                if (bmNotifPollCount % 10 === 0) bmSweepReadNotifications(); // ~раз в 4 минуты
             } catch (e) {
                 console.error('Не удалось обновить счётчик уведомлений:', e);
             }
@@ -4460,6 +4485,7 @@ async function loadSectionVisibility() {
                     .eq('recipient_uuid', currentUserLinkedData.minecraft_uuid).eq('is_read', false);
                 await bmLoadNotifications();
                 bmRefreshNotifBadge();
+                bmSweepReadNotifications();
             } catch (e) { console.error(e); }
         }
 
